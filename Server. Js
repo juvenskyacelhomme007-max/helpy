@@ -1,0 +1,331 @@
+const express = require("express");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const Database = require("better-sqlite3");
+const multer = require("multer");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
+const fs = require("fs");
+const { v4: uuid } = require("uuid");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const ROOT = path.join(__dirname, "..");
+const DATA = path.join(ROOT, "data");
+const UPLOADS = path.join(ROOT, "uploads");
+fs.mkdirSync(DATA, {recursive:true}); fs.mkdirSync(UPLOADS, {recursive:true});
+
+const SECRET = process.env.HELPY_SECRET || "CHANGE_THIS_SECRET_IN_PRODUCTION";
+const db = new Database(path.join(DATA, "helpy.sqlite"));
+db.pragma("journal_mode = WAL");
+
+app.use(cors());
+app.use(express.json({limit:"2mb"}));
+app.use(express.urlencoded({extended:true}));
+app.use(rateLimit({windowMs: 15*60*1000, max: 500}));
+app.use("/uploads", express.static(UPLOADS));
+app.use(express.static(path.join(ROOT, "frontend")));
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+ id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL,
+ password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'client',
+ country TEXT DEFAULT 'Haiti', currency TEXT DEFAULT 'HTG',
+ phone TEXT DEFAULT '', avatar TEXT DEFAULT '', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS businesses (
+ id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, name TEXT NOT NULL,
+ description TEXT DEFAULT '', category TEXT DEFAULT '', location TEXT DEFAULT '',
+ phone TEXT DEFAULT '', hours TEXT DEFAULT '', image TEXT DEFAULT '', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS listings (
+ id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, business_id TEXT,
+ type TEXT NOT NULL CHECK(type IN ('product','service')),
+ title TEXT NOT NULL, description TEXT DEFAULT '', category TEXT DEFAULT '',
+ price REAL DEFAULT 0, currency TEXT DEFAULT 'HTG', quantity INTEGER DEFAULT 1,
+ location TEXT DEFAULT '', availability TEXT DEFAULT '', image TEXT DEFAULT '',
+ status TEXT DEFAULT 'active', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS carts (
+ id TEXT PRIMARY KEY, user_id TEXT NOT NULL, created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS cart_items (
+ id TEXT PRIMARY KEY, cart_id TEXT NOT NULL, listing_id TEXT NOT NULL,
+ quantity INTEGER NOT NULL DEFAULT 1, UNIQUE(cart_id, listing_id)
+);
+CREATE TABLE IF NOT EXISTS orders (
+ id TEXT PRIMARY KEY, buyer_id TEXT NOT NULL, seller_id TEXT NOT NULL,
+ total REAL NOT NULL, currency TEXT DEFAULT 'HTG', status TEXT DEFAULT 'pending',
+ delivery_method TEXT DEFAULT 'pickup', delivery_address TEXT DEFAULT '',
+ created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS order_items (
+ id TEXT PRIMARY KEY, order_id TEXT NOT NULL, listing_id TEXT NOT NULL,
+ title TEXT NOT NULL, quantity INTEGER NOT NULL, unit_price REAL NOT NULL
+);
+CREATE TABLE IF NOT EXISTS conversations (
+ id TEXT PRIMARY KEY, buyer_id TEXT NOT NULL, seller_id TEXT NOT NULL, listing_id TEXT,
+ created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS messages (
+ id TEXT PRIMARY KEY, conversation_id TEXT NOT NULL, sender_id TEXT NOT NULL,
+ body TEXT NOT NULL, image TEXT DEFAULT '', created_at TEXT NOT NULL, read_at TEXT
+);
+CREATE TABLE IF NOT EXISTS reviews (
+ id TEXT PRIMARY KEY, reviewer_id TEXT NOT NULL, listing_id TEXT NOT NULL,
+ rating INTEGER NOT NULL, comment TEXT DEFAULT '', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS reports (
+ id TEXT PRIMARY KEY, reporter_id TEXT NOT NULL, listing_id TEXT,
+ user_id TEXT, reason TEXT NOT NULL, status TEXT DEFAULT 'open', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS notifications (
+ id TEXT PRIMARY KEY, user_id TEXT NOT NULL, title TEXT NOT NULL,
+ body TEXT NOT NULL, read_at TEXT, created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS settings (
+ key TEXT PRIMARY KEY, value TEXT NOT NULL
+);
+`);
+
+const now = () => new Date().toISOString();
+const id = () => uuid();
+const badWords = [
+  "cocaine","heroin","fentanyl","meth","marijuana sale","crack",
+  "gun for sale","ak47","rifle for sale","pistol for sale",
+  "fake passport","fake id","counterfeit money","stolen phone",
+  "credit card dump","scam","fraud","exploit children"
+];
+function blocked(text="") {
+  const s = text.toLowerCase();
+  return badWords.some(w => s.includes(w));
+}
+function tokenFor(user){ return jwt.sign({id:user.id,role:user.role}, SECRET, {expiresIn:"7d"}); }
+function auth(req,res,next){
+  const h=req.headers.authorization||"";
+  if(!h.startsWith("Bearer ")) return res.status(401).json({error:"Authentification requise"});
+  try { req.user=jwt.verify(h.slice(7),SECRET); next(); }
+  catch { return res.status(401).json({error:"Session invalide"}); }
+}
+function admin(req,res,next){ if(req.user.role!=="admin") return res.status(403).json({error:"Accès refusé"}); next(); }
+function notify(user_id,title,body){
+  db.prepare("INSERT INTO notifications VALUES (?,?,?,?,?)").run(id(),user_id,title,body,null,now());
+}
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_,__,cb)=>cb(null,UPLOADS),
+    filename: (_,file,cb)=>cb(null, Date.now()+"-"+Math.random().toString(36).slice(2)+path.extname(file.originalname))
+  }),
+  limits:{fileSize:5*1024*1024},
+  fileFilter: (_,file,cb)=>cb(null,/^image\/(jpeg|png|webp|gif)$/.test(file.mimetype))
+});
+
+app.get("/api/health",(req,res)=>res.json({ok:true,name:"HElPY",version:"Complete V1"}));
+
+app.post("/api/auth/register", async (req,res)=>{
+  const {name,email,password,role="client",country="Haiti",currency="HTG",phone=""}=req.body;
+  if(!name||!email||!password) return res.status(400).json({error:"Nom, email et mot de passe requis"});
+  if(password.length<6) return res.status(400).json({error:"Mot de passe: 6 caractères minimum"});
+  if(!["client","seller","professional","business"].includes(role)) return res.status(400).json({error:"Rôle invalide"});
+  try{
+    const u={id:id(),name,email:email.toLowerCase(),password_hash:await bcrypt.hash(password,10),role,country,currency,phone,created_at:now()};
+    db.prepare(`INSERT INTO users (id,name,email,password_hash,role,country,currency,phone,created_at) VALUES (?,?,?,?,?,?,?,?,?)`).run(...Object.values(u));
+    const user={id:u.id,name:u.name,email:u.email,role:u.role,country:u.country,currency:u.currency,phone:u.phone};
+    res.json({user,token:tokenFor(u)});
+  }catch(e){ res.status(400).json({error:"Email déjà utilisé"}); }
+});
+
+app.post("/api/auth/login", async (req,res)=>{
+  const {email,password}=req.body; const u=db.prepare("SELECT * FROM users WHERE email=?").get((email||"").toLowerCase());
+  if(!u || !(await bcrypt.compare(password||"",u.password_hash))) return res.status(401).json({error:"Email ou mot de passe incorrect"});
+  res.json({user:{id:u.id,name:u.name,email:u.email,role:u.role,country:u.country,currency:u.currency,phone:u.phone},token:tokenFor(u)});
+});
+
+app.get("/api/me",auth,(req,res)=>{
+  const u=db.prepare("SELECT id,name,email,role,country,currency,phone,avatar,created_at FROM users WHERE id=?").get(req.user.id);
+  res.json(u);
+});
+
+app.post("/api/uploads",auth,upload.single("image"),(req,res)=>{
+  if(!req.file) return res.status(400).json({error:"Image invalide"});
+  res.json({url:`/uploads/${req.file.filename}`});
+});
+
+app.get("/api/categories",(req,res)=>{
+  const rows=db.prepare("SELECT category, count(*) count FROM listings WHERE status='active' GROUP BY category ORDER BY count DESC").all();
+  res.json(rows);
+});
+
+app.get("/api/listings",(req,res)=>{
+  const {q="",type="",category="",country="",limit=100}=req.query;
+  let sql=`SELECT l.*,u.name owner_name,b.name business_name,
+    COALESCE((SELECT AVG(r.rating) FROM reviews r WHERE r.listing_id=l.id),0) rating
+    FROM listings l JOIN users u ON u.id=l.owner_id LEFT JOIN businesses b ON b.id=l.business_id
+    WHERE l.status='active'`;
+  const p=[];
+  if(q){sql+=" AND (l.title LIKE ? OR l.description LIKE ? OR l.category LIKE ? OR l.location LIKE ?)"; const x=`%${q}%`;p.push(x,x,x,x);}
+  if(type){sql+=" AND l.type=?";p.push(type)}
+  if(category){sql+=" AND l.category=?";p.push(category)}
+  if(country){sql+=" AND u.country=?";p.push(country)}
+  sql+=" ORDER BY l.created_at DESC LIMIT ?";p.push(Number(limit));
+  res.json(db.prepare(sql).all(...p));
+});
+
+app.post("/api/listings",auth,(req,res)=>{
+  const {type,title,description="",category="",price=0,currency="HTG",quantity=1,location="",availability="",image="",business_id=null}=req.body;
+  if(!["product","service"].includes(type)||!title) return res.status(400).json({error:"Type et titre requis"});
+  if(blocked(`${title} ${description} ${category}`)) return res.status(400).json({error:"Cette annonce est bloquée par la sécurité HELPY"});
+  const x={id:id(),owner_id:req.user.id,business_id,type,title,description,category,price:Number(price),currency,quantity:Number(quantity),location,availability,image,status:"active",created_at:now()};
+  db.prepare(`INSERT INTO listings (id,owner_id,business_id,type,title,description,category,price,currency,quantity,location,availability,image,status,created_at)
+  VALUES (@id,@owner_id,@business_id,@type,@title,@description,@category,@price,@currency,@quantity,@location,@availability,@image,@status,@created_at)`).run(x);
+  res.json(x);
+});
+
+app.get("/api/listings/:id",(req,res)=>{
+  const l=db.prepare(`SELECT l.*,u.name owner_name,u.phone owner_phone,b.name business_name
+    FROM listings l JOIN users u ON u.id=l.owner_id LEFT JOIN businesses b ON b.id=l.business_id WHERE l.id=?`).get(req.params.id);
+  if(!l) return res.status(404).json({error:"Annonce introuvable"});
+  const reviews=db.prepare(`SELECT r.*,u.name reviewer_name FROM reviews r JOIN users u ON u.id=r.reviewer_id WHERE r.listing_id=? ORDER BY r.created_at DESC`).all(l.id);
+  res.json({...l,reviews});
+});
+
+app.post("/api/businesses",auth,(req,res)=>{
+  const {name,description="",category="",location="",phone="",hours="",image=""}=req.body;
+  if(!name) return res.status(400).json({error:"Nom requis"});
+  if(blocked(`${name} ${description}`)) return res.status(400).json({error:"Contenu bloqué"});
+  const x={id:id(),owner_id:req.user.id,name,description,category,location,phone,hours,image,created_at:now()};
+  db.prepare(`INSERT INTO businesses VALUES (?,?,?,?,?,?,?,?,?,?)`).run(...Object.values(x));
+  res.json(x);
+});
+app.get("/api/businesses",(req,res)=>{
+  res.json(db.prepare(`SELECT b.*,u.name owner_name FROM businesses b JOIN users u ON u.id=b.owner_id ORDER BY b.created_at DESC`).all());
+});
+app.get("/api/businesses/:id",(req,res)=>{
+  const b=db.prepare(`SELECT b.*,u.name owner_name,u.phone owner_phone FROM businesses b JOIN users u ON u.id=b.owner_id WHERE b.id=?`).get(req.params.id);
+  if(!b)return res.status(404).json({error:"Entreprise introuvable"});
+  const listings=db.prepare("SELECT * FROM listings WHERE business_id=? AND status='active'").all(b.id);
+  res.json({...b,listings});
+});
+
+app.get("/api/cart",auth,(req,res)=>{
+  let cart=db.prepare("SELECT * FROM carts WHERE user_id=?").get(req.user.id);
+  if(!cart){cart={id:id(),user_id:req.user.id,created_at:now()};db.prepare("INSERT INTO carts VALUES (?,?,?)").run(...Object.values(cart));}
+  const items=db.prepare(`SELECT ci.*,l.title,l.price,l.currency,l.image,l.owner_id,l.type
+    FROM cart_items ci JOIN listings l ON l.id=ci.listing_id WHERE ci.cart_id=?`).all(cart.id);
+  res.json({cart,items});
+});
+app.post("/api/cart",auth,(req,res)=>{
+  const {listing_id,quantity=1}=req.body; const l=db.prepare("SELECT * FROM listings WHERE id=? AND status='active'").get(listing_id);
+  if(!l)return res.status(404).json({error:"Annonce introuvable"});
+  let c=db.prepare("SELECT * FROM carts WHERE user_id=?").get(req.user.id);
+  if(!c){c={id:id(),user_id:req.user.id,created_at:now()};db.prepare("INSERT INTO carts VALUES (?,?,?)").run(...Object.values(c));}
+  db.prepare(`INSERT INTO cart_items VALUES (?,?,?,?) ON CONFLICT(cart_id,listing_id) DO UPDATE SET quantity=quantity+excluded.quantity`).run(id(),c.id,listing_id,Number(quantity));
+  res.json({ok:true});
+});
+app.delete("/api/cart/:listing_id",auth,(req,res)=>{
+  const c=db.prepare("SELECT * FROM carts WHERE user_id=?").get(req.user.id);
+  if(c)db.prepare("DELETE FROM cart_items WHERE cart_id=? AND listing_id=?").run(c.id,req.params.listing_id);
+  res.json({ok:true});
+});
+
+app.post("/api/orders",auth,(req,res)=>{
+  const {delivery_method="pickup",delivery_address=""}=req.body;
+  const c=db.prepare("SELECT * FROM carts WHERE user_id=?").get(req.user.id);
+  if(!c)return res.status(400).json({error:"Panier vide"});
+  const items=db.prepare(`SELECT ci.*,l.* FROM cart_items ci JOIN listings l ON l.id=ci.listing_id WHERE ci.cart_id=?`).all(c.id);
+  if(!items.length)return res.status(400).json({error:"Panier vide"});
+  const sellers=[...new Set(items.map(x=>x.owner_id))];
+  if(sellers.length>1)return res.status(400).json({error:"Pour cette V1, commandez séparément par vendeur"});
+  const total=items.reduce((s,x)=>s+x.price*x.quantity,0), currency=items[0].currency;
+  const oid=id();
+  db.prepare("INSERT INTO orders VALUES (?,?,?,?,?,?,?,?)").run(oid,req.user.id,sellers[0],total,currency,"pending",delivery_method,delivery_address,now());
+  const ins=db.prepare("INSERT INTO order_items VALUES (?,?,?,?,?)");
+  for(const x of items) ins.run(id(),oid,x.id,x.title,x.quantity,x.price);
+  db.prepare("DELETE FROM cart_items WHERE cart_id=?").run(c.id);
+  notify(sellers[0],"Nouvelle commande",`Une commande ${oid.slice(0,8)} a été créée.`);
+  res.json({id:oid,total,currency,status:"pending"});
+});
+app.get("/api/orders",auth,(req,res)=>{
+  const rows=db.prepare(`SELECT o.*,u.name buyer_name FROM orders o JOIN users u ON u.id=o.buyer_id
+    WHERE o.buyer_id=? OR o.seller_id=? ORDER BY o.created_at DESC`).all(req.user.id,req.user.id);
+  res.json(rows);
+});
+
+app.post("/api/conversations",auth,(req,res)=>{
+  const {seller_id,listing_id=null}=req.body;
+  if(!seller_id)return res.status(400).json({error:"Vendeur requis"});
+  let c=db.prepare(`SELECT * FROM conversations WHERE buyer_id=? AND seller_id=? AND (listing_id=? OR (listing_id IS NULL AND ? IS NULL))`).get(req.user.id,seller_id,listing_id,listing_id);
+  if(!c){c={id:id(),buyer_id:req.user.id,seller_id,listing_id,created_at:now()};db.prepare("INSERT INTO conversations VALUES (?,?,?,?,?)").run(...Object.values(c));}
+  res.json(c);
+});
+app.get("/api/conversations",auth,(req,res)=>{
+  res.json(db.prepare(`SELECT c.*,u1.name buyer_name,u2.name seller_name,l.title listing_title
+    FROM conversations c JOIN users u1 ON u1.id=c.buyer_id JOIN users u2 ON u2.id=c.seller_id
+    LEFT JOIN listings l ON l.id=c.listing_id WHERE c.buyer_id=? OR c.seller_id=? ORDER BY c.created_at DESC`).all(req.user.id,req.user.id));
+});
+app.get("/api/conversations/:id/messages",auth,(req,res)=>{
+  const c=db.prepare("SELECT * FROM conversations WHERE id=? AND (buyer_id=? OR seller_id=?)").get(req.params.id,req.user.id,req.user.id);
+  if(!c)return res.status(403).json({error:"Accès refusé"});
+  res.json(db.prepare("SELECT m.*,u.name sender_name FROM messages m JOIN users u ON u.id=m.sender_id WHERE conversation_id=? ORDER BY created_at").all(c.id));
+});
+app.post("/api/conversations/:id/messages",auth,(req,res)=>{
+  const {body="",image=""}=req.body; const c=db.prepare("SELECT * FROM conversations WHERE id=? AND (buyer_id=? OR seller_id=?)").get(req.params.id,req.user.id,req.user.id);
+  if(!c)return res.status(403).json({error:"Accès refusé"});
+  if(!body && !image)return res.status(400).json({error:"Message vide"});
+  const m={id:id(),conversation_id:c.id,sender_id:req.user.id,body,image,created_at:now(),read_at:null};
+  db.prepare("INSERT INTO messages VALUES (?,?,?,?,?,?,?)").run(...Object.values(m));
+  notify(c.buyer_id===req.user.id?c.seller_id:c.buyer_id,"Nouveau message","Vous avez reçu un message sur HELPY.");
+  res.json(m);
+});
+
+app.post("/api/reviews",auth,(req,res)=>{
+  const {listing_id,rating,comment=""}=req.body;
+  if(Number(rating)<1||Number(rating)>5)return res.status(400).json({error:"Note de 1 à 5"});
+  if(!db.prepare("SELECT id FROM listings WHERE id=?").get(listing_id))return res.status(404).json({error:"Annonce introuvable"});
+  const r={id:id(),reviewer_id:req.user.id,listing_id,rating:Number(rating),comment,created_at:now()};
+  db.prepare("INSERT INTO reviews VALUES (?,?,?,?,?,?)").run(...Object.values(r)); res.json(r);
+});
+
+app.post("/api/reports",auth,(req,res)=>{
+  const {listing_id=null,user_id=null,reason}=req.body;
+  if(!reason)return res.status(400).json({error:"Motif requis"});
+  const r={id:id(),reporter_id:req.user.id,listing_id,user_id,reason,status:"open",created_at:now()};
+  db.prepare("INSERT INTO reports VALUES (?,?,?,?,?,?,?)").run(...Object.values(r)); res.json(r);
+});
+
+app.get("/api/notifications",auth,(req,res)=>res.json(db.prepare("SELECT * FROM notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 50").all(req.user.id)));
+app.post("/api/notifications/read",auth,(req,res)=>{db.prepare("UPDATE notifications SET read_at=? WHERE user_id=?").run(now(),req.user.id);res.json({ok:true});});
+
+app.get("/api/admin/stats",auth,admin,(req,res)=>{
+  const counts={users:db.prepare("SELECT count(*) n FROM users").get().n,
+    listings:db.prepare("SELECT count(*) n FROM listings").get().n,
+    businesses:db.prepare("SELECT count(*) n FROM businesses").get().n,
+    orders:db.prepare("SELECT count(*) n FROM orders").get().n,
+    reports:db.prepare("SELECT count(*) n FROM reports WHERE status='open'").get().n,
+    messages:db.prepare("SELECT count(*) n FROM messages").get().n};
+  res.json(counts);
+});
+app.get("/api/admin/reports",auth,admin,(req,res)=>res.json(db.prepare(`SELECT r.*,u.name reporter_name,l.title listing_title
+ FROM reports r JOIN users u ON u.id=r.reporter_id LEFT JOIN listings l ON l.id=r.listing_id ORDER BY r.created_at DESC`).all()));
+app.patch("/api/admin/reports/:id",auth,admin,(req,res)=>{
+  const {status}=req.body; if(!["open","reviewed","resolved","rejected"].includes(status))return res.status(400).json({error:"Statut invalide"});
+  db.prepare("UPDATE reports SET status=? WHERE id=?").run(status,req.params.id);res.json({ok:true});
+});
+app.get("/api/admin/settings",auth,admin,(req,res)=>res.json(db.prepare("SELECT * FROM settings").all()));
+app.post("/api/admin/settings",auth,admin,(req,res)=>{
+  const {key,value}=req.body; if(!key)return res.status(400).json({error:"Clé requise"});
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(key,String(value));
+  res.json({key,value});
+});
+
+app.post("/api/admin/create-admin",auth,admin,async(req,res)=>{
+  const {name,email,password}=req.body; if(!name||!email||!password)return res.status(400).json({error:"Champs requis"});
+  try{const u={id:id(),name,email:email.toLowerCase(),password_hash:await bcrypt.hash(password,10),role:"admin",country:"Haiti",currency:"HTG",phone:"",created_at:now()};
+    db.prepare(`INSERT INTO users (id,name,email,password_hash,role,country,currency,phone,created_at) VALUES (?,?,?,?,?,?,?,?,?)`).run(...Object.values(u));res.json({ok:true});
+  }catch(e){res.status(400).json({error:"Email déjà utilisé"});}
+});
+
+app.use((err,req,res,next)=>{console.error(err);res.status(500).json({error:"Erreur serveur"});});
+app.listen(PORT,()=>console.log(`HElPY Complete API running on http://localhost:${PORT}`));
