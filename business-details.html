@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Entreprise - HELPY</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header {
+      max-width: 850px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,.12);
+      padding: 9px 13px;
+      border-radius: 10px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .loading,
+    .error {
+      background: white;
+      padding: 40px 20px;
+      text-align: center;
+      border-radius: 18px;
+      margin-top: 20px;
+    }
+
+    .profile {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,.08);
+    }
+
+    .cover {
+      height: 250px;
+      background: #e5e7eb;
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content {
+      padding: 22px;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .name {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .verified {
+      display: inline-block;
+      background: #e8f0ff;
+      color: #2563eb;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .category {
+      color: #667085;
+      margin-top: 8px;
+    }
+
+    .description {
+      margin-top: 22px;
+      line-height: 1.7;
+      color: #475467;
+      white-space: pre-wrap;
+    }
+
+    .info {
+      margin-top: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-item {
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 12px;
+    }
+
+    .label {
+      display: block;
+      color: #667085;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .action {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: white;
+      background: #111827;
+      padding: 14px 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .action.whatsapp {
+      background: #16a34a;
+    }
+
+    .action.call {
+      background: #2563eb;
+    }
+
+    .action.website {
+      background: #7c3aed;
+    }
+
+    .owner {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+      color: #667085;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+
+      .cover {
+        height: 200px;
+      }
+
+      .name {
+        font-size: 23px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .title-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+
+    <div class="logo">
+      HELPY
+    </div>
+
+    <a href="businesses.html" class="back">
+      ← Retour
+    </a>
+
+  </div>
+</header>
+
+
+<div class="container">
+
+  <div id="loading" class="loading">
+    ⏳ Chargement de l'entreprise...
+  </div>
+
+  <div id="error" class="error" style="display:none;">
+    ❌ Impossible de charger cette entreprise.
+  </div>
+
+  <div id="business" style="display:none;"></div>
+
+</div>
+
+
+<script>
+
+const API =
+  "https://helpy-production-c2f2.up.railway.app";
+
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const businessId =
+  params.get("id");
+
+
+const loading =
+  document.getElementById("loading");
+
+const errorBox =
+  document.getElementById("error");
+
+const businessBox =
+  document.getElementById("business");
+
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+function cleanPhone(phone) {
+
+  if (!phone) return "";
+
+  return phone
+    .replace(/\s+/g, "")
+    .replace(/-/g, "")
+    .replace(/\(/g, "")
+    .replace(/\)/g, "");
+
+}
+
+
+function whatsappLink(number) {
+
+  if (!number) return "#";
+
+  let clean =
+    cleanPhone(number);
+
+  if (clean.startsWith("0")) {
+    clean =
+      "509" + clean.substring(1);
+  }
+
+  if (!clean.startsWith("+")) {
+    if (!clean.startsWith("509")) {
+      clean = "509" + clean;
+    }
+  }
+
+  clean =
+    clean.replace("+", "");
+
+  return `https://wa.me/${clean}`;
+
+}
+
+
+async function loadBusiness() {
+
+  if (!businessId) {
+
+    loading.style.display = "none";
+
+    errorBox.style.display = "block";
+
+    errorBox.innerHTML =
+      "❌ Aucun identifiant d'entreprise.";
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${API}/api/businesses/${encodeURIComponent(businessId)}`
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok || !data.business) {
+
+      throw new Error(
+        data.message ||
+        "Entreprise introuvable"
+      );
+
+    }
+
+
+    const b =
+      data.business;
+
+
+    loading.style.display = "none";
+
+    businessBox.style.display = "block";
+
+
+    const image =
+      b.image_url ||
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80";
+
+
+    const whatsapp =
+      whatsappLink(b.whatsapp);
+
+
+    const phone =
+      cleanPhone(b.phone);
+
+
+    let actions = "";
+
+
+    if (b.whatsapp) {
+
+      actions += `
+        <a
+          class="action whatsapp"
+          href="${whatsapp}"
+          target="_blank"
+          rel="noopener"
+        >
+          💬 WhatsApp
+        </a>
+      `;
+
+    }
+
+
+    if (b.phone) {
+
+      actions += `
+        <a
+          class="action call"
+          href="tel:${phone}"
+        >
+          📞 Appeler
+        </a>
+      `;
+
+    }
+
+
+    if (b.website) {
+
+      let website =
+        b.website.trim();
+
+      if (
+        !website.startsWith("http://") &&
+        !website.startsWith("https://")
+      ) {
+
+        website =
+          "https://" + website;
+
+      }
+
+
+      actions += `
+        <a
+          class="action website"
+          href="${escapeHtml(website)}"
+          target="_blank"
+          rel="noopener"
+        >
+          🌐 Site web
+        </a>
+      `;
+
+    }
+
+
+    businessBox.innerHTML = `
+
+      <div class="profile">
+
+        <div class="cover">
+
+          <img
+            src="${escapeHtml(image)}"
+            alt="${escapeHtml(b.name)}"
+            onerror="this.src='https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80'"
+          >
+
+        </div>
+
+
+        <div class="content">
+
+          <div class="title-row">
+
+            <div>
+
+              <div class="name">
+                ${escapeHtml(b.name)}
+              </div>
+
+              <div class="category">
+                ${escapeHtml(
+                  b.category ||
+                  "Entreprise"
+                )}
+              </div>
+
+            </div>
+
+
+            ${
+              b.verified
+              ? `
+                <div class="verified">
+                  ✓ Entreprise vérifiée
+                </div>
+              `
+              : ""
+            }
+
+          </div>
+
+
+          ${
+            b.description
+            ? `
+              <div class="description">
+                ${escapeHtml(b.description)}
+              </div>
+            `
+            : ""
+          }
+
+
+          <div class="info">
+
+            ${
+              b.location
+              ? `
+                <div class="info-item">
+
+                  <span class="label">
+                    📍 Localisation
+                  </span>
+
+                  <div class="value">
+                    ${escapeHtml(b.location)}
+                  </div>
+
+                </div>
+              `
+              : ""
+            }
+
+
+            ${
+              b.phone
+              ? `
+                <div class="info-item">
+
+                  <span class="label">
+                    📞 Téléphone
+                  </span>
+
+                  <div class="value">
+                    ${escapeHtml(b.phone)}
+                  </div>
+
+                </div>
+              `
+              : ""
+            }
+
+
+            ${
+              b.whatsapp
+              ? `
+                <div class="info-item">
+
+                  <span class="label">
+                    💬 WhatsApp
+                  </span>
+
+                  <div class="value">
+                    ${escapeHtml(b.whatsapp)}
+                  </div>
+
+                </div>
+              `
+              : ""
+            }
+
+
+            ${
+              b.email
+              ? `
+                <div class="info-item">
+
+                  <span class="label">
+                    ✉️ Email
+                  </span>
+
+                  <div class="value">
+                    ${escapeHtml(b.email)}
+                  </div>
+
+                </div>
+              `
+              : ""
+            }
+
+          </div>
+
+
+          ${
+            actions
+            ? `
+              <div class="actions">
+                ${actions}
+              </div>
+            `
+            : ""
+          }
+
+
+          ${
+            b.owner_name
+            ? `
+              <div class="owner">
+                Publié par :
+                <strong>
+                  ${escapeHtml(b.owner_name)}
+                </strong>
+              </div>
+            `
+            : ""
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    document.title =
+      `${b.name} - HELPY`;
+
+
+  } catch (err) {
+
+    console.error(err);
+
+    loading.style.display = "none";
+
+    errorBox.style.display = "block";
+
+    errorBox.innerHTML =
+      "❌ " +
+      escapeHtml(
+        err.message ||
+        "Impossible de charger l'entreprise."
+      );
+
+  }
+
+}
+
+
+loadBusiness();
+
+</script>
+
+</body>
+</html>
+
+✅ Kijan pou teste l
+
+Apre ou fin kreye fichye a, mete l nan menm dosye ak "businesses.html".
+
+Lè yon entreprise gen "id = 1", URL la ap sanble konsa:
+
+business-details.html?id=1
+
+Epi sou "businesses.html", bouton « Voir l'entreprise » mwen te ba w la ap voye moun otomatikman sou paj sa a.
+
+Pwochen etap la se "edit-business.html" + "admin-businesses.html", pou ou ka jere antrepriz yo depi HELPY.
