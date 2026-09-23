@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HELPY - Entreprises</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f5f7fb;
+  color:#172033;
+}
+
+header{
+  background:#111827;
+  color:white;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.header{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:25px;
+  font-weight:bold;
+}
+
+.add{
+  background:#2563eb;
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+h1{
+  margin-bottom:8px;
+}
+
+.subtitle{
+  color:#667085;
+  margin-bottom:20px;
+}
+
+.search{
+  width:100%;
+  padding:15px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-size:16px;
+  margin-bottom:12px;
+}
+
+.filters{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+select{
+  flex:1;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  background:white;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:15px;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 15px rgba(0,0,0,.07);
+}
+
+.card img{
+  width:100%;
+  height:170px;
+  object-fit:cover;
+  background:#e5e7eb;
+}
+
+.content{
+  padding:16px;
+}
+
+.name{
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.category{
+  display:inline-block;
+  background:#e8f0ff;
+  color:#2563eb;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.location{
+  color:#667085;
+  margin-bottom:12px;
+}
+
+.button{
+  display:block;
+  text-align:center;
+  background:#111827;
+  color:white;
+  text-decoration:none;
+  padding:11px;
+  border-radius:10px;
+}
+
+.empty{
+  text-align:center;
+  padding:50px 20px;
+  color:#667085;
+}
+
+@media(max-width:600px){
+  .filters{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+    <div class="logo">HELPY</div>
+
+    <a class="add" href="add-business.html">
+      + Entreprise
+    </a>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>Entreprises</h1>
+
+  <p class="subtitle">
+    Découvrez les entreprises et commerces disponibles sur HELPY.
+  </p>
+
+  <input
+    id="search"
+    class="search"
+    type="text"
+    placeholder="🔎 Rechercher une entreprise..."
+  >
+
+  <div class="filters">
+
+    <select id="category">
+      <option value="">Toutes les catégories</option>
+      <option value="Restaurant">Restaurant</option>
+      <option value="Boutique">Boutique</option>
+      <option value="Technologie">Technologie</option>
+      <option value="Beauté">Beauté</option>
+      <option value="Construction">Construction</option>
+      <option value="Transport">Transport</option>
+      <option value="Éducation">Éducation</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <select id="location">
+      <option value="">Toutes les zones</option>
+      <option value="Port-au-Prince">Port-au-Prince</option>
+      <option value="Delmas">Delmas</option>
+      <option value="Pétion-Ville">Pétion-Ville</option>
+      <option value="Carrefour">Carrefour</option>
+      <option value="Tabarre">Tabarre</option>
+      <option value="Croix-des-Bouquets">Croix-des-Bouquets</option>
+    </select>
+
+  </div>
+
+  <div id="businesses" class="grid"></div>
+
+</div>
+
+<script>
+
+const API =
+"https://helpy-production-c2f2.up.railway.app";
+
+const searchInput =
+document.getElementById("search");
+
+const categoryInput =
+document.getElementById("category");
+
+const locationInput =
+document.getElementById("location");
+
+const container =
+document.getElementById("businesses");
+
+
+async function loadBusinesses(){
+
+  container.innerHTML =
+    `<div class="empty">Chargement...</div>`;
+
+  try{
+
+    const params = new URLSearchParams();
+
+    if(searchInput.value)
+      params.append("search", searchInput.value);
+
+    if(categoryInput.value)
+      params.append("category", categoryInput.value);
+
+    if(locationInput.value)
+      params.append("location", locationInput.value);
+
+    const response =
+      await fetch(
+        `${API}/api/businesses?${params.toString()}`
+      );
+
+    const data =
+      await response.json();
+
+    if(!data.businesses ||
+       data.businesses.length === 0){
+
+      container.innerHTML =
+        `<div class="empty">
+          🏢<br><br>
+          Aucune entreprise trouvée.
+        </div>`;
+
+      return;
+    }
+
+    container.innerHTML =
+      data.businesses.map(b => {
+
+        const image =
+          b.image_url ||
+          "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80";
+
+        return `
+          <div class="card">
+
+            <img
+              src="${image}"
+              alt="${b.name}"
+            >
+
+            <div class="content">
+
+              <div class="name">
+                ${escapeHtml(b.name)}
+              </div>
+
+              <span class="category">
+                ${escapeHtml(b.category || "Entreprise")}
+              </span>
+
+              <div class="location">
+                📍 ${escapeHtml(b.location || "Haïti")}
+              </div>
+
+              <a
+                class="button"
+                href="business-details.html?id=${b.id}"
+              >
+                Voir l'entreprise
+              </a>
+
+            </div>
+
+          </div>
+        `;
+
+      }).join("");
+
+  }catch(error){
+
+    console.error(error);
+
+    container.innerHTML =
+      `<div class="empty">
+        ❌ Impossible de charger les entreprises.
+      </div>`;
+
+  }
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+searchInput.addEventListener(
+  "input",
+  loadBusinesses
+);
+
+categoryInput.addEventListener(
+  "change",
+  loadBusinesses
+);
+
+locationInput.addEventListener(
+  "change",
+  loadBusinesses
+);
+
+loadBusinesses();
+
+</script>
+
+</body>
+</html>
