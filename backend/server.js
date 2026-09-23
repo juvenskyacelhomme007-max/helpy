@@ -3,1208 +3,498 @@ const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 
-const {
-  pool,
-  initializeDatabase
-} = require("./database");
+const { pool, initializeDatabase } = require("./database");
 
 const app = express();
-
-const PORT =
-  process.env.PORT || 3000;
-
+const PORT = process.env.PORT || 3000;
 
 // =====================================================
 // MIDDLEWARE
 // =====================================================
 
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  express.json({
-    limit: "10mb"
-  })
-);
-
-app.use(
-  express.urlencoded({
-    extended: true
-  })
-);
-
+// Fichye frontend yo
+app.use(express.static(path.join(__dirname, "public")));
 
 // =====================================================
-// HEALTH
+// HOME
 // =====================================================
 
-app.get("/api/health", (req, res) => {
-
-  res.json({
-    status: "ok",
-    service: "HELPY"
-  });
-
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-
 // =====================================================
-// DATABASE TEST
+// HEALTH CHECK
 // =====================================================
 
-app.get("/api/db-test", async (req, res) => {
-
+app.get("/api/health", async (req, res) => {
   try {
-
-    const result =
-      await pool.query("SELECT NOW()");
+    await pool.query("SELECT NOW()");
 
     res.json({
       status: "ok",
-      database: "connected",
-      time: result.rows[0].now
+      message: "HELPY backend is online",
+      database: "connected"
     });
-
   } catch (error) {
-
-    console.error(
-      "DB TEST ERROR:",
-      error
-    );
+    console.error("Health error:", error);
 
     res.status(500).json({
       status: "error",
-      database: "not connected",
-      message: error.message
+      message: "Database connection failed"
     });
-
   }
-
 });
 
-
 // =====================================================
-// USERS
+// USERS - REGISTER
 // =====================================================
 
-app.get("/api/users", async (req, res) => {
-
+app.post("/api/register", async (req, res) => {
   try {
+    const { name, email, phone, password } = req.body;
 
-    const result =
-      await pool.query(`
-        SELECT
-          id,
-          name,
-          email,
-          phone,
-          role,
-          status,
-          verified,
-          created_at
-        FROM users
-        ORDER BY id DESC
-      `);
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Non, email ak modpas obligatwa."
+      });
+    }
+
+    const existingUser = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({
+        status: "error",
+        message: "Email sa deja itilize."
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `
+      INSERT INTO users
+      (name, email, phone, password)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, name, email, phone, created_at
+      `,
+      [name, email, phone || null, hashedPassword]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      message: "Kont kreye avèk siksè.",
+      user: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("Register error:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erè pandan kreyasyon kont lan."
+    });
+  }
+});
+
+// =====================================================
+// USERS - LOGIN
+// =====================================================
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email ak modpas obligatwa."
+      });
+    }
+
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        status: "error",
+        message: "Email oswa modpas pa kòrèk."
+      });
+    }
+
+    const user = result.rows[0];
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        status: "error",
+        message: "Email oswa modpas pa kòrèk."
+      });
+    }
+
+    delete user.password;
 
     res.json({
       status: "ok",
-      users: result.rows
+      message: "Koneksyon reyisi.",
+      user
     });
 
   } catch (error) {
-
-    console.error(
-      "USERS ERROR:",
-      error
-    );
+    console.error("Login error:", error);
 
     res.status(500).json({
       status: "error",
-      message: "Unable to load users"
+      message: "Erè pandan koneksyon."
     });
-
   }
-
 });
 
-
 // =====================================================
-// REGISTER
+// BUSINESSES - CREATE
 // =====================================================
 
-app.post(
-  "/api/auth/register",
-  async (req, res) => {
+app.post("/api/businesses", async (req, res) => {
+  try {
+    const {
+      user_id,
+      name,
+      description,
+      category,
+      phone,
+      whatsapp,
+      email,
+      address,
+      city,
+      image_url
+    } = req.body;
 
-    try {
+    if (!name || !category) {
+      return res.status(400).json({
+        status: "error",
+        message: "Non antrepriz la ak kategori a obligatwa."
+      });
+    }
 
-      const {
+    const result = await pool.query(
+      `
+      INSERT INTO businesses
+      (
+        user_id,
         name,
-        email,
+        description,
+        category,
         phone,
-        password
-      } = req.body;
-
-      if (
-        !name ||
-        !password ||
-        (!email && !phone)
-      ) {
-
-        return res.status(400).json({
-          status: "error",
-          message:
-            "Name, password and email or phone are required"
-        });
-
-      }
-
-      if (password.length < 6) {
-
-        return res.status(400).json({
-          status: "error",
-          message:
-            "Password must contain at least 6 characters"
-        });
-
-      }
-
-      const existingUser =
-        await pool.query(
-          `
-          SELECT id
-          FROM users
-          WHERE
-            ($1 IS NOT NULL AND email = $1)
-            OR
-            ($2 IS NOT NULL AND phone = $2)
-          `,
-          [
-            email || null,
-            phone || null
-          ]
-        );
-
-      if (
-        existingUser.rows.length > 0
-      ) {
-
-        return res.status(409).json({
-          status: "error",
-          message:
-            "User already exists"
-        });
-
-      }
-
-      const passwordHash =
-        await bcrypt.hash(
-          password,
-          12
-        );
-
-      const result =
-        await pool.query(
-          `
-          INSERT INTO users
-          (
-            name,
-            email,
-            phone,
-            password_hash
-          )
-          VALUES
-          ($1,$2,$3,$4)
-          RETURNING
-            id,
-            name,
-            email,
-            phone,
-            role,
-            status,
-            verified,
-            created_at
-          `,
-          [
-            name.trim(),
-            email || null,
-            phone || null,
-            passwordHash
-          ]
-        );
-
-      res.status(201).json({
-        status: "ok",
-        message:
-          "Account created successfully",
-        user:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "REGISTER ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to create account"
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// LOGIN
-// =====================================================
-
-app.post(
-  "/api/auth/login",
-  async (req, res) => {
-
-    try {
-
-      const {
-        identifier,
-        password
-      } = req.body;
-
-      if (
-        !identifier ||
-        !password
-      ) {
-
-        return res.status(400).json({
-          status: "error",
-          message:
-            "Email/téléphone et mot de passe sont requis"
-        });
-
-      }
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            id,
-            name,
-            email,
-            phone,
-            password_hash,
-            role,
-            status,
-            verified
-          FROM users
-          WHERE
-            email = $1
-            OR phone = $1
-          LIMIT 1
-          `,
-          [
-            identifier.trim()
-          ]
-        );
-
-      if (
-        result.rows.length === 0
-      ) {
-
-        return res.status(401).json({
-          status: "error",
-          message:
-            "Compte introuvable"
-        });
-
-      }
-
-      const user =
-        result.rows[0];
-
-      const passwordMatch =
-        await bcrypt.compare(
-          password,
-          user.password_hash
-        );
-
-      if (!passwordMatch) {
-
-        return res.status(401).json({
-          status: "error",
-          message:
-            "Mot de passe incorrect"
-        });
-
-      }
-
-      if (
-        user.status !== "active"
-      ) {
-
-        return res.status(403).json({
-          status: "error",
-          message:
-            "Ce compte est désactivé"
-        });
-
-      }
-
-      delete user.password_hash;
-
-      res.json({
-        status: "ok",
-        message:
-          "Connexion réussie",
-        user
-      });
-
-    } catch (error) {
-
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Erreur serveur"
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// PRODUCTS
-// =====================================================
-
-app.get(
-  "/api/products",
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(`
-          SELECT
-            p.*,
-            u.name AS seller_name
-          FROM products p
-          LEFT JOIN users u
-            ON u.id = p.user_id
-          WHERE p.status = 'active'
-          ORDER BY p.id DESC
-        `);
-
-      res.json({
-        status: "ok",
-        products:
-          result.rows
-      });
-
-    } catch (error) {
-
-      console.error(
-        "PRODUCTS ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load products"
-      });
-
-    }
-
-  }
-);
-
-
-app.post(
-  "/api/products",
-  async (req, res) => {
-
-    try {
-
-      const {
-        user_id,
-        title,
-        description,
-        price,
-        currency,
-        category,
-        location,
         whatsapp,
-        image_url,
-        quantity
-      } = req.body;
-
-      if (
-        !user_id ||
-        !title ||
-        price === undefined ||
-        !whatsapp
-      ) {
-
-        return res.status(400).json({
-          status: "error",
-          message:
-            "user_id, title, price and WhatsApp are required"
-        });
-
-      }
-
-      const user =
-        await pool.query(
-          `
-          SELECT id
-          FROM users
-          WHERE id = $1
-          `,
-          [user_id]
-        );
-
-      if (
-        user.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-          status: "error",
-          message:
-            "User not found"
-        });
-
-      }
-
-      const result =
-        await pool.query(
-          `
-          INSERT INTO products
-          (
-            user_id,
-            title,
-            description,
-            price,
-            currency,
-            category,
-            location,
-            whatsapp,
-            image_url,
-            quantity
-          )
-          VALUES
-          ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-          RETURNING *
-          `,
-          [
-            user_id,
-            title.trim(),
-            description || null,
-            price,
-            currency || "HTG",
-            category || null,
-            location || null,
-            whatsapp.trim(),
-            image_url || null,
-            quantity || 1
-          ]
-        );
-
-      res.status(201).json({
-        status: "ok",
-        message:
-          "Product created successfully",
-        product:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "CREATE PRODUCT ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to create product",
-        details:
-          error.message
-      });
-
-    }
-
-  }
-);
-
-
-app.get(
-  "/api/products/:id",
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            p.*,
-            u.name AS seller_name
-          FROM products p
-          LEFT JOIN users u
-            ON u.id = p.user_id
-          WHERE p.id = $1
-          `,
-          [req.params.id]
-        );
-
-      if (
-        result.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-          status: "error",
-          message:
-            "Product not found"
-        });
-
-      }
-
-      res.json({
-        status: "ok",
-        product:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "GET PRODUCT ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load product"
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// SERVICES
-// =====================================================
-
-app.get(
-  "/api/services",
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(`
-          SELECT
-            s.*,
-            u.name AS provider_name
-          FROM services s
-          LEFT JOIN users u
-            ON u.id = s.user_id
-          WHERE s.status = 'active'
-          ORDER BY s.id DESC
-        `);
-
-      res.json({
-        status: "ok",
-        services:
-          result.rows
-      });
-
-    } catch (error) {
-
-      console.error(
-        "SERVICES ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load services"
-      });
-
-    }
-
-  }
-);
-
-
-app.post(
-  "/api/services",
-  async (req, res) => {
-
-    try {
-
-      const {
-        user_id,
-        title,
-        description,
-        price,
-        currency,
-        category,
-        location,
-        whatsapp,
+        email,
+        address,
+        city,
         image_url
-      } = req.body;
-
-      if (
-        !user_id ||
-        !title ||
-        price === undefined ||
-        !whatsapp
-      ) {
-
-        return res.status(400).json({
-          status: "error",
-          message:
-            "user_id, title, price and WhatsApp are required"
-        });
-
-      }
-
-      const user =
-        await pool.query(
-          `
-          SELECT id
-          FROM users
-          WHERE id = $1
-          `,
-          [user_id]
-        );
-
-      if (
-        user.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-          status: "error",
-          message:
-            "User not found"
-        });
-
-      }
-
-      const result =
-        await pool.query(
-          `
-          INSERT INTO services
-          (
-            user_id,
-            title,
-            description,
-            price,
-            currency,
-            category,
-            location,
-            whatsapp,
-            image_url
-          )
-          VALUES
-          ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-          RETURNING *
-          `,
-          [
-            user_id,
-            title.trim(),
-            description || null,
-            price,
-            currency || "HTG",
-            category || null,
-            location || null,
-            whatsapp.trim(),
-            image_url || null
-          ]
-        );
-
-      res.status(201).json({
-        status: "ok",
-        message:
-          "Service created successfully",
-        service:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "CREATE SERVICE ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to create service",
-        details:
-          error.message
-      });
-
-    }
-
-  }
-);
-
-
-app.get(
-  "/api/services/:id",
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            s.*,
-            u.name AS provider_name
-          FROM services s
-          LEFT JOIN users u
-            ON u.id = s.user_id
-          WHERE s.id = $1
-          `,
-          [req.params.id]
-        );
-
-      if (
-        result.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-          status: "error",
-          message:
-            "Service not found"
-        });
-
-      }
-
-      res.json({
-        status: "ok",
-        service:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "GET SERVICE ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load service"
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// BUSINESSES / ENTREPRISES
-// =====================================================
-
-
-// GET ALL BUSINESSES
-
-app.get(
-  "/api/businesses",
-  async (req, res) => {
-
-    try {
-
-      const {
-        search,
-        category,
-        location
-      } = req.query;
-
-      let query = `
-        SELECT
-          b.*,
-          u.name AS owner_name
-        FROM businesses b
-        LEFT JOIN users u
-          ON u.id = b.user_id
-        WHERE
-          COALESCE(b.status, 'active') = 'active'
-      `;
-
-      const values = [];
-
-
-      // SEARCH
-
-      if (search) {
-
-        values.push(
-          `%${search.trim()}%`
-        );
-
-        query += `
-          AND (
-            b.name ILIKE $${values.length}
-            OR b.description ILIKE $${values.length}
-            OR b.category ILIKE $${values.length}
-            OR b.location ILIKE $${values.length}
-          )
-        `;
-
-      }
-
-
-      // CATEGORY
-
-      if (category) {
-
-        values.push(
-          category.trim()
-        );
-
-        query += `
-          AND b.category = $${values.length}
-        `;
-
-      }
-
-
-      // LOCATION
-
-      if (location) {
-
-        values.push(
-          `%${location.trim()}%`
-        );
-
-        query += `
-          AND b.location ILIKE $${values.length}
-        `;
-
-      }
-
-
-      query += `
-        ORDER BY b.id DESC
-      `;
-
-
-      const result =
-        await pool.query(
-          query,
-          values
-        );
-
-
-      // Retounen "businesses"
-      // + "entreprises" pou compatibilité
-
-      res.json({
-        status: "ok",
-        statut: "ok",
-
-        businesses:
-          result.rows,
-
-        entreprises:
-          result.rows
-      });
-
-    } catch (error) {
-
-      console.error(
-        "BUSINESSES ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load businesses",
-
-        details:
-          error.message
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// GET ONE BUSINESS
-// =====================================================
-
-app.get(
-  "/api/businesses/:id",
-  async (req, res) => {
-
-    try {
-
-      const result =
-        await pool.query(
-          `
-          SELECT
-            b.*,
-            u.name AS owner_name
-          FROM businesses b
-          LEFT JOIN users u
-            ON u.id = b.user_id
-          WHERE b.id = $1
-          `,
-          [req.params.id]
-        );
-
-
-      if (
-        result.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-          status: "error",
-          message:
-            "Entreprise introuvable"
-        });
-
-      }
-
-
-      res.json({
-        status: "ok",
-
-        business:
-          result.rows[0],
-
-        entreprise:
-          result.rows[0]
-      });
-
-    } catch (error) {
-
-      console.error(
-        "GET BUSINESS ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        status: "error",
-        message:
-          "Unable to load business",
-
-        details:
-          error.message
-      });
-
-    }
-
-  }
-);
-
-
-// =====================================================
-// CREATE BUSINESS
-// =====================================================
-
-app.post(
-  "/api/businesses",
-  async (req, res) => {
-
-    console.log(
-      "================================="
-    );
-
-    console.log(
-      "CREATE BUSINESS REQUEST"
-    );
-
-    console.log(
-      req.body
-    );
-
-    console.log(
-      "================================="
-    );
-
-
-    try {
-
-      const {
-        user_id,
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      RETURNING *
+      `,
+      [
+        user_id || null,
         name,
-        description,
+        description || null,
         category,
-        location,
-        phone,
-        whatsapp,
-        email,
-        image_url,
-        website
-      } = req.body;
+        phone || null,
+        whatsapp || null,
+        email || null,
+        address || null,
+        city || null,
+        image_url || null
+      ]
+    );
 
+    res.status(201).json({
+      status: "ok",
+      message: "Antrepriz la ajoute avèk siksè.",
+      business: result.rows[0]
+    });
 
-      // -------------------------
-      // VALIDATION
-      // -------------------------
+  } catch (error) {
+    console.error("Create business error:", error);
 
-      if (
-        !name ||
-        !name.trim()
-      ) {
+    res.status(500).json({
+      status: "error",
+      message: "Pa kapab ajoute antrepriz la.",
+      error: error.message
+    });
+  }
+});
 
-        return res.status(400).json({
-          status: "error",
-          message:
-            "Le nom de l'entreprise est obligatoire"
-        });
+// =====================================================
+// BUSINESSES - GET ALL
+// =====================================================
 
-      }
+app.get("/api/businesses", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM businesses
+      ORDER BY created_at DESC
+      `
+    );
 
+    res.json({
+      status: "ok",
+      businesses: result.rows
+    });
 
-      // -------------------------
-      // USER OPTIONNEL
-      // -------------------------
+  } catch (error) {
+    console.error("Get businesses error:", error);
 
-      let finalUserId = null;
+    res.status(500).json({
+      status: "error",
+      message: "Pa kapab jwenn antrepriz yo."
+    });
+  }
+});
 
+// =====================================================
+// BUSINESS - GET ONE
+// =====================================================
 
-      if (
-        user_id !== undefined &&
-        user_id !== null &&
-        user_id !== ""
-      ) {
+app.get("/api/businesses/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        const numericUserId =
-          Number(user_id);
+    const result = await pool.query(
+      "SELECT * FROM businesses WHERE id = $1",
+      [id]
+    );
 
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Antrepriz la pa jwenn."
+      });
+    }
 
-        if (
-          !Number.isInteger(
-            numericUserId
-          )
-        ) {
+    res.json({
+      status: "ok",
+      business: result.rows[0]
+    });
 
-          return res.status(400).json({
-            status: "error",
-            message:
-              "user_id invalide"
-          });
+  } catch (error) {
+    console.error("Get business error:", error);
 
-        }
+    res.status(500).json({
+      status: "error",
+      message: "Erè pandan rechèch antrepriz la."
+    });
+  }
+});
 
+// =====================================================
+// BUSINESS - UPDATE
+// =====================================================
 
-        const user =
-          await pool.query(
-            `
-            SELECT id
-            FROM users
-            WHERE id = $1
-            `,
-            [numericUserId]
-          );
+app.put("/api/businesses/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const {
+      name,
+      description,
+      category,
+      phone,
+      whatsapp,
+      email,
+      address,
+      city,
+      image_url
+    } = req.body;
 
-        if (
-          user.rows.length === 0
-        ) {
+    const result = await pool.query(
+      `
+      UPDATE businesses
+      SET
+        name = $1,
+        description = $2,
+        category = $3,
+        phone = $4,
+        whatsapp = $5,
+        email = $6,
+        address = $7,
+        city = $8,
+        image_url = $9
+      WHERE id = $10
+      RETURNING *
+      `,
+      [
+        name,
+        description || null,
+        category,
+        phone || null,
+        whatsapp || null,
+        email || null,
+        address || null,
+        city || null,
+        image_url || null,
+        id
+      ]
+    );
 
-          return res.status(404).json({
-            status: "error",
-            message:
-              "Utilisateur introuvable"
-          });
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Antrepriz la pa jwenn."
+      });
+    }
 
-        }
+    res.json({
+      status: "ok",
+      message: "Antrepriz la modifye.",
+      business: result.rows[0]
+    });
 
+  } catch (error) {
+    console.error("Update business error:", error);
 
-        finalUserId =
-          numericUserId;
+    res.status(500).json({
+      status: "error",
+      message: "Pa kapab modifye antrepriz la."
+    });
+  }
+});
 
-      }
+// =====================================================
+// BUSINESS - DELETE
+// =====================================================
 
+app.delete("/api/businesses/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      // -------------------------
-      // INSERT
-      // -------------------------
+    const result = await pool.query(
+      "DELETE FROM businesses WHERE id = $1 RETURNING id",
+      [id]
+    );
 
-      const result =
-        await pool.query(
-          `
-          INSERT INTO businesses
-          (
-            user_id,
-            name,
-            description,
-            category,
-            location,
-            phone,
-            whatsapp,
-            email,
-            image_url,
-            website,
-            status,
-            verified,
-            created_at,
-            updated_at
-          )
-          VALUES
-          (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6,
-            $7,
-            $8,
-            $9,
-            $10,
-            'active',
-            false,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP
-          )
-          RETURNING *
-          `,
-          [
-            finalUserId,
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Antrepriz la pa jwenn."
+      });
+    }
 
-            name.trim(),
+    res.json({
+      status: "ok",
+      message: "Antrepriz la efase avèk siksè."
+    });
 
-            description
-              ? description.trim()
-              : null,
+  } catch (error) {
+    console.error("Delete business error:", error);
 
-            category
-              ? category.trim()
-              : null,
+    res.status(500).json({
+      status: "error",
+      message: "Pa kapab efase antrepriz la."
+    });
+  }
+});
 
-            location
-              ? location.trim()
-              : null,
+// =====================================================
+// SEARCH BUSINESSES
+// =====================================================
 
-            phone
-              
+app.get("/api/search", async (req, res) => {
+  try {
+    const q = req.query.q || "";
+
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM businesses
+      WHERE
+        name ILIKE $1
+        OR category ILIKE $1
+        OR description ILIKE $1
+        OR city ILIKE $1
+        OR address ILIKE $1
+      ORDER BY created_at DESC
+      `,
+      [`%${q}%`]
+    );
+
+    res.json({
+      status: "ok",
+      businesses: result.rows
+    });
+
+  } catch (error) {
+    console.error("Search error:", error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erè pandan rechèch la."
+    });
+  }
+});
+
+// =====================================================
+// 404 API
+// =====================================================
+
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: "API route pa jwenn."
+  });
+});
+
+// =====================================================
+// ERROR HANDLER
+// =====================================================
+
+app.use((err, req, res, next) => {
+  console.error("Server error:", err);
+
+  res.status(500).json({
+    status: "error",
+    message: "Yon erè entèn rive sou sèvè a."
+  });
+});
+
+// =====================================================
+// START SERVER
+// =====================================================
+
+async function startServer() {
+  try {
+    await initializeDatabase();
+
+    app.listen(PORT, () => {
+      console.log("======================================");
+      console.log("🚀 HELPY SERVER ONLINE");
+      console.log(`🌐 Port: ${PORT}`);
+      console.log("🗄️ Database: Connected");
+      console.log("======================================");
+    });
+
+  } catch (error) {
+    console.error("❌ Database initialization failed:");
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+startServer();
