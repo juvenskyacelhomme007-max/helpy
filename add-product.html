@@ -4,75 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>HELPY — Ajouter un produit</title>
+  <title>Publier un produit - HELPY</title>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #111827;
-      padding-bottom: 40px;
+      background: #f5f7fa;
+      color: #17202a;
     }
 
     header {
       background: white;
-      padding: 16px 20px;
+      height: 65px;
+      padding: 0 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     .logo {
-      font-size: 26px;
-      font-weight: 800;
-      color: #5b4bff;
+      font-size: 25px;
+      font-weight: 900;
     }
 
     .back {
       border: none;
-      background: #eeeefc;
-      color: #5b4bff;
-      padding: 9px 14px;
-      border-radius: 9px;
+      background: #f1f3f5;
+      padding: 10px 15px;
+      border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
     }
 
     main {
-      width: 100%;
-      max-width: 650px;
-      margin: auto;
-      padding: 24px 18px;
+      max-width: 700px;
+      margin: 25px auto;
+      padding: 0 15px 40px;
     }
 
-    .title {
-      margin-bottom: 20px;
-    }
-
-    .title h1 {
-      font-size: 26px;
-      margin-bottom: 7px;
-    }
-
-    .title p {
-      color: #6b7280;
-    }
-
-    .form-card {
+    .card {
       background: white;
-      padding: 22px;
       border-radius: 18px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+      padding: 25px;
+      box-shadow: 0 5px 25px rgba(0,0,0,.07);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    .field {
+      margin-bottom: 18px;
     }
 
     label {
@@ -81,102 +76,86 @@
       margin-bottom: 7px;
     }
 
-    .required {
-      color: #ef4444;
-    }
-
     input,
     textarea,
     select {
       width: 100%;
-      padding: 13px;
-      border: 1px solid #d9dce5;
-      border-radius: 10px;
-      margin-bottom: 17px;
-      font-size: 16px;
-      background: white;
+      padding: 14px;
+      border: 1px solid #dfe3e8;
+      border-radius: 11px;
+      font-size: 15px;
       outline: none;
+      background: white;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
     }
 
     input:focus,
     textarea:focus,
     select:focus {
-      border-color: #5b4bff;
-    }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
+      border-color: #2563eb;
     }
 
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .photo-box {
-      border: 2px dashed #cfd3df;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .photo-box p {
-      color: #6b7280;
-      margin-bottom: 12px;
-    }
-
-    .photo-box input {
-      margin-bottom: 0;
-      border: none;
-      padding: 0;
-    }
-
-    .preview {
-      width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .whatsapp-info {
-      background: #ecfdf5;
-      border: 1px solid #bbf7d0;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: -5px;
-      margin-bottom: 17px;
-      color: #166534;
-      font-size: 14px;
+      gap: 15px;
     }
 
     .publish {
       width: 100%;
-      padding: 15px;
       border: none;
-      border-radius: 11px;
-      background: #5b4bff;
+      background: #2563eb;
       color: white;
-      font-size: 17px;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 5px;
     }
 
     .publish:disabled {
-      opacity: 0.6;
+      opacity: .6;
+      cursor: wait;
     }
 
-    #message {
-      text-align: center;
-      margin-top: 15px;
+    .message {
+      display: none;
+      padding: 13px;
+      border-radius: 10px;
+      margin-bottom: 18px;
       font-weight: bold;
     }
 
+    .success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     @media (max-width: 600px) {
+      main {
+        margin-top: 15px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
       .row {
         grid-template-columns: 1fr;
         gap: 0;
@@ -193,7 +172,9 @@
     HELPY
   </div>
 
-  <button class="back" onclick="goBack()">
+  <button
+    class="back"
+    onclick="history.back()">
     ← Retour
   </button>
 
@@ -202,238 +183,199 @@
 
 <main>
 
-  <div class="title">
+  <div class="card">
 
-    <h1>Ajouter un produit</h1>
+    <h1>Publier un produit</h1>
 
-    <p>
-      Présentez votre produit aux utilisateurs de HELPY.
+    <p class="subtitle">
+      Ajoutez votre produit sur HELPY et permettez aux clients de vous contacter.
     </p>
 
-  </div>
 
+    <div
+      id="message"
+      class="message">
+    </div>
 
-  <div class="form-card">
 
     <form id="productForm">
 
 
-      <!-- PHOTO -->
+      <!-- NOM -->
+      <div class="field">
 
-      <label>
-        Photo du produit
-      </label>
-
-      <div class="photo-box">
-
-        <p>
-          Ajoutez une photo de votre produit
-        </p>
+        <label for="title">
+          Nom du produit *
+        </label>
 
         <input
-          id="image"
-          type="file"
-          accept="image/*"
-        >
-
-        <img
-          id="preview"
-          class="preview"
-          alt="Aperçu du produit"
-        >
+          type="text"
+          id="title"
+          placeholder="Ex: iPhone 13"
+          required>
 
       </div>
 
 
-      <!-- NOM -->
-
-      <label for="title">
-        Nom du produit
-        <span class="required">*</span>
-      </label>
-
-      <input
-        id="title"
-        type="text"
-        placeholder="Ex: Samsung Galaxy"
-        required
-      >
-
-
       <!-- DESCRIPTION -->
+      <div class="field">
 
-      <label for="description">
-        Description
-      </label>
+        <label for="description">
+          Description
+        </label>
 
-      <textarea
-        id="description"
-        placeholder="Décrivez votre produit..."
-      ></textarea>
+        <textarea
+          id="description"
+          placeholder="Décrivez votre produit..."></textarea>
+
+      </div>
 
 
-      <!-- PRIX + QUANTITE -->
-
+      <!-- PRIX + QUANTITÉ -->
       <div class="row">
 
-        <div>
+        <div class="field">
 
           <label for="price">
-            Prix
-            <span class="required">*</span>
+            Prix (HTG) *
           </label>
 
           <input
-            id="price"
             type="number"
+            id="price"
             min="0"
             step="0.01"
-            placeholder="Ex: 15000"
-            required
-          >
+            placeholder="19999"
+            required>
 
         </div>
 
 
-        <div>
+        <div class="field">
 
           <label for="quantity">
             Quantité
           </label>
 
           <input
-            id="quantity"
             type="number"
+            id="quantity"
             min="1"
-            value="1"
-          >
+            value="1">
 
         </div>
 
       </div>
 
 
-      <!-- DEVISE -->
-
-      <label for="currency">
-        Devise
-      </label>
-
-      <select id="currency">
-
-        <option value="HTG">
-          Gourdes (HTG)
-        </option>
-
-        <option value="USD">
-          Dollar américain (USD)
-        </option>
-
-      </select>
-
-
       <!-- CATEGORIE -->
+      <div class="field">
 
-      <label for="category">
-        Catégorie
-      </label>
+        <label for="category">
+          Catégorie
+        </label>
 
-      <select id="category">
+        <select id="category">
 
-        <option value="">
-          Choisir une catégorie
-        </option>
+          <option value="">
+            Choisir une catégorie
+          </option>
 
-        <option value="Téléphones">
-          📱 Téléphones
-        </option>
+          <option value="Téléphones">
+            📱 Téléphones
+          </option>
 
-        <option value="Ordinateurs">
-          💻 Ordinateurs
-        </option>
+          <option value="Ordinateurs">
+            💻 Ordinateurs
+          </option>
 
-        <option value="Électronique">
-          🔌 Électronique
-        </option>
+          <option value="Électronique">
+            🔌 Électronique
+          </option>
 
-        <option value="Vêtements">
-          👕 Vêtements
-        </option>
+          <option value="Vêtements">
+            👕 Vêtements
+          </option>
 
-        <option value="Chaussures">
-          👟 Chaussures
-        </option>
+          <option value="Chaussures">
+            👟 Chaussures
+          </option>
 
-        <option value="Maison">
-          🏠 Maison
-        </option>
+          <option value="Maison">
+            🏠 Maison
+          </option>
 
-        <option value="Beauté">
-          💄 Beauté
-        </option>
+          <option value="Beauté">
+            💄 Beauté
+          </option>
 
-        <option value="Alimentation">
-          🍎 Alimentation
-        </option>
+          <option value="Alimentation">
+            🍔 Alimentation
+          </option>
 
-        <option value="Autres">
-          📦 Autres
-        </option>
+          <option value="Autres">
+            📦 Autres
+          </option>
 
-      </select>
-
-
-      <!-- LOCALISATION -->
-
-      <label for="location">
-        Localisation
-      </label>
-
-      <input
-        id="location"
-        type="text"
-        placeholder="Ex: Delmas, Port-au-Prince"
-      >
-
-
-      <!-- WHATSAPP -->
-
-      <label for="whatsapp">
-
-        Numéro WhatsApp
-        <span class="required">*</span>
-
-      </label>
-
-      <input
-        id="whatsapp"
-        type="tel"
-        placeholder="+509XXXXXXXX"
-        required
-      >
-
-      <div class="whatsapp-info">
-
-        📱 Ce numéro permettra aux clients
-        de vous contacter directement sur WhatsApp.
+        </select>
 
       </div>
 
 
-      <!-- PUBLICATION -->
+      <!-- LOCALISATION -->
+      <div class="field">
+
+        <label for="location">
+          Localisation
+        </label>
+
+        <input
+          type="text"
+          id="location"
+          placeholder="Ex: Delmas">
+
+      </div>
+
+
+      <!-- WHATSAPP -->
+      <div class="field">
+
+        <label for="whatsapp">
+          WhatsApp *
+        </label>
+
+        <input
+          type="tel"
+          id="whatsapp"
+          placeholder="32699268"
+          required>
+
+      </div>
+
+
+      <!-- IMAGE URL -->
+      <div class="field">
+
+        <label for="image_url">
+          Lien de la photo
+        </label>
+
+        <input
+          type="url"
+          id="image_url"
+          placeholder="https://exemple.com/photo.jpg">
+
+      </div>
+
 
       <button
-        id="publishButton"
-        class="publish"
         type="submit"
-      >
+        id="publishButton"
+        class="publish">
 
-        Publier le produit
+        🚀 Publier le produit
 
       </button>
-
-
-      <div id="message"></div>
 
     </form>
 
@@ -444,85 +386,68 @@
 
 <script>
 
+const API_URL =
+  "https://helpy-production.up.railway.app";
+
+
 const form =
   document.getElementById("productForm");
+
 
 const button =
   document.getElementById("publishButton");
 
+
 const message =
   document.getElementById("message");
 
-const imageInput =
-  document.getElementById("image");
 
-const preview =
-  document.getElementById("preview");
+// ==========================================
+// MESSAGE
+// ==========================================
+
+function showMessage(text, type) {
+
+  message.textContent = text;
+
+  message.className =
+    "message " + type;
+
+}
 
 
+// ==========================================
 // UTILISATEUR CONNECTÉ
+// ==========================================
 
-const user = JSON.parse(
-  localStorage.getItem("helpyUser") || "null"
-);
+function getUser() {
 
+  const saved =
+    localStorage.getItem("helpyUser");
 
-// VÉRIFICATION
-
-if (!user) {
-
-  window.location.href = "/login.html";
-
-}
-
-
-// APERÇU DE LA PHOTO
-
-imageInput.addEventListener(
-  "change",
-  function() {
-
-    const file =
-      imageInput.files[0];
-
-    if (!file) {
-
-      preview.style.display = "none";
-
-      return;
-    }
-
-    const reader =
-      new FileReader();
-
-    reader.onload =
-      function(event) {
-
-        preview.src =
-          event.target.result;
-
-        preview.style.display =
-          "block";
-
-      };
-
-    reader.readAsDataURL(file);
-
+  if (!saved) {
+    return null;
   }
-);
 
+  try {
 
-// RETOUR AU DASHBOARD
+    return JSON.parse(saved);
 
-function goBack() {
+  } catch (error) {
 
-  window.location.href =
-    "/dashboard.html";
+    console.error(
+      "USER DATA ERROR:",
+      error
+    );
 
+    return null;
+  }
 }
 
 
-// ENVOYER LE PRODUIT
+// ==========================================
+// PUBLICATION
+// ==========================================
 
 form.addEventListener(
   "submit",
@@ -531,71 +456,87 @@ form.addEventListener(
     event.preventDefault();
 
 
-    if (!user) {
+    const user =
+      getUser();
 
-      message.textContent =
-        "❌ Vous devez être connecté.";
 
-      message.style.color =
-        "red";
+    if (!user || !user.id) {
+
+      showMessage(
+        "Vous devez être connecté pour publier un produit.",
+        "error"
+      );
+
+      setTimeout(() => {
+
+        window.location.href =
+          "/login.html";
+
+      }, 1500);
 
       return;
     }
 
 
     const title =
-      document.getElementById("title")
-      .value.trim();
+      document
+        .getElementById("title")
+        .value
+        .trim();
 
 
     const description =
-      document.getElementById("description")
-      .value.trim();
+      document
+        .getElementById("description")
+        .value
+        .trim();
 
 
     const price =
-      document.getElementById("price")
-      .value;
+      document
+        .getElementById("price")
+        .value;
 
 
     const quantity =
-      document.getElementById("quantity")
-      .value || 1;
-
-
-    const currency =
-      document.getElementById("currency")
-      .value;
+      document
+        .getElementById("quantity")
+        .value || 1;
 
 
     const category =
-      document.getElementById("category")
-      .value;
+      document
+        .getElementById("category")
+        .value;
 
 
     const location =
-      document.getElementById("location")
-      .value.trim();
+      document
+        .getElementById("location")
+        .value
+        .trim();
 
 
     const whatsapp =
-      document.getElementById("whatsapp")
-      .value.trim();
+      document
+        .getElementById("whatsapp")
+        .value
+        .trim();
 
 
-    // VALIDATION
+    const image_url =
+      document
+        .getElementById("image_url")
+        .value
+        .trim();
 
-    if (
-      !title ||
-      !price ||
-      !whatsapp
-    ) {
 
-      message.textContent =
-        "❌ Nom, prix et WhatsApp sont obligatoires.";
+    if (!title || !price || !whatsapp) {
 
-      message.style.color =
-        "red";
+      showMessage(
+        "Remplissez les champs obligatoires.",
+        "error"
+      );
 
       return;
     }
@@ -604,14 +545,14 @@ form.addEventListener(
     button.disabled = true;
 
     button.textContent =
-      "Publication...";
+      "Publication en cours...";
 
 
     try {
 
       const response =
         await fetch(
-          "/api/products",
+          `${API_URL}/api/products`,
           {
             method: "POST",
 
@@ -620,41 +561,35 @@ form.addEventListener(
                 "application/json"
             },
 
-            body:
-              JSON.stringify({
+            body: JSON.stringify({
 
-                user_id:
-                  user.id,
+              user_id: user.id,
 
-                title:
-                  title,
+              title: title,
 
-                description:
-                  description,
+              description:
+                description || null,
 
-                price:
-                  price,
+              price: price,
 
-                currency:
-                  currency,
+              currency: "HTG",
 
-                category:
-                  category,
+              category:
+                category || null,
 
-                location:
-                  location,
+              location:
+                location || null,
 
-                whatsapp:
-                  whatsapp,
+              whatsapp:
+                whatsapp,
 
-                image_url:
-                  null,
+              image_url:
+                image_url || null,
 
-                quantity:
-                  quantity
+              quantity:
+                Number(quantity)
 
-              })
-
+            })
           }
         );
 
@@ -663,65 +598,64 @@ form.addEventListener(
         await response.json();
 
 
-      if (response.ok) {
-
-        message.textContent =
-          "✅ Produit publié avec succès !";
-
-        message.style.color =
-          "green";
+      console.log(
+        "CREATE PRODUCT:",
+        data
+      );
 
 
-        form.reset();
+      if (!response.ok) {
 
-        preview.style.display =
-          "none";
-
-
-        setTimeout(
-          function() {
-
-            window.location.href =
-              "/products.html";
-
-          },
-          1200
+        throw new Error(
+          data.message ||
+          "Impossible de publier le produit."
         );
-
-
-      } else {
-
-        message.textContent =
-          "❌ " +
-          (
-            data.message ||
-            "Impossible de publier le produit."
-          );
-
-        message.style.color =
-          "red";
-
       }
+
+
+      showMessage(
+        "✅ Produit publié avec succès !",
+        "success"
+      );
+
+
+      form.reset();
+
+
+      document
+        .getElementById("quantity")
+        .value = 1;
+
+
+      setTimeout(() => {
+
+        window.location.href =
+          "/products.html";
+
+      }, 1200);
 
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "CREATE PRODUCT ERROR:",
+        error
+      );
 
-      message.textContent =
-        "❌ Impossible de contacter HELPY.";
 
-      message.style.color =
-        "red";
+      showMessage(
+        error.message ||
+        "Une erreur est survenue.",
+        "error"
+      );
+
+
+      button.disabled = false;
+
+      button.textContent =
+        "🚀 Publier le produit";
 
     }
-
-
-    button.disabled =
-      false;
-
-    button.textContent =
-      "Publier le produit";
 
   }
 );
