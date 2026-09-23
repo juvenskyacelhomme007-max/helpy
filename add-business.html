@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ajouter une entreprise - HELPY</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  margin:0;
+  background:#f5f7fb;
+  color:#172033;
+}
+
+header{
+  background:#111827;
+  color:white;
+  padding:18px;
+}
+
+.header{
+  max-width:600px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+}
+
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:25px 18px;
+}
+
+.form{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+}
+
+p{
+  color:#667085;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin-top:16px;
+  margin-bottom:7px;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:15px;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+button{
+  width:100%;
+  border:0;
+  background:#2563eb;
+  color:white;
+  padding:15px;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:bold;
+  margin-top:22px;
+}
+
+button:disabled{
+  opacity:.6;
+}
+
+#message{
+  margin-top:15px;
+  text-align:center;
+  font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+  <div class="header">
+
+    <div class="logo">
+      HELPY
+    </div>
+
+    <a
+      class="back"
+      href="businesses.html"
+    >
+      ← Retour
+    </a>
+
+  </div>
+
+</header>
+
+
+<div class="container">
+
+  <div class="form">
+
+    <h1>Ajouter une entreprise</h1>
+
+    <p>
+      Présentez votre entreprise sur HELPY.
+    </p>
+
+
+    <label>
+      Nom de l'entreprise *
+    </label>
+
+    <input
+      id="name"
+      placeholder="Ex: Juvensky Technologie"
+    >
+
+
+    <label>
+      Description
+    </label>
+
+    <textarea
+      id="description"
+      placeholder="Décrivez votre entreprise..."
+    ></textarea>
+
+
+    <label>
+      Catégorie
+    </label>
+
+    <select id="category">
+
+      <option value="">
+        Sélectionner
+      </option>
+
+      <option value="Restaurant">
+        Restaurant
+      </option>
+
+      <option value="Boutique">
+        Boutique
+      </option>
+
+      <option value="Technologie">
+        Technologie
+      </option>
+
+      <option value="Beauté">
+        Beauté
+      </option>
+
+      <option value="Construction">
+        Construction
+      </option>
+
+      <option value="Transport">
+        Transport
+      </option>
+
+      <option value="Éducation">
+        Éducation
+      </option>
+
+      <option value="Autre">
+        Autre
+      </option>
+
+    </select>
+
+
+    <label>
+      Localisation
+    </label>
+
+    <input
+      id="location"
+      placeholder="Ex: Delmas 33"
+    >
+
+
+    <label>
+      Téléphone
+    </label>
+
+    <input
+      id="phone"
+      type="tel"
+      placeholder="Ex: 3xxx-xxxx"
+    >
+
+
+    <label>
+      WhatsApp
+    </label>
+
+    <input
+      id="whatsapp"
+      type="tel"
+      placeholder="Numéro WhatsApp"
+    >
+
+
+    <label>
+      Email
+    </label>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="entreprise@email.com"
+    >
+
+
+    <label>
+      Site web
+    </label>
+
+    <input
+      id="website"
+      type="url"
+      placeholder="https://..."
+    >
+
+
+    <label>
+      URL de l'image/logo
+    </label>
+
+    <input
+      id="image_url"
+      type="url"
+      placeholder="https://..."
+    >
+
+
+    <button
+      id="submit"
+      onclick="createBusiness()"
+    >
+      Publier l'entreprise
+    </button>
+
+    <div id="message"></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const API =
+"https://helpy-production-c2f2.up.railway.app";
+
+
+async function createBusiness(){
+
+  const button =
+    document.getElementById("submit");
+
+  const message =
+    document.getElementById("message");
+
+
+  const business = {
+
+    name:
+      document.getElementById("name").value.trim(),
+
+    description:
+      document.getElementById("description").value.trim(),
+
+    category:
+      document.getElementById("category").value,
+
+    location:
+      document.getElementById("location").value.trim(),
+
+    phone:
+      document.getElementById("phone").value.trim(),
+
+    whatsapp:
+      document.getElementById("whatsapp").value.trim(),
+
+    email:
+      document.getElementById("email").value.trim(),
+
+    website:
+      document.getElementById("website").value.trim(),
+
+    image_url:
+      document.getElementById("image_url").value.trim()
+
+  };
+
+
+  if(!business.name){
+
+    message.innerHTML =
+      "⚠️ Le nom de l'entreprise est obligatoire.";
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.innerText =
+    "Publication...";
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API}/api/businesses`,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(business)
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.message ||
+        "Erreur"
+      );
+
+    }
+
+
+    message.innerHTML =
+      "✅ Entreprise créée avec succès !";
+
+
+    setTimeout(() => {
+
+      window.location.href =
+        "businesses.html";
+
+    },1000);
+
+
+  }catch(error){
+
+    console.error(error);
+
+    message.innerHTML =
+      "❌ " + error.message;
+
+    button.disabled = false;
+
+    button.innerText =
+      "Publier l'entreprise";
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
