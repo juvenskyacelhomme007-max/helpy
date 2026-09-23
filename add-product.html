@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>HELPY — Ajouter un produit</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      color: #5b4bff;
+    }
+
+    .back {
+      border: none;
+      background: #eeeefc;
+      color: #5b4bff;
+      padding: 9px 14px;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    main {
+      width: 100%;
+      max-width: 650px;
+      margin: auto;
+      padding: 24px 18px;
+    }
+
+    .title {
+      margin-bottom: 20px;
+    }
+
+    .title h1 {
+      font-size: 26px;
+      margin-bottom: 7px;
+    }
+
+    .title p {
+      color: #6b7280;
+    }
+
+    .form-card {
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .required {
+      color: #ef4444;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d9dce5;
+      border-radius: 10px;
+      margin-bottom: 17px;
+      font-size: 16px;
+      background: white;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #5b4bff;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .photo-box {
+      border: 2px dashed #cfd3df;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .photo-box p {
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .photo-box input {
+      margin-bottom: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .preview {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .whatsapp-info {
+      background: #ecfdf5;
+      border: 1px solid #bbf7d0;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: -5px;
+      margin-bottom: 17px;
+      color: #166534;
+      font-size: 14px;
+    }
+
+    .publish {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 11px;
+      background: #5b4bff;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .publish:disabled {
+      opacity: 0.6;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">
+    HELPY
+  </div>
+
+  <button class="back" onclick="goBack()">
+    ← Retour
+  </button>
+
+</header>
+
+
+<main>
+
+  <div class="title">
+
+    <h1>Ajouter un produit</h1>
+
+    <p>
+      Présentez votre produit aux utilisateurs de HELPY.
+    </p>
+
+  </div>
+
+
+  <div class="form-card">
+
+    <form id="productForm">
+
+
+      <!-- PHOTO -->
+
+      <label>
+        Photo du produit
+      </label>
+
+      <div class="photo-box">
+
+        <p>
+          Ajoutez une photo de votre produit
+        </p>
+
+        <input
+          id="image"
+          type="file"
+          accept="image/*"
+        >
+
+        <img
+          id="preview"
+          class="preview"
+          alt="Aperçu du produit"
+        >
+
+      </div>
+
+
+      <!-- NOM -->
+
+      <label for="title">
+        Nom du produit
+        <span class="required">*</span>
+      </label>
+
+      <input
+        id="title"
+        type="text"
+        placeholder="Ex: Samsung Galaxy"
+        required
+      >
+
+
+      <!-- DESCRIPTION -->
+
+      <label for="description">
+        Description
+      </label>
+
+      <textarea
+        id="description"
+        placeholder="Décrivez votre produit..."
+      ></textarea>
+
+
+      <!-- PRIX + QUANTITE -->
+
+      <div class="row">
+
+        <div>
+
+          <label for="price">
+            Prix
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="price"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Ex: 15000"
+            required
+          >
+
+        </div>
+
+
+        <div>
+
+          <label for="quantity">
+            Quantité
+          </label>
+
+          <input
+            id="quantity"
+            type="number"
+            min="1"
+            value="1"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- DEVISE -->
+
+      <label for="currency">
+        Devise
+      </label>
+
+      <select id="currency">
+
+        <option value="HTG">
+          Gourdes (HTG)
+        </option>
+
+        <option value="USD">
+          Dollar américain (USD)
+        </option>
+
+      </select>
+
+
+      <!-- CATEGORIE -->
+
+      <label for="category">
+        Catégorie
+      </label>
+
+      <select id="category">
+
+        <option value="">
+          Choisir une catégorie
+        </option>
+
+        <option value="Téléphones">
+          📱 Téléphones
+        </option>
+
+        <option value="Ordinateurs">
+          💻 Ordinateurs
+        </option>
+
+        <option value="Électronique">
+          🔌 Électronique
+        </option>
+
+        <option value="Vêtements">
+          👕 Vêtements
+        </option>
+
+        <option value="Chaussures">
+          👟 Chaussures
+        </option>
+
+        <option value="Maison">
+          🏠 Maison
+        </option>
+
+        <option value="Beauté">
+          💄 Beauté
+        </option>
+
+        <option value="Alimentation">
+          🍎 Alimentation
+        </option>
+
+        <option value="Autres">
+          📦 Autres
+        </option>
+
+      </select>
+
+
+      <!-- LOCALISATION -->
+
+      <label for="location">
+        Localisation
+      </label>
+
+      <input
+        id="location"
+        type="text"
+        placeholder="Ex: Delmas, Port-au-Prince"
+      >
+
+
+      <!-- WHATSAPP -->
+
+      <label for="whatsapp">
+
+        Numéro WhatsApp
+        <span class="required">*</span>
+
+      </label>
+
+      <input
+        id="whatsapp"
+        type="tel"
+        placeholder="+509XXXXXXXX"
+        required
+      >
+
+      <div class="whatsapp-info">
+
+        📱 Ce numéro permettra aux clients
+        de vous contacter directement sur WhatsApp.
+
+      </div>
+
+
+      <!-- PUBLICATION -->
+
+      <button
+        id="publishButton"
+        class="publish"
+        type="submit"
+      >
+
+        Publier le produit
+
+      </button>
+
+
+      <div id="message"></div>
+
+    </form>
+
+  </div>
+
+</main>
+
+
+<script>
+
+const form =
+  document.getElementById("productForm");
+
+const button =
+  document.getElementById("publishButton");
+
+const message =
+  document.getElementById("message");
+
+const imageInput =
+  document.getElementById("image");
+
+const preview =
+  document.getElementById("preview");
+
+
+// UTILISATEUR CONNECTÉ
+
+const user = JSON.parse(
+  localStorage.getItem("helpyUser") || "null"
+);
+
+
+// VÉRIFICATION
+
+if (!user) {
+
+  window.location.href = "/login.html";
+
+}
+
+
+// APERÇU DE LA PHOTO
+
+imageInput.addEventListener(
+  "change",
+  function() {
+
+    const file =
+      imageInput.files[0];
+
+    if (!file) {
+
+      preview.style.display = "none";
+
+      return;
+    }
+
+    const reader =
+      new FileReader();
+
+    reader.onload =
+      function(event) {
+
+        preview.src =
+          event.target.result;
+
+        preview.style.display =
+          "block";
+
+      };
+
+    reader.readAsDataURL(file);
+
+  }
+);
+
+
+// RETOUR AU DASHBOARD
+
+function goBack() {
+
+  window.location.href =
+    "/dashboard.html";
+
+}
+
+
+// ENVOYER LE PRODUIT
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+
+    if (!user) {
+
+      message.textContent =
+        "❌ Vous devez être connecté.";
+
+      message.style.color =
+        "red";
+
+      return;
+    }
+
+
+    const title =
+      document.getElementById("title")
+      .value.trim();
+
+
+    const description =
+      document.getElementById("description")
+      .value.trim();
+
+
+    const price =
+      document.getElementById("price")
+      .value;
+
+
+    const quantity =
+      document.getElementById("quantity")
+      .value || 1;
+
+
+    const currency =
+      document.getElementById("currency")
+      .value;
+
+
+    const category =
+      document.getElementById("category")
+      .value;
+
+
+    const location =
+      document.getElementById("location")
+      .value.trim();
+
+
+    const whatsapp =
+      document.getElementById("whatsapp")
+      .value.trim();
+
+
+    // VALIDATION
+
+    if (
+      !title ||
+      !price ||
+      !whatsapp
+    ) {
+
+      message.textContent =
+        "❌ Nom, prix et WhatsApp sont obligatoires.";
+
+      message.style.color =
+        "red";
+
+      return;
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+      "Publication...";
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/products",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify({
+
+                user_id:
+                  user.id,
+
+                title:
+                  title,
+
+                description:
+                  description,
+
+                price:
+                  price,
+
+                currency:
+                  currency,
+
+                category:
+                  category,
+
+                location:
+                  location,
+
+                whatsapp:
+                  whatsapp,
+
+                image_url:
+                  null,
+
+                quantity:
+                  quantity
+
+              })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (response.ok) {
+
+        message.textContent =
+          "✅ Produit publié avec succès !";
+
+        message.style.color =
+          "green";
+
+
+        form.reset();
+
+        preview.style.display =
+          "none";
+
+
+        setTimeout(
+          function() {
+
+            window.location.href =
+              "/products.html";
+
+          },
+          1200
+        );
+
+
+      } else {
+
+        message.textContent =
+          "❌ " +
+          (
+            data.message ||
+            "Impossible de publier le produit."
+          );
+
+        message.style.color =
+          "red";
+
+      }
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      message.textContent =
+        "❌ Impossible de contacter HELPY.";
+
+      message.style.color =
+        "red";
+
+    }
+
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Publier le produit";
+
+  }
+);
+
+</script>
+
+</body>
+</html>
