@@ -4,6 +4,9 @@ const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.static(__dirname));
 
 app.use(cors());
 app.use(express.json());
