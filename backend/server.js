@@ -381,7 +381,282 @@ app.post("/api", (req, res) => {
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "index.html"));
 });
+// =====================================================
+// SERVICES
+// =====================================================
 
+
+// GET ALL SERVICES
+
+app.get("/api/services", async (req, res) => {
+
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        s.id,
+        s.title,
+        s.description,
+        s.price,
+        s.currency,
+        s.category,
+        s.location,
+        s.whatsapp,
+        s.image_url,
+        s.status,
+        s.created_at,
+        u.name AS provider_name
+
+      FROM services s
+
+      JOIN users u
+        ON u.id = s.user_id
+
+      WHERE s.status = 'active'
+
+      ORDER BY s.id DESC
+    `);
+
+
+    res.json({
+
+      status: "ok",
+
+      services: result.rows
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    res.status(500).json({
+
+      status: "error",
+
+      message: "Unable to load services"
+
+    });
+
+  }
+
+});
+
+
+
+// CREATE SERVICE
+
+app.post("/api/services", async (req, res) => {
+
+  try {
+
+    const {
+      user_id,
+      title,
+      description,
+      price,
+      currency,
+      category,
+      location,
+      whatsapp,
+      image_url
+    } = req.body;
+
+
+    // REQUIRED FIELDS
+
+    if (
+      !user_id ||
+      !title ||
+      price === undefined ||
+      price === null ||
+      !whatsapp
+    ) {
+
+      return res.status(400).json({
+
+        status: "error",
+
+        message:
+          "user_id, title, price and WhatsApp are required"
+
+      });
+
+    }
+
+
+    // CHECK USER
+
+    const user = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE id = $1
+      `,
+      [user_id]
+    );
+
+
+    if (user.rows.length === 0) {
+
+      return res.status(404).json({
+
+        status: "error",
+
+        message: "User not found"
+
+      });
+
+    }
+
+
+    // CHECK PRICE
+
+    if (Number(price) < 0) {
+
+      return res.status(400).json({
+
+        status: "error",
+
+        message: "Price cannot be negative"
+
+      });
+
+    }
+
+
+    // CREATE SERVICE
+
+    const result = await pool.query(
+      `
+      INSERT INTO services
+      (
+        user_id,
+        title,
+        description,
+        price,
+        currency,
+        category,
+        location,
+        whatsapp,
+        image_url
+      )
+
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+
+      RETURNING *
+      `,
+      [
+        user_id,
+        title.trim(),
+        description || null,
+        price,
+        currency || "HTG",
+        category || null,
+        location || null,
+        whatsapp.trim(),
+        image_url || null
+      ]
+    );
+
+
+    res.status(201).json({
+
+      status: "ok",
+
+      message:
+        "Service created successfully",
+
+      service: result.rows[0]
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    res.status(500).json({
+
+      status: "error",
+
+      message:
+        "Unable to create service"
+
+    });
+
+  }
+
+});
+
+
+
+// GET ONE SERVICE
+
+app.get("/api/services/:id", async (req, res) => {
+
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT
+        s.*,
+        u.name AS provider_name
+
+      FROM services s
+
+      JOIN users u
+        ON u.id = s.user_id
+
+      WHERE s.id = $1
+      `,
+      [req.params.id]
+    );
+
+
+    if (result.rows.length === 0) {
+
+      return res.status(404).json({
+
+        status: "error",
+
+        message: "Service not found"
+
+      });
+
+    }
+
+
+    res.json({
+
+      status: "ok",
+
+      service: result.rows[0]
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    res.status(500).json({
+
+      status: "error",
+
+      message:
+        "Unable to load service"
+
+    });
+
+  }
+
+});
 app.listen(PORT, () => {
   console.log(`HELPY server running on port ${PORT}`);
 }); 
