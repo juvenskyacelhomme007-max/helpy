@@ -1,72 +1,150 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // =====================================================
 // DATABASE
 // =====================================================
 
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is missing");
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL
-    ? { rejectUnauthorized: false }
-    : false
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
+// =====================================================
+// DATABASE INITIALIZATION
+// =====================================================
+
 async function initializeDatabase() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE,
-        password TEXT,
-        phone VARCHAR(30),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(120) NOT NULL,
+      email VARCHAR(180) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      phone VARCHAR(40),
+      whatsapp VARCHAR(40),
+      photo_url TEXT,
+      location VARCHAR(180),
+      bio TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS businesses (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(150) NOT NULL,
-        description TEXT,
-        category VARCHAR(100),
-        location VARCHAR(200),
-        phone VARCHAR(50),
-        whatsapp VARCHAR(50),
-        email VARCHAR(150),
-        website VARCHAR(255),
-        image_url TEXT,
-        owner_name VARCHAR(150),
-        status VARCHAR(30) DEFAULT 'active',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS businesses (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name VARCHAR(180) NOT NULL,
+      description TEXT,
+      category VARCHAR(100),
+      phone VARCHAR(40),
+      whatsapp VARCHAR(40),
+      location VARCHAR(180),
+      address TEXT,
+      opening_hours VARCHAR(255),
+      photo_url TEXT,
+      rating NUMERIC(3,2) DEFAULT 0,
+      reviews_count INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 
-    console.log("✅ Database initialized");
-  } catch (error) {
-    console.error("❌ Database initialization error:");
-    console.error(error.message);
-  }
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id INTEGER REFERENCES businesses(id) ON DELETE SET NULL,
+      title VARCHAR(180) NOT NULL,
+      description TEXT,
+      price NUMERIC(12,2) DEFAULT 0,
+      currency VARCHAR(10) DEFAULT 'HTG',
+      category VARCHAR(100),
+      location VARCHAR(180),
+      whatsapp VARCHAR(40),
+      phone VARCHAR(40),
+      image_url TEXT,
+      quantity INTEGER DEFAULT 1,
+      status VARCHAR(30) DEFAULT 'active',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS services (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id INTEGER REFERENCES businesses(id) ON DELETE SET NULL,
+      title VARCHAR(180) NOT NULL,
+      description TEXT,
+      price NUMERIC(12,2) DEFAULT 0,
+      currency VARCHAR(10) DEFAULT 'HTG',
+      category VARCHAR(100),
+      location VARCHAR(180),
+      whatsapp VARCHAR(40),
+      phone VARCHAR(40),
+      image_url TEXT,
+      status VARCHAR(30) DEFAULT 'active',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+      product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+      service_id INTEGER REFERENCES services(id) ON DELETE CASCADE,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+      comment TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id SERIAL PRIMARY KEY,
+      sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      message TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS reports (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      target_type VARCHAR(30) NOT NULL,
+      target_id INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  console.log("HElPY database ready");
 }
 
 // =====================================================
-// MIDDLEWARE
+// HELPERS
 // =====================================================
 
-app.use(cors());
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// =====================================================
-// SECURITY / ESCAPE
-// =====================================================
-
-function escapeHTML(value) {
+function escapeHtml(value) {
   if (value === null || value === undefined) return "";
 
   return String(value)
@@ -78,822 +156,708 @@ function escapeHTML(value) {
 }
 
 function cleanPhone(value) {
-  if (!value) return "";
-  return String(value).replace(/[^\d+]/g, "");
+  return String(value || "").replace(/[^\d+]/g, "");
 }
 
-function whatsappNumber(value) {
-  if (!value) return "";
+function whatsappUrl(value) {
+  const phone = cleanPhone(value).replace("+", "");
+  return "https://wa.me/" + phone;
+}
 
-  let number = String(value).replace(/\D/g, "");
+function authRequired(req, res, next) {
+  const userId = req.headers["x-user-id"];
 
-  // Haiti number without country code
-  if (number.length === 8) {
-    number = "509" + number;
+  if (!userId) {
+    return res.status(401).json({
+      status: "error",
+      message: "Connexion requise"
+    });
   }
 
-  return number;
+  req.userId = Number(userId);
+  next();
+}
+
+async function getUser(userId) {
+  const result = await pool.query(
+    "SELECT * FROM users WHERE id = $1",
+    [userId]
+  );
+
+  return result.rows[0];
 }
 
 // =====================================================
-// GLOBAL HTML
+// API HOME
 // =====================================================
 
-function pageTemplate(title, content) {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>${escapeHTML(title)} - HELPY</title>
-
-<style>
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f4f7fb;
-  color: #172033;
-}
-
-a {
-  text-decoration: none;
-}
-
-.navbar {
-  background: #0b63f6;
-  color: white;
-  padding: 15px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  color: white;
-  font-size: 25px;
-  font-weight: 900;
-}
-
-.nav-links {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.nav-links a {
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.container {
-  width: 94%;
-  max-width: 1100px;
-  margin: 25px auto;
-}
-
-.hero {
-  background: linear-gradient(135deg, #075cf0, #00a6ff);
-  color: white;
-  border-radius: 22px;
-  padding: 35px 25px;
-  margin-bottom: 25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.12);
-}
-
-.hero h1 {
-  margin: 0 0 10px;
-  font-size: 34px;
-}
-
-.hero p {
-  margin: 0 0 20px;
-  font-size: 16px;
-  opacity: .95;
-}
-
-.search-box {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.search-box input {
-  flex: 1;
-  min-width: 200px;
-  padding: 15px;
-  border: 0;
-  border-radius: 12px;
-  font-size: 16px;
-}
-
-button,
-.btn {
-  border: none;
-  border-radius: 12px;
-  padding: 13px 18px;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 15px;
-  display: inline-block;
-}
-
-.btn-primary {
-  background: #0b63f6;
-  color: white;
-}
-
-.btn-success {
-  background: #16a34a;
-  color: white;
-}
-
-.btn-dark {
-  background: #172033;
-  color: white;
-}
-
-.btn-light {
-  background: white;
-  color: #0b63f6;
-}
-
-.card {
-  background: white;
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 18px;
-  box-shadow: 0 5px 20px rgba(0,0,0,.07);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-.business-card {
-  overflow: hidden;
-  padding: 0;
-}
-
-.business-image {
-  width: 100%;
-  height: 190px;
-  object-fit: cover;
-  background: #e9eef5;
-}
-
-.business-content {
-  padding: 18px;
-}
-
-.business-name {
-  font-size: 21px;
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-
-.badge {
-  display: inline-block;
-  background: #e8f1ff;
-  color: #075cf0;
-  padding: 6px 10px;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.muted {
-  color: #697386;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-top: 15px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 800;
-  margin-bottom: 7px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #d8dee9;
-  border-radius: 12px;
-  font-size: 15px;
-  background: white;
-}
-
-.form-group textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.success {
-  background: #dcfce7;
-  color: #166534;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-}
-
-.error {
-  background: #fee2e2;
-  color: #991b1b;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-}
-
-.footer {
-  text-align: center;
-  padding: 35px 15px;
-  margin-top: 40px;
-  background: #172033;
-  color: white;
-}
-
-.detail-image {
-  width: 100%;
-  max-height: 430px;
-  object-fit: cover;
-  border-radius: 18px;
-}
-
-.info-row {
-  padding: 13px 0;
-  border-bottom: 1px solid #edf0f4;
-}
-
-.info-label {
-  font-weight: 900;
-}
-
-.empty {
-  text-align: center;
-  padding: 50px 20px;
-  color: #697386;
-}
-
-@media(max-width:600px) {
-
-  .navbar {
-    padding: 13px;
-  }
-
-  .logo {
-    font-size: 21px;
-  }
-
-  .nav-links a {
-    font-size: 12px;
-  }
-
-  .hero {
-    padding: 27px 18px;
-  }
-
-  .hero h1 {
-    font-size: 27px;
-  }
-
-  .actions .btn {
-    width: 100%;
-    text-align: center;
-  }
-
-}
-
-</style>
-</head>
-
-<body>
-
-<nav class="navbar">
-
-<a class="logo" href="/">HElPY</a>
-
-<div class="nav-links">
-<a href="/">Accueil</a>
-<a href="/businesses">Entreprises</a>
-<a href="/add-business">Ajouter</a>
-</div>
-
-</nav>
-
-<main class="container">
-
-${content}
-
-</main>
-
-<footer class="footer">
-<strong>HElPY</strong>
-<br>
-Trouvez facilement les entreprises et services en Haïti.
-<br><br>
-© ${new Date().getFullYear()} HELPY
-</footer>
-
-</body>
-</html>`;
-}
-
-// =====================================================
-// HOME
-// =====================================================
-
-app.get("/", async (req, res) => {
-
-  let businesses = [];
-
-  try {
-    const result = await pool.query(`
-      SELECT *
-      FROM businesses
-      WHERE status = 'active'
-      ORDER BY created_at DESC
-      LIMIT 6
-    `);
-
-    businesses = result.rows;
-
-  } catch (error) {
-    console.error(error.message);
-  }
-
-  const cards = businesses.map(businessCard).join("");
-
-  const content = `
-    <section class="hero">
-
-      <h1>Bienvenue sur HELPY 🇭🇹</h1>
-
-      <p>
-        Trouvez rapidement des entreprises, commerces et services
-        près de vous en Haïti.
-      </p>
-
-      <form action="/businesses" method="GET" class="search-box">
-
-        <input
-          type="text"
-          name="q"
-          placeholder="Rechercher une entreprise ou un service..."
-        >
-
-        <button class="btn-light" type="submit">
-          🔎 Rechercher
-        </button>
-
-      </form>
-
-    </section>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-
-      <h2>Entreprises récentes</h2>
-
-      <a class="btn btn-primary" href="/add-business">
-        + Ajouter une entreprise
-      </a>
-
-    </div>
-
-    ${
-      businesses.length
-        ? `<div class="grid">${cards}</div>`
-        : `
-          <div class="card empty">
-            <h3>Aucune entreprise pour le moment</h3>
-            <p>Ajoutez la première entreprise sur HELPY.</p>
-
-            <a class="btn btn-primary" href="/add-business">
-              Ajouter une entreprise
-            </a>
-          </div>
-        `
-    }
-  `;
-
-  res.send(pageTemplate("Accueil", content));
+app.get("/api", (req, res) => {
+  res.json({
+    status: "ok",
+    app: "HElPY",
+    message: "HElPY API is running"
+  });
 });
 
 // =====================================================
-// BUSINESS CARD
+// REGISTER
 // =====================================================
 
-function businessCard(business) {
-
-  const image = business.image_url
-    ? escapeHTML(business.image_url)
-    : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80";
-
-  return `
-    <article class="card business-card">
-
-      <img
-        class="business-image"
-        src="${image}"
-        alt="${escapeHTML(business.name)}"
-        loading="lazy"
-      >
-
-      <div class="business-content">
-
-        <span class="badge">
-          ${escapeHTML(business.category || "Entreprise")}
-        </span>
-
-        <div class="business-name">
-          ${escapeHTML(business.name)}
-        </div>
-
-        <p class="muted">
-          📍 ${escapeHTML(business.location || "Haïti")}
-        </p>
-
-        <p>
-          ${escapeHTML(
-            business.description
-              ? business.description.substring(0, 120)
-              : "Découvrez cette entreprise sur HELPY."
-          )}
-        </p>
-
-        <a
-          class="btn btn-primary"
-          href="/business/${business.id}"
-        >
-          Voir détails
-        </a>
-
-      </div>
-
-    </article>
-  `;
-}
-
-// =====================================================
-// BUSINESSES PAGE
-// =====================================================
-
-app.get("/businesses", async (req, res) => {
-
-  const q = String(req.query.q || "").trim();
-
-  let businesses = [];
-
+app.post("/api/register", async (req, res) => {
   try {
+    const {
+      name,
+      email,
+      password,
+      phone,
+      whatsapp,
+      photo_url,
+      location,
+      bio
+    } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Nom, email et mot de passe obligatoires"
+      });
+    }
+
+    const existing = await pool.query(
+      "SELECT id FROM users WHERE LOWER(email) = LOWER($1)",
+      [email.trim()]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(409).json({
+        status: "error",
+        message: "Ce compte existe déjà"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `
+      INSERT INTO users
+      (name, email, password, phone, whatsapp, photo_url, location, bio)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING id, name, email, phone, whatsapp, photo_url, location, bio, created_at
+      `,
+      [
+        name.trim(),
+        email.trim().toLowerCase(),
+        hashedPassword,
+        phone || null,
+        whatsapp || null,
+        photo_url || null,
+        location || null,
+        bio || null
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      message: "Compte créé avec succès",
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// LOGIN
+// =====================================================
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const result = await pool.query(
+      "SELECT * FROM users WHERE LOWER(email) = LOWER($1)",
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        status: "error",
+        message: "Email ou mot de passe incorrect"
+      });
+    }
+
+    const user = result.rows[0];
+
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
+      return res.status(401).json({
+        status: "error",
+        message: "Email ou mot de passe incorrect"
+      });
+    }
+
+    delete user.password;
+
+    res.json({
+      status: "ok",
+      message: "Connexion réussie",
+      user
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// PROFILE
+// =====================================================
+
+app.get("/api/profile/:id", async (req, res) => {
+  try {
+    const user = await getUser(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Utilisateur introuvable"
+      });
+    }
+
+    delete user.password;
+
+    const businesses = await pool.query(
+      "SELECT * FROM businesses WHERE user_id = $1 ORDER BY id DESC",
+      [req.params.id]
+    );
+
+    const products = await pool.query(
+      "SELECT * FROM products WHERE user_id = $1 ORDER BY id DESC",
+      [req.params.id]
+    );
+
+    const services = await pool.query(
+      "SELECT * FROM services WHERE user_id = $1 ORDER BY id DESC",
+      [req.params.id]
+    );
+
+    res.json({
+      status: "ok",
+      user,
+      businesses: businesses.rows,
+      products: products.rows,
+      services: services.rows
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// UPDATE PROFILE
+// =====================================================
+
+app.put("/api/profile", authRequired, async (req, res) => {
+  try {
+    const {
+      name,
+      phone,
+      whatsapp,
+      photo_url,
+      location,
+      bio
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        name = COALESCE($1, name),
+        phone = COALESCE($2, phone),
+        whatsapp = COALESCE($3, whatsapp),
+        photo_url = COALESCE($4, photo_url),
+        location = COALESCE($5, location),
+        bio = COALESCE($6, bio)
+      WHERE id = $7
+      RETURNING id, name, email, phone, whatsapp, photo_url, location, bio
+      `,
+      [
+        name,
+        phone,
+        whatsapp,
+        photo_url,
+        location,
+        bio,
+        req.userId
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Impossible de modifier le profil"
+    });
+  }
+});
+
+// =====================================================
+// BUSINESSES - CREATE
+// =====================================================
+
+app.post("/api/businesses", authRequired, async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      category,
+      phone,
+      whatsapp,
+      location,
+      address,
+      opening_hours,
+      photo_url
+    } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        status: "error",
+        message: "Nom de l'entreprise obligatoire"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO businesses
+      (
+        user_id,
+        name,
+        description,
+        category,
+        phone,
+        whatsapp,
+        location,
+        address,
+        opening_hours,
+        photo_url
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      RETURNING *
+      `,
+      [
+        req.userId,
+        name,
+        description || null,
+        category || null,
+        phone || null,
+        whatsapp || null,
+        location || null,
+        address || null,
+        opening_hours || null,
+        photo_url || null
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      business: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Impossible de créer l'entreprise"
+    });
+  }
+});
+
+// =====================================================
+// BUSINESSES - LIST
+// =====================================================
+
+app.get("/api/businesses", async (req, res) => {
+  try {
+    const search = String(req.query.search || "").trim();
 
     let result;
 
-    if (q) {
-
+    if (search) {
       result = await pool.query(
         `
-        SELECT *
-        FROM businesses
-        WHERE status = 'active'
-        AND (
-          name ILIKE $1
-          OR description ILIKE $1
-          OR category ILIKE $1
-          OR location ILIKE $1
-        )
-        ORDER BY created_at DESC
+        SELECT b.*, u.name AS owner_name, u.photo_url AS owner_photo
+        FROM businesses b
+        JOIN users u ON u.id = b.user_id
+        WHERE
+          b.name ILIKE $1
+          OR b.category ILIKE $1
+          OR b.location ILIKE $1
+          OR b.description ILIKE $1
+        ORDER BY b.id DESC
         `,
-        [`%${q}%`]
+        ["%" + search + "%"]
       );
-
     } else {
-
-      result = await pool.query(`
-        SELECT *
-        FROM businesses
-        WHERE status = 'active'
-        ORDER BY created_at DESC
-      `);
-
+      result = await pool.query(
+        `
+        SELECT b.*, u.name AS owner_name, u.photo_url AS owner_photo
+        FROM businesses b
+        JOIN users u ON u.id = b.user_id
+        ORDER BY b.id DESC
+        `
+      );
     }
 
-    businesses = result.rows;
-
+    res.json({
+      status: "ok",
+      entreprises: result.rows
+    });
   } catch (error) {
+    console.error(error);
 
-    console.error(error.message);
-
-    return res.status(500).send(
-      pageTemplate(
-        "Erreur",
-        `
-        <div class="error">
-          Impossible de récupérer les entreprises.
-        </div>
-        `
-      )
-    );
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
   }
-
-  const cards = businesses.map(businessCard).join("");
-
-  const content = `
-
-    <div class="card">
-
-      <h1>Entreprises & Services</h1>
-
-      <form action="/businesses" method="GET" class="search-box">
-
-        <input
-          type="text"
-          name="q"
-          value="${escapeHTML(q)}"
-          placeholder="Rechercher..."
-        >
-
-        <button class="btn btn-primary">
-          🔎 Rechercher
-        </button>
-
-      </form>
-
-    </div>
-
-    ${
-      q
-        ? `<p class="muted">
-            Résultats pour : <strong>${escapeHTML(q)}</strong>
-          </p>`
-        : ""
-    }
-
-    ${
-      businesses.length
-        ? `<div class="grid">${cards}</div>`
-        : `
-          <div class="card empty">
-            <h2>Aucun résultat</h2>
-            <p>Aucune entreprise ne correspond à votre recherche.</p>
-          </div>
-        `
-    }
-
-  `;
-
-  res.send(pageTemplate("Entreprises", content));
-});
-
-// =====================================================
-// ADD BUSINESS PAGE
-// =====================================================
-
-app.get("/add-business", (req, res) => {
-
-  const content = `
-
-    <div class="card">
-
-      <h1>Ajouter une entreprise</h1>
-
-      <p class="muted">
-        Présentez votre entreprise ou votre service sur HELPY.
-      </p>
-
-      <form action="/api/businesses" method="POST">
-
-        <div class="form-group">
-          <label>Nom de l'entreprise *</label>
-
-          <input
-            name="name"
-            required
-            placeholder="Ex: Boutique Juvensky"
-          >
-        </div>
-
-        <div class="form-group">
-          <label>Catégorie *</label>
-
-          <select name="category" required>
-
-            <option value="">Choisir une catégorie</option>
-
-            <option>Restaurant</option>
-            <option>Boutique</option>
-            <option>Technologie</option>
-            <option>Beauté</option>
-            <option>Construction</option>
-            <option>Transport</option>
-            <option>Santé</option>
-            <option>Éducation</option>
-            <option>Services</option>
-            <option>Autre</option>
-
-          </select>
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Description</label>
-
-          <textarea
-            name="description"
-            placeholder="Décrivez votre entreprise..."
-          ></textarea>
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Localisation *</label>
-
-          <input
-            name="location"
-            required
-            placeholder="Ex: Delmas, Port-au-Prince"
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Téléphone</label>
-
-          <input
-            name="phone"
-            type="tel"
-            placeholder="Ex: 509..."
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>WhatsApp</label>
-
-          <input
-            name="whatsapp"
-            type="tel"
-            placeholder="Ex: 509..."
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Email</label>
-
-          <input
-            name="email"
-            type="email"
-            placeholder="contact@example.com"
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Site web</label>
-
-          <input
-            name="website"
-            type="url"
-            placeholder="https://..."
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>URL de l'image</label>
-
-          <input
-            name="image_url"
-            type="url"
-            placeholder="https://..."
-          >
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Nom du propriétaire/contact</label>
-
-          <input
-            name="owner_name"
-            placeholder="Nom du responsable"
-          >
-
-        </div>
-
-        <button class="btn btn-primary" type="submit">
-          🚀 Ajouter l'entreprise
-        </button>
-
-      </form>
-
-    </div>
-
-  `;
-
-  res.send(pageTemplate("Ajouter une entreprise", content));
 });
 
 // =====================================================
 // BUSINESS DETAILS
 // =====================================================
 
-app.get("/business/:id", async (req, res) => {
-
-  const id = Number(req.params.id);
-
-  if (!Number.isInteger(id)) {
-    return res.status(400).send(
-      pageTemplate(
-        "Erreur",
-        `<div class="error">ID invalide.</div>`
-      )
-    );
-  }
-
+app.get("/api/businesses/:id", async (req, res) => {
   try {
+    const business = await pool.query(
+      `
+      SELECT
+        b.*,
+        u.name AS owner_name,
+        u.photo_url AS owner_photo,
+        u.phone AS owner_phone,
+        u.whatsapp AS owner_whatsapp
+      FROM businesses b
+      JOIN users u ON u.id = b.user_id
+      WHERE b.id = $1
+      `,
+      [req.params.id]
+    );
+
+    if (business.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Entreprise introuvable"
+      });
+    }
+
+    const products = await pool.query(
+      "SELECT * FROM products WHERE business_id = $1 ORDER BY id DESC",
+      [req.params.id]
+    );
+
+    const services = await pool.query(
+      "SELECT * FROM services WHERE business_id = $1 ORDER BY id DESC",
+      [req.params.id]
+    );
+
+    const reviews = await pool.query(
+      `
+      SELECT r.*, u.name AS reviewer_name, u.photo_url AS reviewer_photo
+      FROM reviews r
+      JOIN users u ON u.id = r.user_id
+      WHERE r.business_id = $1
+      ORDER BY r.id DESC
+      `,
+      [req.params.id]
+    );
+
+    res.json({
+      status: "ok",
+      business: business.rows[0],
+      products: products.rows,
+      services: services.rows,
+      reviews: reviews.rows
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// BUSINESS - UPDATE
+// =====================================================
+
+app.put("/api/businesses/:id", authRequired, async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      category,
+      phone,
+      whatsapp,
+      location,
+      address,
+      opening_hours,
+      photo_url
+    } = req.body;
 
     const result = await pool.query(
       `
-      SELECT *
-      FROM businesses
-      WHERE id = $1
+      UPDATE businesses
+      SET
+        name = COALESCE($1,name),
+        description = COALESCE($2,description),
+        category = COALESCE($3,category),
+        phone = COALESCE($4,phone),
+        whatsapp = COALESCE($5,whatsapp),
+        location = COALESCE($6,location),
+        address = COALESCE($7,address),
+        opening_hours = COALESCE($8,opening_hours),
+        photo_url = COALESCE($9,photo_url)
+      WHERE id = $10 AND user_id = $11
+      RETURNING *
       `,
-      [id]
+      [
+        name,
+        description,
+        category,
+        phone,
+        whatsapp,
+        location,
+        address,
+        opening_hours,
+        photo_url,
+        req.params.id,
+        req.userId
+      ]
     );
 
-    if (!result.rows.length) {
-
-      return res.status(404).send(
-        pageTemplate(
-          "Entreprise introuvable",
-          `
-          <div class="card empty">
-
-            <h2>Entreprise introuvable</h2>
-
-            <a class="btn btn-primary" href="/businesses">
-              Retour aux entreprises
-            </a>
-
-          </div>
-          `
-        )
-      );
-
+    if (result.rows.length === 0) {
+      return res.status(403).json({
+        status: "error",
+        message: "Vous ne pouvez modifier que votre propre entreprise"
+      });
     }
 
-    const business = result.rows[0];
+    res.json({
+      status: "ok",
+      business: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
 
-    const image = business.image_url
-      ? escapeHTML(business.image_url)
-      : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80";
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
 
-    const phone = cleanPhone(business.phone);
-    const whatsapp = whatsappNumber(business.whatsapp);
+// =====================================================
+// BUSINESS - DELETE
+// =====================================================
 
-    const phoneButton = phone
-      ? `
-        <a
-          class="btn btn-primary"
-          href="tel:${escapeHTML(phone)}"
-        >
-          📞 Appeler
-        </a>
+app.delete("/api/businesses/:id", authRequired, async (req, res) => {
+  try {
+    const result = await pool.query(
       `
-      : "";
+      DELETE FROM businesses
+      WHERE id = $1 AND user_id = $2
+      RETURNING id
+      `,
+      [req.params.id, req.userId]
+    );
 
-    const whatsappButton = whatsapp
-      ? `
-        <a
-          class="btn btn-success"
-          href="https://wa.me/${
+    if (result.rows.length === 0) {
+      return res.status(403).json({
+        status: "error",
+        message: "Vous ne pouvez supprimer que votre propre entreprise"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      message: "Entreprise supprimée"
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// PRODUCTS - CREATE
+// =====================================================
+
+app.post("/api/products", authRequired, async (req, res) => {
+  try {
+    const {
+      business_id,
+      title,
+      description,
+      price,
+      currency,
+      category,
+      location,
+      whatsapp,
+      phone,
+      image_url,
+      quantity
+    } = req.body;
+
+    if (!title) {
+      return res.status(400).json({
+        status: "error",
+        message: "Nom du produit obligatoire"
+      });
+    }
+
+    if (business_id) {
+      const owner = await pool.query(
+        "SELECT id FROM businesses WHERE id = $1 AND user_id = $2",
+        [business_id, req.userId]
+      );
+
+      if (owner.rows.length === 0) {
+        return res.status(403).json({
+          status: "error",
+          message: "Entreprise invalide"
+        });
+      }
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO products
+      (
+        user_id,
+        business_id,
+        title,
+        description,
+        price,
+        currency,
+        category,
+        location,
+        whatsapp,
+        phone,
+        image_url,
+        quantity
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+      RETURNING *
+      `,
+      [
+        req.userId,
+        business_id || null,
+        title,
+        description || null,
+        Number(price || 0),
+        currency || "HTG",
+        category || null,
+        location || null,
+        whatsapp || null,
+        phone || null,
+        image_url || null,
+        Number(quantity || 1)
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      product: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Impossible de créer le produit"
+    });
+  }
+});
+
+// =====================================================
+// PRODUCTS - LIST / SEARCH
+// =====================================================
+
+app.get("/api/products", async (req, res) => {
+  try {
+    const search = String(req.query.search || "").trim();
+
+    const result = await pool.query(
+      `
+      SELECT
+        p.*,
+        u.name AS seller_name,
+        u.photo_url AS seller_photo,
+        b.name AS business_name
+      FROM products p
+      JOIN users u ON u.id = p.user_id
+      LEFT JOIN businesses b ON b.id = p.business_id
+      WHERE
+        ($1 = '' OR
+        p.title ILIKE $2 OR
+        p.category ILIKE $2 OR
+        p.location ILIKE $2 OR
+        p.description ILIKE $2)
+      ORDER BY p.id DESC
+      `,
+      [search, "%" + search + "%"]
+    );
+
+    res.json({
+      status: "ok",
+      products: result.rows
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
+
+// =====================================================
+// PRODUCT DETAILS
+// =====================================================
+
+app.get("/api/products/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        p.*,
+        u.name AS seller_name,
+        u.photo_url AS seller_photo,
+        u.phone AS se
