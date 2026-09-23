@@ -8,6 +8,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(__dirname));
 
+app.get("/business-details.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "business-details.html"));
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
