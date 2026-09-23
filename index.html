@@ -90,3 +90,136 @@ const API =
 "https://helpy-production-c2f2.up.railway.app";
 
 async function register(){
+
+async function register(){
+  const data={
+    name:document.getElementById("name").value,
+    email:document.getElementById("email").value,
+    password:document.getElementById("password").value,
+    phone:document.getElementById("phone").value,
+    whatsapp:document.getElementById("whatsapp").value
+  };
+
+  try{
+    const r=await fetch(API+"/api/register",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(data)
+    });
+
+    const d=await r.json();
+
+    if(d.user){
+      localStorage.setItem("user",JSON.stringify(d.user));
+      show("Kont kreye avèk siksè ✅ ID: "+d.user.id);
+    }else{
+      show(d.error || "Erè");
+    }
+  }catch(e){
+    show("Server pa disponib");
+  }
+}
+
+
+async function login(){
+  const data={
+    email:document.getElementById("lemail").value,
+    password:document.getElementById("lpassword").value
+  };
+
+  try{
+    const r=await fetch(API+"/api/login",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(data)
+    });
+
+    const d=await r.json();
+
+    if(d.user){
+      localStorage.setItem("user",JSON.stringify(d.user));
+      show("Konekte avèk siksè ✅ ID: "+d.user.id);
+    }else{
+      show(d.error || "Erè koneksyon");
+    }
+  }catch(e){
+    show("Server pa disponib");
+  }
+}
+
+
+function show(msg){
+  document.getElementById("result").innerHTML=msg;
+}
+
+</script>
+
+<div class="card">
+<h2>Ajoute antrepriz</h2>
+
+<input id="bname" placeholder="Non antrepriz la">
+<input id="bdesc" placeholder="Deskripsyon">
+<input id="bcat" placeholder="Kategori">
+<input id="bloc" placeholder="Kote">
+<input id="bphone" placeholder="Telefòn">
+<input id="bwa" placeholder="WhatsApp">
+<input id="bphoto" placeholder="URL foto/logo">
+
+<button onclick="addBusiness()">
+Ajoute antrepriz
+</button>
+
+<div id="businessResult"></div>
+</div>
+
+<script>
+async function addBusiness(){
+
+  const user=JSON.parse(localStorage.getItem("user"));
+
+  if(!user){
+    document.getElementById("businessResult").innerHTML=
+      "⚠️ Konekte anvan.";
+    return;
+  }
+
+  const data={
+    name:document.getElementById("bname").value,
+    description:document.getElementById("bdesc").value,
+    category:document.getElementById("bcat").value,
+    location:document.getElementById("bloc").value,
+    phone:document.getElementById("bphone").value,
+    whatsapp:document.getElementById("bwa").value,
+    photo_url:document.getElementById("bphoto").value
+  };
+
+  try{
+    const r=await fetch(API+"/api/businesses",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-user-id":user.id
+      },
+      body:JSON.stringify(data)
+    });
+
+    const d=await r.json();
+
+    if(d.business){
+      document.getElementById("businessResult").innerHTML=
+        "✅ Antrepriz ajoute! ID: "+d.business.id;
+    }else{
+      document.getElementById("businessResult").innerHTML=
+        "❌ "+(d.error || "Erè");
+    }
+
+  }catch(e){
+    document.getElementById("businessResult").innerHTML=
+      "❌ Server pa disponib";
+  }
+}
+</script>
+
+</main>
+</body>
+</html>
