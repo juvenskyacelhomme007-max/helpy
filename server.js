@@ -1,863 +1,858 @@
 const express = require("express");
 const cors = require("cors");
-const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const { Pool } = require("pg");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// =====================================================
-// DATABASE
-// =====================================================
-
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is missing");
-}
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false }
 });
 
-// =====================================================
-// DATABASE INITIALIZATION
-// =====================================================
-
-async function initializeDatabase() {
+async function db() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
-      name VARCHAR(120) NOT NULL,
-      email VARCHAR(180) UNIQUE NOT NULL,
-      password VARCHAR(255) NOT NULL,
-      phone VARCHAR(40),
-      whatsapp VARCHAR(40),
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(150) UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      phone VARCHAR(30),
+      whatsapp VARCHAR(30),
       photo_url TEXT,
-      location VARCHAR(180),
-      bio TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+      created_at TIMESTAMP DEFAULT NOW()
+    );
 
-  await pool.query(`
     CREATE TABLE IF NOT EXISTS businesses (
       id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      name VARCHAR(180) NOT NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      name VARCHAR(150) NOT NULL,
       description TEXT,
       category VARCHAR(100),
-      phone VARCHAR(40),
-      whatsapp VARCHAR(40),
-      location VARCHAR(180),
-      address TEXT,
-      opening_hours VARCHAR(255),
+      location VARCHAR(150),
+      phone VARCHAR(30),
+      whatsapp VARCHAR(30),
       photo_url TEXT,
-      rating NUMERIC(3,2) DEFAULT 0,
-      reviews_count INTEGER DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+      created_at TIMESTAMP DEFAULT NOW()
+    );
 
-  await pool.query(`
     CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
       business_id INTEGER REFERENCES businesses(id) ON DELETE SET NULL,
-      title VARCHAR(180) NOT NULL,
+      title VARCHAR(150) NOT NULL,
       description TEXT,
-      price NUMERIC(12,2) DEFAULT 0,
+      price NUMERIC(12,2),
       currency VARCHAR(10) DEFAULT 'HTG',
-      category VARCHAR(100),
-      location VARCHAR(180),
-      whatsapp VARCHAR(40),
-      phone VARCHAR(40),
+      location VARCHAR(150),
+      whatsapp VARCHAR(30),
       image_url TEXT,
       quantity INTEGER DEFAULT 1,
       status VARCHAR(30) DEFAULT 'active',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+      created_at TIMESTAMP DEFAULT NOW()
+    );
   `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS services (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      business_id INTEGER REFERENCES businesses(id) ON DELETE SET NULL,
-      title VARCHAR(180) NOT NULL,
-      description TEXT,
-      price NUMERIC(12,2) DEFAULT 0,
-      currency VARCHAR(10) DEFAULT 'HTG',
-      category VARCHAR(100),
-      location VARCHAR(180),
-      whatsapp VARCHAR(40),
-      phone VARCHAR(40),
-      image_url TEXT,
-      status VARCHAR(30) DEFAULT 'active',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS reviews (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
-      product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
-      service_id INTEGER REFERENCES services(id) ON DELETE CASCADE,
-      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-      comment TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS messages (
-      id SERIAL PRIMARY KEY,
-      sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      message TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS reports (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      target_type VARCHAR(30) NOT NULL,
-      target_id INTEGER NOT NULL,
-      reason TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  console.log("HElPY database ready");
 }
 
-// =====================================================
-// HELPERS
-// =====================================================
+db()
+  .then(() => console.log("Database OK"))
+  .catch(err => console.error("Database error:", err));
 
-function escapeHtml(value) {
-  if (value === null || value === undefined) return "";
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+function userId(req) {
+  return Number(req.headers["x-user-id"]) || null;
 }
 
-function cleanPhone(value) {
-  return String(value || "").replace(/[^\d+]/g, "");
-}
-
-function whatsappUrl(value) {
-  const phone = cleanPhone(value).replace("+", "");
-  return "https://wa.me/" + phone;
-}
-
-function authRequired(req, res, next) {
-  const userId = req.headers["x-user-id"];
-
-  if (!userId) {
-    return res.status(401).json({
-      status: "error",
-      message: "Connexion requise"
-    });
-  }
-
-  req.userId = Number(userId);
-  next();
-}
-
-async function getUser(userId) {
-  const result = await pool.query(
-    "SELECT * FROM users WHERE id = $1",
-    [userId]
-  );
-
-  return result.rows[0];
-}
-
-// =====================================================
-// API HOME
-// =====================================================
-
-app.get("/api", (req, res) => {
-  res.json({
-    status: "ok",
-    app: "HElPY",
-    message: "HElPY API is running"
-  });
+app.get("/", (req, res) => {
+  res.send("HElPY API OK");
 });
 
-// =====================================================
-// REGISTER
-// =====================================================
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+// ===============================
+// AUTH
+// ===============================
 
 app.post("/api/register", async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      phone,
-      whatsapp,
-      photo_url,
-      location,
-      bio
-    } = req.body;
+    const { name, email, password, phone, whatsapp, photo_url } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({
-        status: "error",
-        message: "Nom, email et mot de passe obligatoires"
-      });
+      return res.status(400).json({ error: "Name, email and password required" });
     }
 
-    const existing = await pool.query(
-      "SELECT id FROM users WHERE LOWER(email) = LOWER($1)",
-      [email.trim()]
+    const exists = await pool.query(
+      "SELECT id FROM users WHERE email=$1",
+      [email]
     );
 
-    if (existing.rows.length > 0) {
-      return res.status(409).json({
-        status: "error",
-        message: "Ce compte existe déjà"
-      });
+    if (exists.rows.length) {
+      return res.status(400).json({ error: "Email already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
 
-    const result = await pool.query(
-      `
-      INSERT INTO users
-      (name, email, password, phone, whatsapp, photo_url, location, bio)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-      RETURNING id, name, email, phone, whatsapp, photo_url, location, bio, created_at
-      `,
-      [
-        name.trim(),
-        email.trim().toLowerCase(),
-        hashedPassword,
-        phone || null,
-        whatsapp || null,
-        photo_url || null,
-        location || null,
-        bio || null
-      ]
+    const r = await pool.query(
+      `INSERT INTO users
+       (name,email,password,phone,whatsapp,photo_url)
+       VALUES ($1,$2,$3,$4,$5,$6)
+       RETURNING id,name,email,phone,whatsapp,photo_url`,
+      [name, email, hash, phone || null, whatsapp || null, photo_url || null]
     );
 
-    res.status(201).json({
+    res.json({
       status: "ok",
-      message: "Compte créé avec succès",
-      user: result.rows[0]
+      user: r.rows[0]
     });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
-    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
-// =====================================================
-// LOGIN
-// =====================================================
 
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await pool.query(
-      "SELECT * FROM users WHERE LOWER(email) = LOWER($1)",
+    const r = await pool.query(
+      "SELECT * FROM users WHERE email=$1",
       [email]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({
-        status: "error",
-        message: "Email ou mot de passe incorrect"
-      });
+    if (!r.rows.length) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const user = result.rows[0];
+    const user = r.rows[0];
+    const ok = await bcrypt.compare(password, user.password);
 
-    const valid = await bcrypt.compare(password, user.password);
-
-    if (!valid) {
-      return res.status(401).json({
-        status: "error",
-        message: "Email ou mot de passe incorrect"
-      });
+    if (!ok) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     delete user.password;
 
     res.json({
       status: "ok",
-      message: "Connexion réussie",
-      user
+      user: user
     });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
-    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
-// =====================================================
-// PROFILE
-// =====================================================
 
-app.get("/api/profile/:id", async (req, res) => {
+app.get("/api/profile", async (req, res) => {
   try {
-    const user = await getUser(req.params.id);
+    const id = userId(req);
 
-    if (!user) {
-      return res.status(404).json({
-        status: "error",
-        message: "Utilisateur introuvable"
-      });
+    if (!id) {
+      return res.status(401).json({ error: "Login required" });
     }
 
-    delete user.password;
-
-    const businesses = await pool.query(
-      "SELECT * FROM businesses WHERE user_id = $1 ORDER BY id DESC",
-      [req.params.id]
+    const r = await pool.query(
+      `SELECT id,name,email,phone,whatsapp,photo_url,created_at
+       FROM users
+       WHERE id=$1`,
+      [id]
     );
 
-    const products = await pool.query(
-      "SELECT * FROM products WHERE user_id = $1 ORDER BY id DESC",
-      [req.params.id]
-    );
+    if (!r.rows.length) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-    const services = await pool.query(
-      "SELECT * FROM services WHERE user_id = $1 ORDER BY id DESC",
-      [req.params.id]
-    );
-
-    res.json({
-      status: "ok",
-      user,
-      businesses: businesses.rows,
-      products: products.rows,
-      services: services.rows
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
-    });
+    res.json(r.rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
-
-// =====================================================
-// UPDATE PROFILE
-// =====================================================
-
-app.put("/api/profile", authRequired, async (req, res) => {
+app.put("/api/profile", async (req, res) => {
   try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({ error: "Login required" });
+    }
+
     const {
       name,
       phone,
       whatsapp,
-      photo_url,
-      location,
-      bio
+      photo_url
     } = req.body;
 
-    const result = await pool.query(
-      `
-      UPDATE users
-      SET
-        name = COALESCE($1, name),
-        phone = COALESCE($2, phone),
-        whatsapp = COALESCE($3, whatsapp),
-        photo_url = COALESCE($4, photo_url),
-        location = COALESCE($5, location),
-        bio = COALESCE($6, bio)
-      WHERE id = $7
-      RETURNING id, name, email, phone, whatsapp, photo_url, location, bio
-      `,
+    const r = await pool.query(
+      `UPDATE users
+       SET name=$1, phone=$2, whatsapp=$3, photo_url=$4
+       WHERE id=$5
+       RETURNING id,name,email,phone,whatsapp,photo_url`,
       [
         name,
-        phone,
-        whatsapp,
-        photo_url,
-        location,
-        bio,
-        req.userId
+        phone || null,
+        whatsapp || null,
+        photo_url || null,
+        id
       ]
     );
 
     res.json({
       status: "ok",
-      user: result.rows[0]
+      user: r.rows[0]
     });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Impossible de modifier le profil"
-    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
-// =====================================================
-// BUSINESSES - CREATE
-// =====================================================
 
-app.post("/api/businesses", authRequired, async (req, res) => {
+// ===============================
+// BUSINESSES
+// ===============================
+
+app.post("/api/businesses", async (req, res) => {
   try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({ error: "Login required" });
+    }
+
     const {
       name,
       description,
       category,
+      location,
       phone,
       whatsapp,
-      location,
-      address,
-      opening_hours,
       photo_url
     } = req.body;
 
     if (!name) {
-      return res.status(400).json({
-        status: "error",
-        message: "Nom de l'entreprise obligatoire"
-      });
+      return res.status(400).json({ error: "Business name required" });
     }
 
-    const result = await pool.query(
-      `
-      INSERT INTO businesses
-      (
-        user_id,
-        name,
-        description,
-        category,
-        phone,
-        whatsapp,
-        location,
-        address,
-        opening_hours,
-        photo_url
-      )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-      RETURNING *
-      `,
+    const r = await pool.query(
+      `INSERT INTO businesses
+       (user_id,name,description,category,location,phone,whatsapp,photo_url)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       RETURNING *`,
       [
-        req.userId,
+        id,
         name,
         description || null,
         category || null,
+        location || null,
         phone || null,
         whatsapp || null,
-        location || null,
-        address || null,
-        opening_hours || null,
         photo_url || null
       ]
     );
 
-    res.status(201).json({
+    res.json({
       status: "ok",
-      business: result.rows[0]
+      business: r.rows[0]
     });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Impossible de créer l'entreprise"
-    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
-// =====================================================
-// BUSINESSES - LIST
-// =====================================================
 
 app.get("/api/businesses", async (req, res) => {
   try {
-    const search = String(req.query.search || "").trim();
-
-    let result;
-
-    if (search) {
-      result = await pool.query(
-        `
-        SELECT b.*, u.name AS owner_name, u.photo_url AS owner_photo
-        FROM businesses b
-        JOIN users u ON u.id = b.user_id
-        WHERE
-          b.name ILIKE $1
-          OR b.category ILIKE $1
-          OR b.location ILIKE $1
-          OR b.description ILIKE $1
-        ORDER BY b.id DESC
-        `,
-        ["%" + search + "%"]
-      );
-    } else {
-      result = await pool.query(
-        `
-        SELECT b.*, u.name AS owner_name, u.photo_url AS owner_photo
-        FROM businesses b
-        JOIN users u ON u.id = b.user_id
-        ORDER BY b.id DESC
-        `
-      );
-    }
+    const r = await pool.query(
+      `SELECT b.*, u.name AS owner_name
+       FROM businesses b
+       LEFT JOIN users u ON u.id=b.user_id
+       ORDER BY b.id DESC`
+    );
 
     res.json({
       status: "ok",
-      entreprises: result.rows
+      entreprises: r.rows
     });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
-    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
-
-// =====================================================
-// BUSINESS DETAILS
-// =====================================================
 
 app.get("/api/businesses/:id", async (req, res) => {
   try {
-    const business = await pool.query(
-      `
-      SELECT
-        b.*,
-        u.name AS owner_name,
-        u.photo_url AS owner_photo,
-        u.phone AS owner_phone,
-        u.whatsapp AS owner_whatsapp
-      FROM businesses b
-      JOIN users u ON u.id = b.user_id
-      WHERE b.id = $1
-      `,
+    const r = await pool.query(
+      `SELECT b.*, u.name AS owner_name,
+              u.photo_url AS owner_photo
+       FROM businesses b
+       LEFT JOIN users u ON u.id=b.user_id
+       WHERE b.id=$1`,
       [req.params.id]
     );
 
-    if (business.rows.length === 0) {
+    if (!r.rows.length) {
       return res.status(404).json({
-        status: "error",
-        message: "Entreprise introuvable"
+        error: "Business not found"
       });
     }
 
-    const products = await pool.query(
-      "SELECT * FROM products WHERE business_id = $1 ORDER BY id DESC",
-      [req.params.id]
-    );
-
-    const services = await pool.query(
-      "SELECT * FROM services WHERE business_id = $1 ORDER BY id DESC",
-      [req.params.id]
-    );
-
-    const reviews = await pool.query(
-      `
-      SELECT r.*, u.name AS reviewer_name, u.photo_url AS reviewer_photo
-      FROM reviews r
-      JOIN users u ON u.id = r.user_id
-      WHERE r.business_id = $1
-      ORDER BY r.id DESC
-      `,
-      [req.params.id]
-    );
-
-    res.json({
-      status: "ok",
-      business: business.rows[0],
-      products: products.rows,
-      services: services.rows,
-      reviews: reviews.rows
-    });
-  } catch (error) {
-    console.error(error);
-
+    res.json(r.rows[0]);
+  } catch (e) {
     res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
+      error: e.message
     });
   }
 });
 
-// =====================================================
-// BUSINESS - UPDATE
-// =====================================================
 
-app.put("/api/businesses/:id", authRequired, async (req, res) => {
+app.put("/api/businesses/:id", async (req, res) => {
   try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const check = await pool.query(
+      "SELECT id FROM businesses WHERE id=$1 AND user_id=$2",
+      [req.params.id, id]
+    );
+
+    if (!check.rows.length) {
+      return res.status(403).json({
+        error: "Not your business"
+      });
+    }
+
     const {
       name,
       description,
       category,
+      location,
       phone,
       whatsapp,
-      location,
-      address,
-      opening_hours,
       photo_url
     } = req.body;
 
-    const result = await pool.query(
-      `
-      UPDATE businesses
-      SET
-        name = COALESCE($1,name),
-        description = COALESCE($2,description),
-        category = COALESCE($3,category),
-        phone = COALESCE($4,phone),
-        whatsapp = COALESCE($5,whatsapp),
-        location = COALESCE($6,location),
-        address = COALESCE($7,address),
-        opening_hours = COALESCE($8,opening_hours),
-        photo_url = COALESCE($9,photo_url)
-      WHERE id = $10 AND user_id = $11
-      RETURNING *
-      `,
+    const r = await pool.query(
+      `UPDATE businesses
+       SET name=$1,
+           description=$2,
+           category=$3,
+           location=$4,
+           phone=$5,
+           whatsapp=$6,
+           photo_url=$7
+       WHERE id=$8
+       RETURNING *`,
       [
         name,
-        description,
-        category,
-        phone,
-        whatsapp,
-        location,
-        address,
-        opening_hours,
-        photo_url,
-        req.params.id,
-        req.userId
+        description || null,
+        category || null,
+        location || null,
+        phone || null,
+        whatsapp || null,
+        photo_url || null,
+        req.params.id
       ]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(403).json({
-        status: "error",
-        message: "Vous ne pouvez modifier que votre propre entreprise"
-      });
-    }
-
     res.json({
       status: "ok",
-      business: result.rows[0]
+      business: r.rows[0]
     });
-  } catch (error) {
-    console.error(error);
-
+  } catch (e) {
     res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
+      error: e.message
     });
   }
 });
 
-// =====================================================
-// BUSINESS - DELETE
-// =====================================================
 
-app.delete("/api/businesses/:id", authRequired, async (req, res) => {
+app.delete("/api/businesses/:id", async (req, res) => {
   try {
-    const result = await pool.query(
-      `
-      DELETE FROM businesses
-      WHERE id = $1 AND user_id = $2
-      RETURNING id
-      `,
-      [req.params.id, req.userId]
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const r = await pool.query(
+      `DELETE FROM businesses
+       WHERE id=$1 AND user_id=$2
+       RETURNING id`,
+      [req.params.id, id]
     );
 
-    if (result.rows.length === 0) {
+    if (!r.rows.length) {
       return res.status(403).json({
-        status: "error",
-        message: "Vous ne pouvez supprimer que votre propre entreprise"
+        error: "Not your business"
       });
     }
 
     res.json({
       status: "ok",
-      message: "Entreprise supprimée"
+      message: "Business deleted"
     });
-  } catch (error) {
-    console.error(error);
-
+  } catch (e) {
     res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
+      error: e.message
     });
   }
 });
 
-// =====================================================
-// PRODUCTS - CREATE
-// =====================================================
+// ===============================
+// PRODUCTS
+// ===============================
 
-app.post("/api/products", authRequired, async (req, res) => {
+app.post("/api/products", async (req, res) => {
   try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
     const {
       business_id,
       title,
       description,
       price,
       currency,
-      category,
       location,
       whatsapp,
-      phone,
       image_url,
       quantity
     } = req.body;
 
     if (!title) {
       return res.status(400).json({
-        status: "error",
-        message: "Nom du produit obligatoire"
+        error: "Product title required"
       });
     }
 
-    if (business_id) {
-      const owner = await pool.query(
-        "SELECT id FROM businesses WHERE id = $1 AND user_id = $2",
-        [business_id, req.userId]
-      );
-
-      if (owner.rows.length === 0) {
-        return res.status(403).json({
-          status: "error",
-          message: "Entreprise invalide"
-        });
-      }
-    }
-
-    const result = await pool.query(
-      `
-      INSERT INTO products
-      (
-        user_id,
-        business_id,
-        title,
-        description,
-        price,
-        currency,
-        category,
-        location,
-        whatsapp,
-        phone,
-        image_url,
-        quantity
-      )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-      RETURNING *
-      `,
+    const r = await pool.query(
+      `INSERT INTO products
+       (user_id,business_id,title,description,price,currency,
+        location,whatsapp,image_url,quantity)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+       RETURNING *`,
       [
-        req.userId,
+        id,
         business_id || null,
         title,
         description || null,
-        Number(price || 0),
+        price || 0,
         currency || "HTG",
-        category || null,
         location || null,
         whatsapp || null,
-        phone || null,
         image_url || null,
-        Number(quantity || 1)
+        quantity || 1
       ]
-    );
-
-    res.status(201).json({
-      status: "ok",
-      product: result.rows[0]
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      status: "error",
-      message: "Impossible de créer le produit"
-    });
-  }
-});
-
-// =====================================================
-// PRODUCTS - LIST / SEARCH
-// =====================================================
-
-app.get("/api/products", async (req, res) => {
-  try {
-    const search = String(req.query.search || "").trim();
-
-    const result = await pool.query(
-      `
-      SELECT
-        p.*,
-        u.name AS seller_name,
-        u.photo_url AS seller_photo,
-        b.name AS business_name
-      FROM products p
-      JOIN users u ON u.id = p.user_id
-      LEFT JOIN businesses b ON b.id = p.business_id
-      WHERE
-        ($1 = '' OR
-        p.title ILIKE $2 OR
-        p.category ILIKE $2 OR
-        p.location ILIKE $2 OR
-        p.description ILIKE $2)
-      ORDER BY p.id DESC
-      `,
-      [search, "%" + search + "%"]
     );
 
     res.json({
       status: "ok",
-      products: result.rows
+      product: r.rows[0]
     });
-  } catch (error) {
-    console.error(error);
-
+  } catch (e) {
     res.status(500).json({
-      status: "error",
-      message: "Erreur serveur"
+      error: e.message
     });
   }
 });
 
-// =====================================================
-// PRODUCT DETAILS
-// =====================================================
+
+app.get("/api/products", async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT p.*, u.name AS seller_name
+       FROM products p
+       LEFT JOIN users u ON u.id=p.user_id
+       ORDER BY p.id DESC`
+    );
+
+    res.json({
+      status: "ok",
+      products: r.rows
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
 
 app.get("/api/products/:id", async (req, res) => {
   try {
-    const result = await pool.query(
-      `
-      SELECT
-        p.*,
-        u.name AS seller_name,
-        u.photo_url AS seller_photo,
-        u.phone AS se
+    const r = await pool.query(
+      `SELECT p.*, u.name AS seller_name,
+              u.photo_url AS seller_photo
+       FROM products p
+       LEFT JOIN users u ON u.id=p.user_id
+       WHERE p.id=$1`,
+      [req.params.id]
+    );
+
+    if (!r.rows.length) {
+      return res.status(404).json({
+        error: "Product not found"
+      });
+    }
+
+    res.json(r.rows[0]);
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+// ===============================
+// PRODUCT EDIT / DELETE
+// ===============================
+
+app.put("/api/products/:id", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({ error: "Login required" });
+    }
+
+    const check = await pool.query(
+      "SELECT id FROM products WHERE id=$1 AND user_id=$2",
+      [req.params.id, id]
+    );
+
+    if (!check.rows.length) {
+      return res.status(403).json({ error: "Not your product" });
+    }
+
+    const {
+      title,
+      description,
+      price,
+      currency,
+      location,
+      whatsapp,
+      image_url,
+      quantity
+    } = req.body;
+
+    const r = await pool.query(
+      `UPDATE products
+       SET title=$1,
+           description=$2,
+           price=$3,
+           currency=$4,
+           location=$5,
+           whatsapp=$6,
+           image_url=$7,
+           quantity=$8
+       WHERE id=$9
+       RETURNING *`,
+      [
+        title,
+        description || null,
+        price || 0,
+        currency || "HTG",
+        location || null,
+        whatsapp || null,
+        image_url || null,
+        quantity || 1,
+        req.params.id
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      product: r.rows[0]
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
+app.delete("/api/products/:id", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({ error: "Login required" });
+    }
+
+    const r = await pool.query(
+      `DELETE FROM products
+       WHERE id=$1 AND user_id=$2
+       RETURNING id`,
+      [req.params.id, id]
+    );
+
+    if (!r.rows.length) {
+      return res.status(403).json({
+        error: "Not your product"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      message: "Product deleted"
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
+// ===============================
+// SEARCH
+// ===============================
+
+app.get("/api/search", async (req, res) => {
+  try {
+    const q = "%" + (req.query.q || "") + "%";
+
+    const businesses = await pool.query(
+      `SELECT id,name,description,location,photo_url
+       FROM businesses
+       WHERE name ILIKE $1
+          OR description ILIKE $1
+       ORDER BY id DESC`,
+      [q]
+    );
+
+    const products = await pool.query(
+      `SELECT id,title,description,price,currency,image_url
+       FROM products
+       WHERE title ILIKE $1
+          OR description ILIKE $1
+       ORDER BY id DESC`,
+      [q]
+    );
+
+    res.json({
+      status: "ok",
+      businesses: businesses.rows,
+      products: products.rows
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+// ===============================
+// REVIEWS
+// ===============================
+
+app.post("/api/reviews", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const {
+      business_id,
+      product_id,
+      rating,
+      comment
+    } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        error: "Rating must be 1-5"
+      });
+    }
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+        rating INTEGER NOT NULL,
+        comment TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    const r = await pool.query(
+      `INSERT INTO reviews
+       (user_id,business_id,product_id,rating,comment)
+       VALUES ($1,$2,$3,$4,$5)
+       RETURNING *`,
+      [
+        id,
+        business_id || null,
+        product_id || null,
+        rating,
+        comment || null
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      review: r.rows[0]
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+app.get("/api/reviews/:businessId", async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT r.*, u.name AS user_name,
+              u.photo_url AS user_photo
+       FROM reviews r
+       LEFT JOIN users u ON u.id=r.user_id
+       WHERE r.business_id=$1
+       ORDER BY r.id DESC`,
+      [req.params.businessId]
+    );
+
+    res.json({
+      status: "ok",
+      reviews: r.rows
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// ===============================
+// MESSAGES
+// ===============================
+
+app.post("/api/messages", async (req, res) => {
+  try {
+    const sender = userId(req);
+
+    if (!sender) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const { receiver_id, message } = req.body;
+
+    if (!receiver_id || !message) {
+      return res.status(400).json({
+        error: "Receiver and message required"
+      });
+    }
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        sender_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        receiver_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    const r = await pool.query(
+      `INSERT INTO messages
+       (sender_id,receiver_id,message)
+       VALUES ($1,$2,$3)
+       RETURNING *`,
+      [sender, receiver_id, message]
+    );
+
+    res.json({
+      status: "ok",
+      message: r.rows[0]
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+// ===============================
+// REPORTS
+// ===============================
+
+app.post("/api/reports", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const { type, target_id, reason } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({
+        error: "Reason required"
+      });
+    }
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS reports (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(50),
+        target_id INTEGER,
+        reason TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    const r = await pool.query(
+      `INSERT INTO reports
+       (user_id,type,target_id,reason)
+       VALUES ($1,$2,$3,$4)
+       RETURNING *`,
+      [
+        id,
+        type || null,
+        target_id || null,
+        reason
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      report: r.rows[0]
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// ===============================
+// START SERVER
+// ===============================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("HElPY running on port " + PORT);
+});
