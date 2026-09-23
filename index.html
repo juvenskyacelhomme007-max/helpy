@@ -3,204 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HELPY — Votre assistant</title>
+  <title>HELPY</title>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
+      background: #f5f6fb;
       color: #172033;
-      min-height: 100vh;
-    }
-
-    .app {
-      max-width: 700px;
-      margin: auto;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
 
     header {
-      background: #ffffff;
-      padding: 20px;
-      border-bottom: 1px solid #e5e7eb;
+      background: white;
+      padding: 18px 20px;
       text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .logo {
-      font-size: 30px;
+      font-size: 34px;
       font-weight: 800;
-      color: #5b4bff;
+      color: #5846e8;
     }
 
     .subtitle {
-      margin-top: 6px;
-      color: #6b7280;
-      font-size: 14px;
+      color: #777;
+      margin-top: 5px;
     }
 
-    main {
-      flex: 1;
-      padding: 20px;
+    nav {
       display: flex;
-      flex-direction: column;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 10px;
+      background: white;
     }
 
-    .welcome {
+    nav a {
+      text-decoration: none;
+      color: #172033;
+      background: #f0efff;
+      padding: 10px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    nav a.active,
+    nav a:hover {
+      background: #5846e8;
+      color: white;
+    }
+
+    .hero {
       text-align: center;
-      margin: 35px 0 25px;
+      padding: 55px 20px 30px;
     }
 
-    .welcome h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 12px;
     }
 
-    .welcome p {
-      color: #6b7280;
-      line-height: 1.5;
+    .hero p {
+      font-size: 18px;
+      color: #666;
     }
 
     .chat {
-      flex: 1;
-      margin-bottom: 15px;
+      width: calc(100% - 30px);
+      max-width: 700px;
+      margin: 20px auto 100px;
+      background: white;
+      border-radius: 24px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
     }
 
     .message {
-      background: white;
-      padding: 14px 16px;
-      border-radius: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
-      line-height: 1.5;
-    }
-
-    .message.user {
-      background: #5b4bff;
-      color: white;
-      margin-left: 35px;
-    }
-
-    .message.bot {
-      margin-right: 35px;
+      background: #f0f1f7;
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      font-size: 16px;
     }
 
     .input-area {
       display: flex;
-      gap: 8px;
-      background: white;
-      padding: 10px;
-      border-radius: 18px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      gap: 10px;
     }
 
     input {
       flex: 1;
-      border: none;
-      outline: none;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      padding: 15px;
       font-size: 16px;
-      padding: 10px;
+      outline: none;
     }
 
     button {
       border: none;
-      background: #5b4bff;
+      background: #5846e8;
       color: white;
-      padding: 11px 18px;
-      border-radius: 12px;
+      padding: 0 22px;
+      border-radius: 15px;
+      font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.6;
-    }
+    @media(max-width:600px) {
+      .hero h1 {
+        font-size: 34px;
+      }
 
-    .status {
-      text-align: center;
-      font-size: 12px;
-      color: #16a34a;
-      margin-top: 10px;
+      .input-area {
+        flex-direction: column;
+      }
+
+      button {
+        height: 50px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<div class="app">
+<header>
+  <div class="logo">HELPY</div>
+  <div class="subtitle">Votre assistant intelligent</div>
+</header>
 
-  <header>
-    <div class="logo">HELPY</div>
-    <div class="subtitle">Votre assistant intelligent</div>
-  </header>
+<nav>
+  <a href="/" class="active">🏠 Accueil</a>
+  <a href="/login.html">🔐 Connexion</a>
+  <a href="/register.html">📝 Inscription</a>
+  <a href="/products.html">🛒 Produits</a>
+  <a href="/services.html">🛠️ Services</a>
+  <a href="/add-service.html">➕ Ajouter</a>
+</nav>
 
-  <main>
+<section class="hero">
+  <h1>Bonjour 👋</h1>
+  <p>Comment puis-je vous aider aujourd'hui ?</p>
+</section>
 
-    <div class="welcome">
-      <h1>Bonjour 👋</h1>
-      <p>Comment puis-je vous aider aujourd'hui ?</p>
-    </div>
+<div class="chat">
 
-    <div class="chat" id="chat">
-      <div class="message bot">
-        Bonjour 👋 Je suis HELPY. Posez-moi votre question.
-      </div>
-    </div>
+  <div class="message" id="chatMessage">
+    Bonjour 👋 Je suis HELPY. Posez-moi votre question.
+  </div>
 
-    <div class="input-area">
-      <input
-        id="messageInput"
-        type="text"
-        placeholder="Écrivez votre message..."
-        autocomplete="off"
-      >
+  <div class="input-area">
+    <input
+      type="text"
+      id="messageInput"
+      placeholder="Écrivez votre message..."
+    >
 
-      <button id="sendButton">Envoyer</button>
-    </div>
-
-    <div class="status" id="status">
-      ● HELPY est en ligne
-    </div>
-
-  </main>
+    <button onclick="sendMessage()">
+      Envoyer
+    </button>
+  </div>
 
 </div>
 
 <script>
-  const API_URL = "";
-
-  const input = document.getElementById("messageInput");
-  const button = document.getElementById("sendButton");
-  const chat = document.getElementById("chat");
-  const status = document.getElementById("status");
-
-  function addMessage(text, type) {
-    const message = document.createElement("div");
-    message.className = "message " + type;
-    message.textContent = text;
-    chat.appendChild(message);
-    chat.scrollTop = chat.scrollHeight;
-  }
+  const API_URL = "https://helpy-production.up.railway.app";
 
   async function sendMessage() {
+
+    const input = document.getElementById("messageInput");
+    const messageBox = document.getElementById("chatMessage");
+
     const text = input.value.trim();
 
     if (!text) return;
 
-    addMessage(text, "user");
-
+    messageBox.innerText = "⏳ HELPY réfléchit...";
     input.value = "";
-    button.disabled = true;
-    status.textContent = "● HELPY réfléchit...";
 
     try {
+
       const response = await fetch(API_URL + "/api", {
         method: "POST",
         headers: {
@@ -213,34 +207,29 @@
 
       const data = await response.json();
 
-      addMessage(
-        data.message || data.response || "Je n'ai pas encore de réponse.",
-        "bot"
-      );
-
-      status.textContent = "● HELPY est en ligne";
+      messageBox.innerText =
+        data.message ||
+        data.response ||
+        "Je n'ai pas pu répondre.";
 
     } catch (error) {
 
-      addMessage(
-        "Désolé, je n'arrive pas à contacter le serveur HELPY.",
-        "bot"
-      );
+      console.error(error);
 
-      status.textContent = "● Problème de connexion";
+      messageBox.innerText =
+        "❌ Impossible de contacter HELPY.";
     }
-
-    button.disabled = false;
-    input.focus();
   }
 
-  button.addEventListener("click", sendMessage);
+  document
+    .getElementById("messageInput")
+    .addEventListener("keydown", function(e) {
 
-  input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      sendMessage();
-    }
-  });
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+
+    });
 </script>
 
 </body>
