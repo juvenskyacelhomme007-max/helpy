@@ -8,10 +8,13 @@ const pool = new Pool({
 });
 
 async function initializeDatabase() {
+
   try {
+
     // =========================
     // USERS
     // =========================
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -26,9 +29,11 @@ async function initializeDatabase() {
       );
     `);
 
+
     // =========================
     // PRODUCTS
     // =========================
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
@@ -47,9 +52,11 @@ async function initializeDatabase() {
       );
     `);
 
+
     // =========================
     // SERVICES
     // =========================
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS services (
         id SERIAL PRIMARY KEY,
@@ -67,16 +74,36 @@ async function initializeDatabase() {
       );
     `);
 
+
     // =========================
     // BUSINESSES
     // =========================
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS businesses (
-        id SERIAL PRIMARY KEY
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        name VARCHAR(150) NOT NULL,
+        description TEXT,
+        category VARCHAR(100),
+        location VARCHAR(200),
+        phone VARCHAR(30),
+        whatsapp VARCHAR(30),
+        email VARCHAR(150),
+        image_url TEXT,
+        website VARCHAR(255),
+        status VARCHAR(30) DEFAULT 'active',
+        verified BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
-    // Ajoute kolòn yo si yo pa egziste
+
+    // =========================
+    // MIGRATION ANCIENNE TABLE
+    // =========================
+
     await pool.query(`
       ALTER TABLE businesses
       ADD COLUMN IF NOT EXISTS user_id INTEGER;
@@ -129,25 +156,29 @@ async function initializeDatabase() {
 
     await pool.query(`
       ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'active';
+      ADD COLUMN IF NOT EXISTS status VARCHAR(30);
     `);
 
     await pool.query(`
       ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false;
+      ADD COLUMN IF NOT EXISTS verified BOOLEAN;
     `);
 
     await pool.query(`
       ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
     `);
 
     await pool.query(`
       ALTER TABLE businesses
-      ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+      ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
     `);
 
-    // Mete default si gen ansyen records ki NULL
+
+    // =========================
+    // DEFAULT VALUES
+    // =========================
+
     await pool.query(`
       UPDATE businesses
       SET status = 'active'
@@ -160,9 +191,23 @@ async function initializeDatabase() {
       WHERE verified IS NULL;
     `);
 
+    await pool.query(`
+      UPDATE businesses
+      SET created_at = CURRENT_TIMESTAMP
+      WHERE created_at IS NULL;
+    `);
+
+    await pool.query(`
+      UPDATE businesses
+      SET updated_at = CURRENT_TIMESTAMP
+      WHERE updated_at IS NULL;
+    `);
+
+
     // =========================
     // INDEXES
     // =========================
+
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_businesses_category
       ON businesses(category);
@@ -179,6 +224,11 @@ async function initializeDatabase() {
     `);
 
     await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_businesses_user
+      ON businesses(user_id);
+    `);
+
+    await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_products_category
       ON products(category);
     `);
@@ -188,15 +238,26 @@ async function initializeDatabase() {
       ON services(category);
     `);
 
+
     console.log("=================================");
     console.log("✅ HELPY DATABASE READY");
     console.log("=================================");
 
+    return true;
+
   } catch (error) {
-    console.error("❌ DATABASE ERROR:");
+
+    console.error("=================================");
+    console.error("❌ DATABASE INITIALIZATION ERROR");
+    console.error("=================================");
     console.error(error);
+
+    throw error;
+
   }
+
 }
+
 
 module.exports = {
   pool,
