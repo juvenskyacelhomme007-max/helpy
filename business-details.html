@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0">
+
+<title>HElPY — Détails</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:#f5f7fb;
+  color:#172033;
+}
+
+.topbar{
+  height:62px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  border-bottom:1px solid #e8ecf2;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.back{
+  border:0;
+  background:#eef4ff;
+  color:#0868e8;
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  font-size:21px;
+}
+
+.logo{
+  margin-left:14px;
+  font-size:25px;
+  font-weight:900;
+}
+
+.logo span{
+  color:#0868e8;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding-bottom:40px;
+}
+
+.cover{
+  height:210px;
+  background:linear-gradient(
+    135deg,
+    #0868e8,
+    #19a7ff
+  );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.card{
+  background:#fff;
+  margin:0 15px;
+  margin-top:-35px;
+  position:relative;
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.avatar{
+  width:78px;
+  height:78px;
+  border-radius:20px;
+  background:#eaf2ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.info{
+  flex:1;
+}
+
+.info h1{
+  font-size:23px;
+  margin-bottom:6px;
+}
+
+.location{
+  color:#0868e8;
+  font-size:14px;
+}
+
+.description{
+  margin-top:16px;
+  color:#667085;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.action{
+  border:0;
+  padding:13px;
+  border-radius:13px;
+  font-weight:800;
+  font-size:14px;
+}
+
+.call{
+  background:#eaf8ef;
+  color:#16803f;
+}
+
+.whatsapp{
+  background:#e9f8ef;
+  color:#128c4a;
+}
+
+.section{
+  background:#fff;
+  margin:15px;
+  border-radius:18px;
+  padding:18px;
+}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.section-title h2{
+  font-size:19px;
+}
+
+.badge{
+  background:#eef5ff;
+  color:#0868e8;
+  padding:6px 10px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.list{
+  display:grid;
+  gap:12px;
+}
+
+.item{
+  border:1px solid #edf0f5;
+  border-radius:15px;
+  padding:14px;
+}
+
+.item h3{
+  font-size:16px;
+  margin-bottom:7px;
+}
+
+.item p{
+  color:#667085;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.price{
+  color:#0868e8;
+  font-size:17px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.empty{
+  text-align:center;
+  color:#7b8493;
+  padding:20px 5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <button
+    class="back"
+    onclick="history.back()">
+    ←
+  </button>
+
+  <div class="logo">
+    HE<span>l</span>PY
+  </div>
+
+</header>
+
+<main class="container">
+
+  <div
+    id="cover"
+    class="cover">
+  </div>
+
+  <div
+    id="profileCard"
+    class="card">
+
+    <div class="profile">
+
+      <div
+        id="avatar"
+        class="avatar">
+        🏪
+      </div>
+
+      <div class="info">
+
+        <h1 id="businessName">
+          Chargement...
+        </h1>
+
+        <div
+          id="businessLocation"
+          class="location">
+        </div>
+
+      </div>
+
+    </div>
+
+    <p
+      id="businessDescription"
+      class="description">
+      Chargement des informations...
+    </p>
+
+    <div class="actions">
+
+      <button
+        id="callBtn"
+        class="action call">
+        📞 Appeler
+      </button>
+
+      <button
+        id="whatsappBtn"
+        class="action whatsapp">
+        💬 WhatsApp
+      </button>
+
+    </div>
+
+  </div>
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>🛍️ Produits</h2>
+
+      <span
+        id="productCount"
+        class="badge">
+        0
+      </span>
+
+    </div>
+
+    <div
+      id="products"
+      class="list">
+
+      <div class="empty">
+        Aucun produit pour le moment.
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>🛠️ Services</h2>
+
+      <span class="badge">
+        Services
+      </span>
+
+    </div>
+
+    <div
+      id="services"
+      class="list">
+
+      <div class="empty">
+        Aucun service pour le moment.
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-title">
+
+      <h2>⭐ Avis</h2>
+
+      <span
+        id="reviewCount"
+        class="badge">
+        0
+      </span>
+
+    </div>
+
+    <div
+      id="reviews"
+      class="list">
+
+      <div class="empty">
+        Aucun avis pour le moment.
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+const API =
+  "https://helpy-production-c2f2.up.railway.app";
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const businessId =
+  params.get("id");
+
+
+async function loadBusiness(){
+
+  if(!businessId){
+
+    showError("Entreprise introuvable.");
+    return;
+
+  }
+
+  try{
+
+    const response =
+      await fetch(
+        API + "/api/businesses/" + businessId
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok){
+
+      showError(
+        data.message ||
+        data.error ||
+        "Entreprise introuvable."
+      );
+
+      return;
+
+    }
+
+    const business =
+      data.entreprise ||
+      data.business ||
+      data;
+
+    displayBusiness(business);
+
+    loadProducts();
+
+    loadReviews();
+
+  }catch(error){
+
+    showError(
+      "Impossible de contacter HELPY."
+    );
+
+  }
+
+}
+
+
+function displayBusiness(b){
+
+  document.getElementById(
+    "businessName"
+  ).textContent =
+    b.name || "Entreprise";
+
+  document.getElementById(
+    "businessLocation"
+  ).textContent =
+    b.location
+    ? "📍 " + b.location
+    : "";
+
+  document.getElementById(
+    "businessDescription"
+  ).textContent =
+    b.description ||
+    "Aucune description disponible.";
+
+  const photo =
+    b.photo_url ||
+    b.image_url ||
+    b.logo_url;
+
+  if(photo){
+
+    document.getElementById(
+      "avatar"
+    ).innerHTML =
+      `<img src="${escapeHtml(photo)}" alt="">`;
+
+    document.getElementById(
+      "cover"
+    ).innerHTML =
+      `<img src="${escapeHtml(photo)}" alt="">`;
+
+  }else{
+
+    document.getElementById(
+      "cover"
+    ).innerHTML =
+      "🏪";
+
+  }
+
+
+  const phone =
+    b.phone || "";
+
+  const whatsapp =
+    b.whatsapp || "";
+
+
+  const callBtn =
+    document.getElementById("callBtn");
+
+  const whatsappBtn =
+    document.getElementById("whatsappBtn");
+
+
+  if(phone){
+
+    callBtn.onclick = function(){
+
+      window.location.href =
+        "tel:" + phone;
+
+    };
+
+  }else{
+
+    callBtn.disabled = true;
+    callBtn.style.opacity = ".5";
+
+  }
+
+
+  if(whatsapp){
+
+    let number =
+      String(whatsapp)
+      .replace(/\D/g,"");
+
+    whatsappBtn.onclick = function(){
+
+      window.open(
+        "https://wa.me/" + number,
+        "_blank"
+      );
+
+    };
+
+  }else{
+
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = ".5";
+
+  }
+
+}
+
+
+async function loadProducts(){
+
+  const box =
+    document.getElementById("products");
+
+  try{
+
+    const response =
+      await fetch(
+        API +
+        "/api/products?business_id=" +
+        businessId
+      );
+
+    const data =
+      await response.json();
+
+    const products =
+      data.products ||
+      data.produits ||
+      [];
+
+    document.getElementById(
+      "productCount"
+    ).textContent =
+      products.length;
+
+    if(!products.length){
+
+      box.innerHTML = `
+        <div class="empty">
+          Aucun produit pour le moment.
+        </div>
+      `;
+
+      return;
+
+    }
+
+    box.innerHTML =
+      products.map(p => `
+
+        <div class="item">
+
+          <h3>
+            ${escapeHtml(
+              p.title ||
+              p.name ||
+              "Produit"
+            )}
+          </h3>
+
+          <p>
+            ${escapeHtml(
+              p.description ||
+              "Aucune description."
+            )}
+          </p>
+
+          ${
+            p.price
+            ? `
+              <div class="price">
+                ${escapeHtml(p.price)}
+                ${p.currency
+                  ? " " + escapeHtml(p.currency)
+                  : " HTG"}
+              </div>
+            `
+            : ""
+          }
+
+        </div>
+
+      `).join("");
+
+  }catch(error){
+
+    box.innerHTML = `
+      <div class="empty">
+        Aucun produit pour le moment.
+      </div>
+    `;
+
+  }
+
+}
+
+
+async function loadReviews(){
+
+  const box =
+    document.getElementById("reviews");
+
+  try{
+
+    const response =
+      await fetch(
+        API +
+        "/api/reviews/" +
+        businessId
+      );
+
+    const data =
+      await response.json();
+
+    const reviews =
+      data.reviews ||
+      data.avis ||
+      [];
+
+    document.getElementById(
+      "reviewCount"
+    ).textContent =
+      reviews.length;
+
+    if(!reviews.length){
+
+      box.innerHTML = `
+        <div class="empty">
+          Aucun avis pour le moment.
+        </div>
+      `;
+
+      return;
+
+    }
+
+    box.innerHTML =
+      reviews.map(r => `
+
+        <div class="item">
+
+          <h3>
+            ⭐ ${escapeHtml(
+              r.rating || 5
+            )}/5
+          </h3>
+
+          <p>
+            ${escapeHtml(
+              r.comment ||
+              r.review ||
+              "Bon service."
+            )}
+          </p>
+
+        </div>
+
+      `).join("");
+
+  }catch(error){
+
+    box.innerHTML = `
+      <div class="empty">
+        Aucun avis pour le moment.
+      </div>
+    `;
+
+  }
+
+}
+
+
+function showError(message){
+
+  document.getElementById(
+    "profileCard"
+  ).innerHTML = `
+
+    <div class="empty">
+
+      <div style="font-size:45px;">
+        😕
+      </div>
+
+      <h2 style="margin:10px 0;">
+        Oups !
+      </h2>
+
+      <p>
+        ${escapeHtml(message)}
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+loadBusiness();
+
+</script>
+
+</body>
+</html>
