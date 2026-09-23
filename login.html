@@ -171,10 +171,14 @@ form.addEventListener("submit", async function(event) {
 
     if (response.ok) {
 
-      message.textContent = "✅ Connexion réussie !";
-      message.style.color = "green";
+  localStorage.setItem(
+    "helpyUser",
+    JSON.stringify(data.user)
+  );
 
-    } else {
+  window.location.href = "/dashboard.html";
+
+} else {
 
       message.textContent =
         "❌ " + (data.message || "Erreur de connexion");
