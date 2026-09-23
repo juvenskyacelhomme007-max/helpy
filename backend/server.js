@@ -187,7 +187,175 @@ app.post("/api/auth/login", async (req, res) => {
     });
   }
 });
+// PRODUCTS
 
+// Get all products
+app.get("/api/products", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        p.id,
+        p.title,
+        p.description,
+        p.price,
+        p.currency,
+        p.category,
+        p.location,
+        p.whatsapp,
+        p.image_url,
+        p.quantity,
+        p.status,
+        p.created_at,
+        u.name AS seller_name
+      FROM products p
+      JOIN users u ON u.id = p.user_id
+      WHERE p.status = 'active'
+      ORDER BY p.id DESC
+    `);
+
+    res.json({
+      status: "ok",
+      products: result.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Unable to load products"
+    });
+  }
+});
+
+
+// Create product
+app.post("/api/products", async (req, res) => {
+  try {
+
+    const {
+      user_id,
+      title,
+      description,
+      price,
+      currency,
+      category,
+      location,
+      whatsapp,
+      image_url,
+      quantity
+    } = req.body;
+
+    if (
+      !user_id ||
+      !title ||
+      !price ||
+      !whatsapp
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message: "user_id, title, price and WhatsApp are required"
+      });
+    }
+
+    const user = await pool.query(
+      "SELECT id FROM users WHERE id = $1",
+      [user_id]
+    );
+
+    if (user.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO products
+      (
+        user_id,
+        title,
+        description,
+        price,
+        currency,
+        category,
+        location,
+        whatsapp,
+        image_url,
+        quantity
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      RETURNING *
+      `,
+      [
+        user_id,
+        title,
+        description || null,
+        price,
+        currency || "HTG",
+        category || null,
+        location || null,
+        whatsapp,
+        image_url || null,
+        quantity || 1
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      message: "Product created successfully",
+      product: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Unable to create product"
+    });
+  }
+});
+
+
+// Get one product
+app.get("/api/products/:id", async (req, res) => {
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT
+        p.*,
+        u.name AS seller_name
+      FROM products p
+      JOIN users u ON u.id = p.user_id
+      WHERE p.id = $1
+      `,
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Product not found"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      product: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Unable to load product"
+    });
+  }
+});
 // Frontend
 app.use(express.static(path.join(__dirname, "..")));
 
