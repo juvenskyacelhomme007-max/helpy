@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Ajouter une entreprise - HELPY</title>
 
 <style>
-
 *{
   box-sizing:border-box;
   font-family:Arial,sans-serif;
@@ -105,35 +103,44 @@ button:disabled{
 
 #message{
   margin-top:15px;
+  padding:12px;
+  border-radius:10px;
   text-align:center;
   font-weight:bold;
+  display:none;
 }
 
-</style>
+.success{
+  display:block !important;
+  background:#dcfce7;
+  color:#166534;
+}
 
+.error{
+  display:block !important;
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.info{
+  display:block !important;
+  background:#dbeafe;
+  color:#1e40af;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-
   <div class="header">
+    <div class="logo">HELPY</div>
 
-    <div class="logo">
-      HELPY
-    </div>
-
-    <a
-      class="back"
-      href="businesses.html"
-    >
+    <a class="back" href="businesses.html">
       ← Retour
     </a>
-
   </div>
-
 </header>
-
 
 <div class="container">
 
@@ -145,141 +152,73 @@ button:disabled{
       Présentez votre entreprise sur HELPY.
     </p>
 
-
-    <label>
-      Nom de l'entreprise *
-    </label>
-
+    <label>Nom de l'entreprise *</label>
     <input
       id="name"
       placeholder="Ex: Juvensky Technologie"
     >
 
-
-    <label>
-      Description
-    </label>
-
+    <label>Description</label>
     <textarea
       id="description"
       placeholder="Décrivez votre entreprise..."
     ></textarea>
 
-
-    <label>
-      Catégorie
-    </label>
-
+    <label>Catégorie</label>
     <select id="category">
-
-      <option value="">
-        Sélectionner
-      </option>
-
-      <option value="Restaurant">
-        Restaurant
-      </option>
-
-      <option value="Boutique">
-        Boutique
-      </option>
-
-      <option value="Technologie">
-        Technologie
-      </option>
-
-      <option value="Beauté">
-        Beauté
-      </option>
-
-      <option value="Construction">
-        Construction
-      </option>
-
-      <option value="Transport">
-        Transport
-      </option>
-
-      <option value="Éducation">
-        Éducation
-      </option>
-
-      <option value="Autre">
-        Autre
-      </option>
-
+      <option value="">Sélectionner</option>
+      <option value="Restaurant">Restaurant</option>
+      <option value="Boutique">Boutique</option>
+      <option value="Technologie">Technologie</option>
+      <option value="Beauté">Beauté</option>
+      <option value="Construction">Construction</option>
+      <option value="Transport">Transport</option>
+      <option value="Éducation">Éducation</option>
+      <option value="Autre">Autre</option>
     </select>
 
-
-    <label>
-      Localisation
-    </label>
-
+    <label>Localisation</label>
     <input
       id="location"
       placeholder="Ex: Delmas 33"
     >
 
-
-    <label>
-      Téléphone
-    </label>
-
+    <label>Téléphone</label>
     <input
       id="phone"
       type="tel"
-      placeholder="Ex: 3xxx-xxxx"
+      placeholder="3xxx-xxxx"
     >
 
-
-    <label>
-      WhatsApp
-    </label>
-
+    <label>WhatsApp</label>
     <input
       id="whatsapp"
       type="tel"
       placeholder="Numéro WhatsApp"
     >
 
-
-    <label>
-      Email
-    </label>
-
+    <label>Email</label>
     <input
       id="email"
       type="email"
       placeholder="entreprise@email.com"
     >
 
-
-    <label>
-      Site web
-    </label>
-
+    <label>Site web</label>
     <input
       id="website"
       type="url"
       placeholder="https://..."
     >
 
-
-    <label>
-      URL de l'image/logo
-    </label>
-
+    <label>URL de l'image/logo</label>
     <input
       id="image_url"
       type="url"
       placeholder="https://..."
     >
 
-
-    <button
-      id="submit"
-      onclick="createBusiness()"
-    >
+    <button id="submit" onclick="createBusiness()">
       Publier l'entreprise
     </button>
 
@@ -289,11 +228,24 @@ button:disabled{
 
 </div>
 
-
 <script>
 
 const API =
 "https://helpy-production-c2f2.up.railway.app";
+
+
+function showMessage(text, type){
+
+  const message =
+    document.getElementById("message");
+
+  message.className = "";
+
+  message.classList.add(type);
+
+  message.innerText = text;
+
+}
 
 
 async function createBusiness(){
@@ -301,20 +253,29 @@ async function createBusiness(){
   const button =
     document.getElementById("submit");
 
-  const message =
-    document.getElementById("message");
+  const name =
+    document.getElementById("name").value.trim();
+
+  if(!name){
+
+    showMessage(
+      "⚠️ Le nom de l'entreprise est obligatoire.",
+      "error"
+    );
+
+    return;
+  }
 
 
   const business = {
 
-    name:
-      document.getElementById("name").value.trim(),
+    name: name,
 
     description:
       document.getElementById("description").value.trim(),
 
     category:
-      document.getElementById("category").value,
+      document.getElementById("category").value.trim(),
 
     location:
       document.getElementById("location").value.trim(),
@@ -337,73 +298,130 @@ async function createBusiness(){
   };
 
 
-  if(!business.name){
-
-    message.innerHTML =
-      "⚠️ Le nom de l'entreprise est obligatoire.";
-
-    return;
-
-  }
-
-
   button.disabled = true;
+  button.innerText = "Connexion au serveur...";
 
-  button.innerText =
-    "Publication...";
+  showMessage(
+    "⏳ Création de l'entreprise...",
+    "info"
+  );
 
 
   try{
 
-    const response =
-      await fetch(
-        `${API}/api/businesses`,
-        {
-          method:"POST",
+    const response = await fetch(
+      `${API}/api/businesses`,
+      {
+        method:"POST",
 
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
+        headers:{
+          "Content-Type":"application/json",
+          "Accept":"application/json"
+        },
 
-          body:
-            JSON.stringify(business)
-        }
-      );
+        body:JSON.stringify(business)
+      }
+    );
 
 
-    const data =
-      await response.json();
+    const text =
+      await response.text();
+
+
+    let data = {};
+
+    try{
+
+      data =
+        text ? JSON.parse(text) : {};
+
+    }catch(e){
+
+      data = {
+        message:text
+      };
+
+    }
+
+
+    console.log(
+      "STATUS:",
+      response.status
+    );
+
+    console.log(
+      "SERVER RESPONSE:",
+      data
+    );
 
 
     if(!response.ok){
 
       throw new Error(
         data.message ||
-        "Erreur"
+        data.error ||
+        `Erreur serveur (${response.status})`
       );
 
     }
 
 
-    message.innerHTML =
-      "✅ Entreprise créée avec succès !";
+    showMessage(
+      "✅ Entreprise créée avec succès !",
+      "success"
+    );
+
+
+    button.innerText =
+      "Entreprise créée ✓";
 
 
     setTimeout(() => {
 
-      window.location.href =
-        "businesses.html";
+      if(data.business && data.business.id){
 
-    },1000);
+        window.location.href =
+          `business-details.html?id=${data.business.id}`;
+
+      }else{
+
+        window.location.href =
+          "businesses.html";
+
+      }
+
+    },1200);
 
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "ERREUR CREATION ENTREPRISE:",
+      error
+    );
 
-    message.innerHTML =
-      "❌ " + error.message;
+
+    let message =
+      error.message ||
+      "Impossible de créer l'entreprise.";
+
+
+    if(
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError")
+    ){
+
+      message =
+        "❌ Le serveur HELPY ne répond pas. Vérifiez Railway.";
+
+    }
+
+
+    showMessage(
+      message,
+      "error"
+    );
+
 
     button.disabled = false;
 
