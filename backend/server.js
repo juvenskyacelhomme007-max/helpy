@@ -120,6 +120,73 @@ app.post("/api/auth/register", async (req, res) => {
     });
   }
 });
+// Login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email/téléphone et mot de passe sont requis"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT id, name, email, phone, password_hash, role, status, verified
+      FROM users
+      WHERE email = $1 OR phone = $1
+      LIMIT 1
+      `,
+      [identifier]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        status: "error",
+        message: "Compte introuvable"
+      });
+    }
+
+    const user = result.rows[0];
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        status: "error",
+        message: "Mot de passe incorrect"
+      });
+    }
+
+    if (user.status !== "active") {
+      return res.status(403).json({
+        status: "error",
+        message: "Ce compte est désactivé"
+      });
+    }
+
+    delete user.password_hash;
+
+    res.json({
+      status: "ok",
+      message: "Connexion réussie",
+      user
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Erreur serveur"
+    });
+  }
+});
 
 // Frontend
 app.use(express.static(path.join(__dirname, "..")));
