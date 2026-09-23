@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HElPY</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f7f9;
+ color:#17202a;
+}
+header{
+ background:#087f5b;
+ color:white;
+ padding:20px;
+ text-align:center;
+}
+h1{margin:0}
+main{
+ max-width:500px;
+ margin:auto;
+ padding:20px;
+}
+.card{
+ background:white;
+ padding:18px;
+ margin-bottom:15px;
+ border-radius:14px;
+ box-shadow:0 3px 12px #0001;
+}
+input,button{
+ width:100%;
+ padding:13px;
+ margin:7px 0;
+ border-radius:9px;
+ border:1px solid #ddd;
+}
+button{
+ background:#087f5b;
+ color:white;
+ border:0;
+ font-weight:bold;
+}
+button:active{opacity:.8}
+#result{
+ margin-top:15px;
+ padding:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>HElPY</h1>
+<p>Biznis • Pwodwi • Sèvis</p>
+</header>
+
+<main>
+
+<div class="card">
+<h2>Kreye kont</h2>
+
+<input id="name" placeholder="Non ou">
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Modpas">
+<input id="phone" placeholder="Telefòn">
+<input id="whatsapp" placeholder="WhatsApp">
+
+<button onclick="register()">Kreye kont</button>
+</div>
+
+<div class="card">
+<h2>Konekte</h2>
+
+<input id="lemail" type="email" placeholder="Email">
+<input id="lpassword" type="password" placeholder="Modpas">
+
+<button onclick="login()">Konekte</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+const API =
+"https://helpy-production-c2f2.up.railway.app";
+
+async function register(){
