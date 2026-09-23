@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Services - HELPY</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #17202a;
+    }
+
+    header {
+      background: white;
+      height: 65px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .publish {
+      background: #111827;
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 15px 40px;
+    }
+
+    .top {
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+    }
+
+    .search {
+      margin-top: 18px;
+      width: 100%;
+      padding: 15px 17px;
+      border: 1px solid #ddd;
+      border-radius: 13px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
+
+    .search:focus {
+      border-color: #111827;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 50px 10px;
+      color: #666;
+    }
+
+    #error {
+      display: none;
+      background: white;
+      padding: 30px;
+      text-align: center;
+      border-radius: 15px;
+    }
+
+    #error p {
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,.06);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,.09);
+    }
+
+    .image {
+      height: 190px;
+      background: #eef1f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .placeholder {
+      font-size: 60px;
+    }
+
+    .content {
+      padding: 17px;
+    }
+
+    .category {
+      display: inline-block;
+      background: #eef2ff;
+      color: #3949ab;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 9px;
+    }
+
+    .description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 42px;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      font-size: 21px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .location {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .details {
+      text-align: center;
+      text-decoration: none;
+      background: #111827;
+      color: white;
+      padding: 12px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .whatsapp {
+      text-align: center;
+      text-decoration: none;
+      background: #25D366;
+      color: white;
+      padding: 12px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .empty {
+      display: none;
+      text-align: center;
+      background: white;
+      padding: 45px 20px;
+      border-radius: 15px;
+      color: #777;
+    }
+
+    @media (max-width: 850px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        height: 60px;
+      }
+
+      .logo {
+        font-size: 23px;
+      }
+
+      .publish {
+        padding: 9px 11px;
+        font-size: 13px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image {
+        height: 210px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">HELPY</div>
+
+  <a href="/add-service.html" class="publish">
+    ➕ Publier un service
+  </a>
+</header>
+
+<main>
+
+  <div class="top">
+    <h1>🛠️ Services</h1>
+
+    <p class="subtitle">
+      Trouvez les services dont vous avez besoin.
+    </p>
+
+    <input
+      type="search"
+      id="search"
+      class="search"
+      placeholder="🔎 Rechercher un service..."
+    >
+  </div>
+
+  <div id="loading">
+    Chargement des services...
+  </div>
+
+  <div id="error">
+    <h2>Impossible de charger les services</h2>
+    <p id="errorMessage"></p>
+  </div>
+
+  <div id="servicesGrid" class="grid"></div>
+
+  <div id="empty" class="empty">
+    <h2>Aucun service trouvé</h2>
+    <p>Essayez une autre recherche.</p>
+  </div>
+
+</main>
+
+<script>
+
+const API_URL =
+  "https://helpy-production.up.railway.app";
+
+let services = [];
+
+
+/* =========================
+   CHARGER LES SERVICES
+========================= */
+
+async function loadServices() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_URL}/api/services`
+      );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "HELPY SERVICES:",
+      data
+    );
+
+    if (
+      !response.ok ||
+      data.status !== "ok"
+    ) {
+
+      showError(
+        data.message ||
+        "Impossible de charger les services."
+      );
+
+      return;
+    }
+
+    services =
+      data.services || [];
+
+    document
+      .getElementById("loading")
+      .style.display = "none";
+
+    renderServices(services);
+
+  } catch (error) {
+
+    console.error(
+      "SERVICES ERROR:",
+      error
+    );
+
+    showError(
+      "Impossible de communiquer avec le serveur."
+    );
+  }
+}
+
+
+/* =========================
+   AFFICHER LES SERVICES
+========================= */
+
+function renderServices(list) {
+
+  const grid =
+    document.getElementById(
+      "servicesGrid"
+    );
+
+  const empty =
+    document.getElementById(
+      "empty"
+    );
+
+  grid.innerHTML = "";
+
+  if (!list.length) {
+
+    empty.style.display = "block";
+
+    return;
+  }
+
+  empty.style.display = "none";
+
+
+  list.forEach(service => {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "card";
+
+
+    /* IMAGE */
+
+    let imageHTML = `
+      <div class="placeholder">
+        🛠️
+      </div>
+    `;
+
+    if (service.image_url) {
+
+      imageHTML = `
+        <img
+          src="${escapeHTML(service.image_url)}"
+          alt="${escapeHTML(service.title || "Service")}"
+          style="display:block;"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+        >
+
+        <div
+          class="placeholder"
+          style="display:none;"
+        >
+          🛠️
+        </div>
+      `;
+    }
+
+
+    /* WHATSAPP */
+
+    let whatsappHTML = "";
+
+    if (service.whatsapp) {
+
+      let number =
+        String(service.whatsapp)
+          .replace(/\D/g, "");
+
+      if (number.length === 8) {
+        number = "509" + number;
+      }
+
+      const message =
+        "Bonjour, je suis intéressé par votre service : " +
+        (service.title || "");
+
+      whatsappHTML = `
+        <a
+          class="whatsapp"
+          href="https://wa.me/${number}?text=${encodeURIComponent(message)}"
+          target="_blank"
+        >
+          💬 WhatsApp
+        </a>
+      `;
+
+    } else {
+
+      whatsappHTML = `
+        <span></span>
+      `;
+    }
+
+
+    card.innerHTML = `
+
+      <div class="image">
+        ${imageHTML}
+      </div>
+
+      <div class="content">
+
+        ${
+          service.category
+          ? `
+            <div class="category">
+              ${escapeHTML(service.category)}
+            </div>
+          `
+          : ""
+        }
+
+        <div class="title">
+          ${escapeHTML(
+            service.title ||
+            "Service sans nom"
+          )}
+        </div>
+
+        <div class="description">
+          ${escapeHTML(
+            service.description ||
+            "Aucune description disponible."
+          )}
+        </div>
+
+        <div class="price">
+          ${escapeHTML(
+            service.price || "0"
+          )}
+          ${escapeHTML(
+            service.currency || "HTG"
+          )}
+        </div>
+
+        <div class="location">
+          📍 ${escapeHTML(
+            service.location ||
+            "Localisation non précisée"
+          )}
+        </div>
+
+        <div class="buttons">
+
+          <a
+            class="details"
+            href="/service-details.html?id=${encodeURIComponent(service.id)}"
+          >
+            👁️ Voir détails
+          </a>
+
+          ${whatsappHTML}
+
+        </div>
+
+      </div>
+    `;
+
+
+    grid.appendChild(card);
+
+  });
+}
+
+
+/* =========================
+   RECHERCHE
+========================= */
+
+document
+  .getElementById("search")
+  .addEventListener(
+    "input",
+    function() {
+
+      const query =
+        this.value
+          .toLowerCase()
+          .trim();
+
+      const filtered =
+        services.filter(service => {
+
+          const text = [
+
+            service.title,
+
+            service.description,
+
+            service.category,
+
+            service.location,
+
+            service.provider_name
+
+          ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+          return text.includes(query);
+
+        });
+
+      renderServices(filtered);
+
+    }
+  );
+
+
+/* =========================
+   ERREUR
+========================= */
+
+function showError(message) {
+
+  document
+    .getElementById("loading")
+    .style.display = "none";
+
+  document
+    .getElementById("error")
+    .style.display = "block";
+
+  document
+    .getElementById("errorMessage")
+    .textContent =
+      message;
+}
+
+
+/* =========================
+   PROTECTION HTML
+========================= */
+
+function escapeHTML(value) {
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadServices();
+
+</script>
+
+</body>
+</html>
