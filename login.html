@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY — Connexion</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 28px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: #5b4bff;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #5b4bff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <div class="logo">HELPY</div>
+
+    <h1>Connexion</h1>
+
+    <p class="subtitle">
+      Connectez-vous à votre compte HELPY.
+    </p>
+
+    <form id="loginForm">
+
+      <label>Email ou téléphone</label>
+
+      <input
+        id="identifier"
+        type="text"
+        placeholder="Email ou téléphone"
+        required
+      >
+
+      <label>Mot de passe</label>
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Votre mot de passe"
+        required
+      >
+
+      <button id="loginButton" type="submit">
+        Se connecter
+      </button>
+
+    </form>
+
+    <div id="message"></div>
+
+  </div>
+
+<script>
+
+const form = document.getElementById("loginForm");
+const button = document.getElementById("loginButton");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  const identifier =
+    document.getElementById("identifier").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  button.disabled = true;
+  button.textContent = "Connexion...";
+
+  try {
+
+    const response = await fetch("/api/auth/login", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        identifier,
+        password
+      })
+
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+      message.textContent = "✅ Connexion réussie !";
+      message.style.color = "green";
+
+    } else {
+
+      message.textContent =
+        "❌ " + (data.message || "Erreur de connexion");
+
+      message.style.color = "red";
+
+    }
+
+  } catch (error) {
+
+    message.textContent =
+      "❌ Impossible de contacter HELPY.";
+
+    message.style.color = "red";
+
+  }
+
+  button.disabled = false;
+  button.textContent = "Se connecter";
+
+});
+
+</script>
+
+</body>
+</html>
