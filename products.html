@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>HELPY - Produits</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    button,
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .dashboard-btn {
+      background: white;
+      color: #111827;
+    }
+
+    .add-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px 15px 40px;
+    }
+
+    .top-section {
+      margin-bottom: 20px;
+    }
+
+    .top-section h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .top-section p {
+      color: #6b7280;
+    }
+
+    .search-box {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .search-box input:focus {
+      border-color: #2563eb;
+    }
+
+    #status {
+      text-align: center;
+      padding: 20px;
+      color: #6b7280;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(0,0,0,0.12);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: #e5e7eb;
+      display: block;
+    }
+
+    .placeholder {
+      width: 100%;
+      height: 190px;
+      background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 55px;
+    }
+
+    .product-content {
+      padding: 15px;
+    }
+
+    .category {
+      display: inline-block;
+      background: #eff6ff;
+      color: #2563eb;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 9px;
+    }
+
+    .product-title {
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .description {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      min-height: 42px;
+    }
+
+    .price {
+      font-size: 21px;
+      font-weight: bold;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 5px 0;
+    }
+
+    .seller {
+      border-top: 1px solid #e5e7eb;
+      margin-top: 12px;
+      padding-top: 12px;
+      font-size: 14px;
+    }
+
+    .seller strong {
+      color: #111827;
+    }
+
+    .whatsapp-btn {
+      width: 100%;
+      text-align: center;
+      margin-top: 13px;
+      background: #25D366;
+      color: white;
+      font-size: 15px;
+    }
+
+    .whatsapp-btn:hover {
+      background: #1ebe5d;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+
+      .header-content {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .logo {
+        text-align: center;
+      }
+
+      .header-buttons {
+        justify-content: center;
+      }
+
+      .top-section h1 {
+        font-size: 24px;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-content">
+
+      <div class="logo">
+        HELPY
+      </div>
+
+      <div class="header-buttons">
+        <a href="/dashboard.html" class="btn dashboard-btn">
+          Dashboard
+        </a>
+
+        <a href="/add-product.html" class="btn add-btn">
+          + Vendre
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+
+  <main>
+
+    <div class="top-section">
+      <h1>🛍️ Produits</h1>
+      <p>Découvrez les produits disponibles sur HELPY.</p>
+    </div>
+
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="🔎 Rechercher un produit, une catégorie ou une ville..."
+      >
+    </div>
+
+
+    <div id="status">
+      Chargement des produits...
+    </div>
+
+
+    <div
+      id="productsContainer"
+      class="products-grid"
+    ></div>
+
+  </main>
+
+
+  <script>
+
+    let allProducts = [];
+
+
+    // =========================
+    // CHARGER LES PRODUITS
+    // =========================
+
+    async function loadProducts() {
+
+      const status = document.getElementById("status");
+      const container = document.getElementById("productsContainer");
+
+      status.style.display = "block";
+      status.textContent = "Chargement des produits...";
+
+      try {
+
+        const response = await fetch("/api/products");
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Impossible de charger les produits"
+          );
+        }
+
+        allProducts = data.products || [];
+
+        status.style.display = "none";
+
+        displayProducts(allProducts);
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.innerHTML = `
+          <div class="error">
+            ❌ Impossible de charger les produits.
+            <br><br>
+            Vérifiez votre connexion puis actualisez la page.
+          </div>
+        `;
+
+        container.innerHTML = "";
+
+      }
+
+    }
+
+
+    // =========================
+    // AFFICHER LES PRODUITS
+    // =========================
+
+    function displayProducts(products) {
+
+      const container =
+        document.getElementById("productsContainer");
+
+      if (!products || products.length === 0) {
+
+        container.innerHTML = `
+          <div class="empty">
+            <div style="font-size:50px;">🛍️</div>
+
+            <h3 style="margin:10px 0;">
+              Aucun produit trouvé
+            </h3>
+
+            <p>
+              Soyez le premier à publier un produit sur HELPY.
+            </p>
+
+            <a
+              href="/add-product.html"
+              class="btn add-btn"
+              style="
