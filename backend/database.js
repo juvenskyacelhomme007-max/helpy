@@ -19,8 +19,11 @@ async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(150) UNIQUE,
-        phone VARCHAR(30),
-        password TEXT,
+        phone VARCHAR(30) UNIQUE,
+        password_hash TEXT NOT NULL,
+        role VARCHAR(30) DEFAULT 'user',
+        status VARCHAR(30) DEFAULT 'active',
+        verified BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -33,6 +36,7 @@ async function initializeDatabase() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         title VARCHAR(200) NOT NULL,
         description TEXT,
         price NUMERIC(12,2) NOT NULL DEFAULT 0,
@@ -49,12 +53,36 @@ async function initializeDatabase() {
 
 
     // =========================
+    // SERVICES
+    // =========================
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(200) NOT NULL,
+        description TEXT,
+        price NUMERIC(12,2) NOT NULL DEFAULT 0,
+        currency VARCHAR(10) DEFAULT 'HTG',
+        category VARCHAR(100),
+        location VARCHAR(150),
+        whatsapp VARCHAR(30),
+        image_url TEXT,
+        status VARCHAR(30) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+
+    // =========================
     // BUSINESSES / ENTREPRISES
     // =========================
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS businesses (
         id SERIAL PRIMARY KEY,
+
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
 
         name VARCHAR(150) NOT NULL,
 
@@ -76,10 +104,32 @@ async function initializeDatabase() {
 
         status VARCHAR(30) DEFAULT 'active',
 
+        verified BOOLEAN DEFAULT false,
+
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+
+    // =========================
+    // MIGRATION FOR OLD TABLE
+    // =========================
+
+    await pool.query(`
+      ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS user_id INTEGER;
+    `);
+
+    await pool.query(`
+      ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false;
+    `);
+
+    await pool.query(`
+      ALTER TABLE businesses
+      ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
     `);
 
 
@@ -102,30 +152,30 @@ async function initializeDatabase() {
       ON businesses(status);
     `);
 
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_products_category
+      ON products(category);
+    `);
 
-    console.log("✅ Database HELPY initialized successfully");
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_services_category
+      ON services(category);
+    `);
+
+
+    console.log("=================================");
+    console.log("✅ HELPY DATABASE READY");
+    console.log("=================================");
 
   } catch (error) {
 
-    console.error("❌ Database initialization error:");
+    console.error("❌ DATABASE ERROR");
     console.error(error);
 
   }
 }
 
-
 module.exports = {
   pool,
   initializeDatabase
 };
-
-Kounye a fè sa 👇🏽
-
-1. Louvri pwojè HELPY ou a.
-2. Chèche fichye "database.js".
-3. Efase ansyen kòd la.
-4. Kole kòd ki anlè a.
-5. Save / Commit.
-6. Railway ap fè nouvo deploy la otomatikman.
-
-Apre deploy la fin di Successful, n ap pase nan pwochen etap la: API Entreprises ("POST", "GET", "PUT", "DELETE") pou nou ka ajoute antrepriz epi fè yo parèt sou HELPY.
