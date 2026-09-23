@@ -2,7 +2,6 @@
 <html lang="fr">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -11,7 +10,6 @@
   >
 
   <title>HELPY - Ajouter un service</title>
-
 
   <style>
 
@@ -22,12 +20,10 @@
       font-family: Arial, sans-serif;
     }
 
-
     body {
       background: #f3f4f6;
       color: #111827;
     }
-
 
     header {
       background: #111827;
@@ -35,212 +31,136 @@
       padding: 16px;
     }
 
-
     .header {
       max-width: 800px;
       margin: auto;
-
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       gap: 10px;
     }
-
 
     .logo {
       font-size: 25px;
       font-weight: bold;
     }
 
-
     .back {
       background: white;
       color: #111827;
-
       padding: 10px 14px;
-
       border-radius: 8px;
-
       text-decoration: none;
-
       font-weight: bold;
     }
-
 
     main {
       max-width: 800px;
       margin: auto;
-
       padding: 25px 15px 50px;
     }
 
-
     .box {
       background: white;
-
       padding: 20px;
-
       border-radius: 15px;
-
-      box-shadow:
-        0 3px 12px
-        rgba(0,0,0,.08);
+      box-shadow: 0 3px 12px rgba(0,0,0,.08);
     }
-
 
     h1 {
       margin-bottom: 7px;
     }
-
 
     .subtitle {
       color: #6b7280;
       margin-bottom: 25px;
     }
 
-
     .field {
       margin-bottom: 17px;
     }
 
-
     label {
       display: block;
-
       font-weight: bold;
-
       margin-bottom: 7px;
     }
-
 
     input,
     textarea,
     select {
-
       width: 100%;
-
       padding: 13px;
-
       border: 1px solid #d1d5db;
-
       border-radius: 9px;
-
       font-size: 16px;
-
       outline: none;
-
       background: white;
     }
-
 
     input:focus,
     textarea:focus,
     select:focus {
-
       border-color: #2563eb;
-
     }
-
 
     textarea {
-
       min-height: 120px;
-
       resize: vertical;
-
     }
-
 
     .required {
       color: #dc2626;
     }
 
-
     .help {
       color: #6b7280;
-
       font-size: 13px;
-
       margin-top: 5px;
     }
-
 
     .publish {
-
       width: 100%;
-
       border: none;
-
       background: #2563eb;
-
       color: white;
-
       padding: 14px;
-
       border-radius: 9px;
-
       font-size: 17px;
-
       font-weight: bold;
-
       cursor: pointer;
-
       margin-top: 5px;
     }
-
 
     .publish:hover {
       background: #1d4ed8;
     }
 
-
     .publish:disabled {
-
       background: #9ca3af;
-
       cursor: not-allowed;
-
     }
 
-
     #message {
-
       display: none;
-
       padding: 13px;
-
       border-radius: 8px;
-
       margin-bottom: 17px;
-
       text-align: center;
-
       font-weight: bold;
     }
 
-
     .success {
-
       display: block !important;
-
       background: #dcfce7;
-
       color: #166534;
-
     }
-
 
     .error {
-
       display: block !important;
-
       background: #fee2e2;
-
       color: #991b1b;
-
     }
-
 
     @media(max-width:600px) {
 
@@ -261,7 +181,6 @@
 
 <body>
 
-
 <header>
 
   <div class="header">
@@ -269,7 +188,6 @@
     <div class="logo">
       HELPY
     </div>
-
 
     <a
       href="/dashboard.html"
@@ -283,7 +201,6 @@
 </header>
 
 
-
 <main>
 
   <div class="box">
@@ -292,17 +209,14 @@
       🛠️ Publier un service
     </h1>
 
-
     <p class="subtitle">
       Présentez votre service aux clients sur HELPY.
     </p>
 
-
     <div id="message"></div>
 
 
-
-    <!-- NOM -->
+    <!-- NOM DU SERVICE -->
 
     <div class="field">
 
@@ -310,7 +224,6 @@
         Nom du service
         <span class="required">*</span>
       </label>
-
 
       <input
         type="text"
@@ -323,7 +236,6 @@
     </div>
 
 
-
     <!-- DESCRIPTION -->
 
     <div class="field">
@@ -332,14 +244,12 @@
         Description
       </label>
 
-
       <textarea
         id="description"
         placeholder="Décrivez votre service..."
       ></textarea>
 
     </div>
-
 
 
     <!-- PRIX -->
@@ -350,7 +260,6 @@
         Prix
         <span class="required">*</span>
       </label>
-
 
       <input
         type="number"
@@ -364,7 +273,6 @@
     </div>
 
 
-
     <!-- DEVISE -->
 
     <div class="field">
@@ -372,7 +280,6 @@
       <label>
         Devise
       </label>
-
 
       <select id="currency">
 
@@ -389,7 +296,6 @@
     </div>
 
 
-
     <!-- CATEGORIE -->
 
     <div class="field">
@@ -397,7 +303,6 @@
       <label>
         Catégorie
       </label>
-
 
       <select id="category">
 
@@ -454,7 +359,6 @@
     </div>
 
 
-
     <!-- LOCALISATION -->
 
     <div class="field">
@@ -462,7 +366,6 @@
       <label>
         Localisation
       </label>
-
 
       <input
         type="text"
@@ -474,7 +377,6 @@
     </div>
 
 
-
     <!-- WHATSAPP -->
 
     <div class="field">
@@ -484,7 +386,6 @@
         <span class="required">*</span>
       </label>
 
-
       <input
         type="tel"
         id="whatsapp"
@@ -493,7 +394,6 @@
         required
       >
 
-
       <div class="help">
         Les clients utiliseront ce numéro pour vous contacter.
       </div>
@@ -501,8 +401,7 @@
     </div>
 
 
-
-    <!-- IMAGE URL TEMPORAIRE -->
+    <!-- IMAGE -->
 
     <div class="field">
 
@@ -510,20 +409,17 @@
         Image du service
       </label>
 
-
       <input
         type="url"
         id="image_url"
         placeholder="https://..."
       >
 
-
       <div class="help">
-        Optionnel. Le système d'upload d'images sera ajouté plus tard.
+        Optionnel.
       </div>
 
     </div>
-
 
 
     <button
@@ -539,21 +435,39 @@
 </main>
 
 
-
 <script>
 
+// =====================================================
+// CONFIGURATION API HELPY
+// =====================================================
 
-// ==========================================
+const API_URL =
+  "https://helpy-production.up.railway.app";
+
+
+// =====================================================
 // VERIFIER UTILISATEUR
-// ==========================================
+// =====================================================
 
-const user =
-  JSON.parse(
+let user = null;
+
+try {
+
+  user = JSON.parse(
     localStorage.getItem("helpyUser")
   );
 
+} catch (error) {
 
-if (!user) {
+  console.error(
+    "Erreur lecture utilisateur:",
+    error
+  );
+
+}
+
+
+if (!user || !user.id) {
 
   window.location.href =
     "/login.html";
@@ -561,35 +475,27 @@ if (!user) {
 }
 
 
-
-// ==========================================
+// =====================================================
 // MESSAGE
-// ==========================================
+// =====================================================
 
-function showMessage(
-  text,
-  type
-) {
+function showMessage(text, type) {
 
   const message =
     document.getElementById("message");
 
-
   message.textContent = text;
-
 
   message.className = type;
 
 }
 
 
-
-// ==========================================
+// =====================================================
 // PUBLIER SERVICE
-// ==========================================
+// =====================================================
 
 async function publishService() {
-
 
   const button =
     document.getElementById(
@@ -645,8 +551,9 @@ async function publishService() {
     ).value.trim();
 
 
-
+  // =================================================
   // VALIDATION
+  // =================================================
 
   if (!title) {
 
@@ -662,6 +569,7 @@ async function publishService() {
 
   if (
     price === "" ||
+    isNaN(Number(price)) ||
     Number(price) < 0
   ) {
 
@@ -687,22 +595,25 @@ async function publishService() {
   }
 
 
-
-  // BUTTON LOADING
+  // =================================================
+  // LOADING
+  // =================================================
 
   button.disabled = true;
 
   button.textContent =
-    "Publication en cours...";
-
+    "⏳ Publication en cours...";
 
 
   try {
 
+    // =================================================
+    // ENVOI AU BACKEND RAILWAY
+    // =================================================
 
     const response =
       await fetch(
-        "/api/services",
+        API_URL + "/api/services",
         {
 
           method: "POST",
@@ -714,9 +625,11 @@ async function publishService() {
 
           body: JSON.stringify({
 
-            user_id: user.id,
+            user_id:
+              user.id,
 
-            title: title,
+            title:
+              title,
 
             description:
               description || null,
@@ -745,22 +658,31 @@ async function publishService() {
       );
 
 
+    // =================================================
+    // LIRE REPONSE
+    // =================================================
 
     const data =
       await response.json();
 
 
+    // =================================================
+    // ERREUR API
+    // =================================================
 
     if (!response.ok) {
 
       throw new Error(
         data.message ||
-        "Impossible de publier le service"
+        "Impossible de publier le service."
       );
 
     }
 
 
+    // =================================================
+    // SUCCES
+    // =================================================
 
     showMessage(
       "✅ Service publié avec succès !",
@@ -772,10 +694,12 @@ async function publishService() {
       "✅ Service publié";
 
 
+    // =================================================
     // REDIRECTION
+    // =================================================
 
     setTimeout(
-      function() {
+      () => {
 
         window.location.href =
           "/services.html";
@@ -785,14 +709,19 @@ async function publishService() {
     );
 
 
-
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "ERREUR PUBLICATION SERVICE:",
+      error
+    );
 
 
     showMessage(
-      "❌ " + error.message,
+      "❌ " + (
+        error.message ||
+        "Erreur de connexion au serveur."
+      ),
       "error"
     );
 
@@ -807,7 +736,6 @@ async function publishService() {
 }
 
 </script>
-
 
 </body>
 
