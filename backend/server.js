@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { Pool } = require("pg");
+
+const { pool, initializeDatabase } = require("./database");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,15 +10,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// Initialize database
+initializeDatabase();
 
-// Test database
+// Database test
 app.get("/api/db-test", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -33,6 +29,29 @@ app.get("/api/db-test", async (req, res) => {
     res.status(500).json({
       status: "error",
       database: "not connected"
+    });
+  }
+});
+
+// Users test
+app.get("/api/users", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, name, email, phone, role, status, verified, created_at
+      FROM users
+      ORDER BY id DESC
+    `);
+
+    res.json({
+      status: "ok",
+      users: result.rows
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Unable to load users"
     });
   }
 });
