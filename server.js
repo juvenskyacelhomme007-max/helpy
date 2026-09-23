@@ -1,24 +1,13 @@
-// ============================================================
-// HELPY - FULL APP FROM ZERO
-// Backend + Frontend + API + PostgreSQL
-// ============================================================
-
 const express = require("express");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
 const { Pool } = require("pg");
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
-// ============================================================
+// =====================================================
 // DATABASE
-// ============================================================
-
-if (!process.env.DATABASE_URL) {
-  console.warn("⚠️ DATABASE_URL pa defini.");
-}
+// =====================================================
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -27,43 +16,30 @@ const pool = new Pool({
     : false
 });
 
-// ============================================================
-// MIDDLEWARE
-// ============================================================
-
-app.use(cors());
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// ============================================================
-// DATABASE INITIALIZATION
-// ============================================================
-
 async function initializeDatabase() {
   try {
-    // USERS
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL,
-        password TEXT NOT NULL,
+        email VARCHAR(150) UNIQUE,
+        password TEXT,
+        phone VARCHAR(30),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // BUSINESSES
     await pool.query(`
       CREATE TABLE IF NOT EXISTS businesses (
         id SERIAL PRIMARY KEY,
         name VARCHAR(150) NOT NULL,
-        category VARCHAR(100) NOT NULL,
         description TEXT,
-        address VARCHAR(250),
+        category VARCHAR(100),
+        location VARCHAR(200),
         phone VARCHAR(50),
         whatsapp VARCHAR(50),
         email VARCHAR(150),
-        website TEXT,
+        website VARCHAR(255),
         image_url TEXT,
         owner_name VARCHAR(150),
         status VARCHAR(30) DEFAULT 'active',
@@ -71,18 +47,28 @@ async function initializeDatabase() {
       )
     `);
 
-    console.log("✅ Database initialized successfully.");
+    console.log("✅ Database initialized");
   } catch (error) {
     console.error("❌ Database initialization error:");
     console.error(error.message);
   }
 }
 
-// ============================================================
-// HELPER
-// ============================================================
+// =====================================================
+// MIDDLEWARE
+// =====================================================
 
-function escapeHTML(value = "") {
+app.use(cors());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// =====================================================
+// SECURITY / ESCAPE
+// =====================================================
+
+function escapeHTML(value) {
+  if (value === null || value === undefined) return "";
+
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -91,19 +77,36 @@ function escapeHTML(value = "") {
     .replace(/'/g, "&#039;");
 }
 
-// ============================================================
-// HOME PAGE
-// ============================================================
+function cleanPhone(value) {
+  if (!value) return "";
+  return String(value).replace(/[^\d+]/g, "");
+}
 
-app.get("/", async (req, res) => {
-  res.send(`
-<!DOCTYPE html>
+function whatsappNumber(value) {
+  if (!value) return "";
+
+  let number = String(value).replace(/\D/g, "");
+
+  // Haiti number without country code
+  if (number.length === 8) {
+    number = "509" + number;
+  }
+
+  return number;
+}
+
+// =====================================================
+// GLOBAL HTML
+// =====================================================
+
+function pageTemplate(title, content) {
+  return `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>HElPY</title>
+<title>${escapeHTML(title)} - HELPY</title>
 
 <style>
 
@@ -114,195 +117,273 @@ app.get("/", async (req, res) => {
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: #f5f7fb;
+  background: #f4f7fb;
   color: #172033;
 }
 
-header {
-  background: #111827;
+a {
+  text-decoration: none;
+}
+
+.navbar {
+  background: #0b63f6;
   color: white;
-  padding: 18px 20px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-.nav {
-  max-width: 1100px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .logo {
-  font-size: 27px;
-  font-weight: 900;
-  letter-spacing: -1px;
-}
-
-.logo span {
-  color: #22c55e;
-}
-
-.nav a {
   color: white;
-  text-decoration: none;
-  margin-left: 15px;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.nav-links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: white;
   font-size: 14px;
+  font-weight: 700;
+}
+
+.container {
+  width: 94%;
+  max-width: 1100px;
+  margin: 25px auto;
 }
 
 .hero {
-  background:
-    linear-gradient(135deg, #111827, #1f2937);
+  background: linear-gradient(135deg, #075cf0, #00a6ff);
   color: white;
-  padding: 70px 20px;
-}
-
-.hero-content {
-  max-width: 1100px;
-  margin: auto;
+  border-radius: 22px;
+  padding: 35px 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
 }
 
 .hero h1 {
-  font-size: 45px;
-  margin: 0 0 15px;
+  margin: 0 0 10px;
+  font-size: 34px;
 }
 
 .hero p {
-  font-size: 18px;
-  max-width: 650px;
-  color: #d1d5db;
+  margin: 0 0 20px;
+  font-size: 16px;
+  opacity: .95;
 }
 
 .search-box {
-  margin-top: 30px;
   display: flex;
-  max-width: 700px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .search-box input {
   flex: 1;
-  padding: 17px;
-  border: none;
-  border-radius: 10px 0 0 10px;
+  min-width: 200px;
+  padding: 15px;
+  border: 0;
+  border-radius: 12px;
   font-size: 16px;
-  outline: none;
 }
 
-.search-box button {
+button,
+.btn {
   border: none;
-  background: #22c55e;
+  border-radius: 12px;
+  padding: 13px 18px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 15px;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #0b63f6;
   color: white;
-  padding: 0 25px;
-  border-radius: 0 10px 10px 0;
-  font-weight: bold;
-  cursor: pointer;
 }
 
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 35px 20px;
+.btn-success {
+  background: #16a34a;
+  color: white;
 }
 
-.section-title {
-  font-size: 27px;
-  margin-bottom: 20px;
+.btn-dark {
+  background: #172033;
+  color: white;
 }
 
-.categories {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 12px;
-}
-
-.category {
+.btn-light {
   background: white;
-  padding: 20px 10px;
-  border-radius: 14px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 3px 12px rgba(0,0,0,.06);
-  transition: .2s;
+  color: #0b63f6;
 }
 
-.category:hover {
-  transform: translateY(-3px);
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.07);
 }
 
-.category .icon {
-  font-size: 30px;
-}
-
-.business-grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 18px;
 }
 
 .business-card {
-  background: white;
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 18px rgba(0,0,0,.07);
+  padding: 0;
 }
 
 .business-image {
-  height: 160px;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 50px;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  background: #e9eef5;
 }
 
 .business-content {
   padding: 18px;
 }
 
-.business-content h3 {
-  margin-top: 0;
+.business-name {
+  font-size: 21px;
+  font-weight: 900;
+  margin-bottom: 8px;
 }
 
 .badge {
   display: inline-block;
+  background: #e8f1ff;
+  color: #075cf0;
+  padding: 6px 10px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.muted {
+  color: #697386;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 800;
+  margin-bottom: 7px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d8dee9;
+  border-radius: 12px;
+  font-size: 15px;
+  background: white;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.success {
   background: #dcfce7;
   color: #166534;
-  padding: 5px 9px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
 }
 
-.btn {
-  display: inline-block;
-  border: none;
-  background: #111827;
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.footer {
+  text-align: center;
+  padding: 35px 15px;
+  margin-top: 40px;
+  background: #172033;
   color: white;
-  text-decoration: none;
-  padding: 11px 16px;
-  border-radius: 9px;
-  cursor: pointer;
-  margin-top: 10px;
 }
 
-.btn-green {
-  background: #22c55e;
+.detail-image {
+  width: 100%;
+  max-height: 430px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.info-row {
+  padding: 13px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.info-label {
+  font-weight: 900;
 }
 
 .empty {
-  background: white;
-  padding: 35px;
   text-align: center;
-  border-radius: 15px;
+  padding: 50px 20px;
+  color: #697386;
 }
 
-footer {
-  margin-top: 50px;
-  background: #111827;
-  color: #9ca3af;
-  padding: 35px 20px;
-  text-align: center;
+@media(max-width:600px) {
+
+  .navbar {
+    padding: 13px;
+  }
+
+  .logo {
+    font-size: 21px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+  }
+
+  .hero {
+    padding: 27px 18px;
+  }
+
+  .hero h1 {
+    font-size: 27px;
+  }
+
+  .actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
 }
 
 </style>
@@ -310,725 +391,454 @@ footer {
 
 <body>
 
-<header>
-  <div class="nav">
-    <div class="logo">HE<span>l</span>PY</div>
+<nav class="navbar">
 
-    <div>
-      <a href="/">Accueil</a>
-      <a href="/businesses">Entreprises</a>
-      <a href="/add-business">Ajouter</a>
-    </div>
-  </div>
-</header>
+<a class="logo" href="/">HElPY</a>
 
-<section class="hero">
-
-  <div class="hero-content">
-
-    <h1>Trouvez ce dont vous avez besoin.</h1>
-
-    <p>
-      HElPY connecte les personnes avec les entreprises,
-      services et professionnels disponibles autour d'elles.
-    </p>
-
-    <form class="search-box" action="/businesses" method="GET">
-      <input
-        type="text"
-        name="search"
-        placeholder="Rechercher une entreprise ou un service..."
-      >
-
-      <button type="submit">
-        Rechercher
-      </button>
-    </form>
-
-  </div>
-
-</section>
-
-<div class="container">
-
-  <h2 class="section-title">
-    Catégories
-  </h2>
-
-  <div class="categories">
-
-    <div class="category" onclick="goCategory('Restaurants')">
-      <div class="icon">🍽️</div>
-      Restaurants
-    </div>
-
-    <div class="category" onclick="goCategory('Informatique')">
-      <div class="icon">💻</div>
-      Informatique
-    </div>
-
-    <div class="category" onclick="goCategory('Beauté')">
-      <div class="icon">💄</div>
-      Beauté
-    </div>
-
-    <div class="category" onclick="goCategory('Transport')">
-      <div class="icon">🚗</div>
-      Transport
-    </div>
-
-    <div class="category" onclick="goCategory('Construction')">
-      <div class="icon">🏗️</div>
-      Construction
-    </div>
-
-    <div class="category" onclick="goCategory('Éducation')">
-      <div class="icon">📚</div>
-      Éducation
-    </div>
-
-    <div class="category" onclick="goCategory('Santé')">
-      <div class="icon">🏥</div>
-      Santé
-    </div>
-
-    <div class="category" onclick="goCategory('Commerce')">
-      <div class="icon">🛒</div>
-      Commerce
-    </div>
-
-  </div>
-
+<div class="nav-links">
+<a href="/">Accueil</a>
+<a href="/businesses">Entreprises</a>
+<a href="/add-business">Ajouter</a>
 </div>
 
-<footer>
-  <strong>HElPY</strong>
-  <br><br>
-  Trouvez. Connectez. Aidez.
+</nav>
+
+<main class="container">
+
+${content}
+
+</main>
+
+<footer class="footer">
+<strong>HElPY</strong>
+<br>
+Trouvez facilement les entreprises et services en Haïti.
+<br><br>
+© ${new Date().getFullYear()} HELPY
 </footer>
 
-<script>
-
-function goCategory(category) {
-  window.location.href =
-    "/businesses?category=" +
-    encodeURIComponent(category);
+</body>
+</html>`;
 }
 
-</script>
+// =====================================================
+// HOME
+// =====================================================
 
-</body>
-</html>
-  `);
-});
+app.get("/", async (req, res) => {
 
-// ============================================================
-// BUSINESSES PAGE
-// ============================================================
-
-app.get("/businesses", async (req, res) => {
+  let businesses = [];
 
   try {
-
-    const search = req.query.search || "";
-    const category = req.query.category || "";
-
-    let query = `
+    const result = await pool.query(`
       SELECT *
       FROM businesses
       WHERE status = 'active'
-    `;
-
-    const values = [];
-
-    if (search) {
-      values.push("%" + search + "%");
-
-      query += `
-        AND (
-          name ILIKE $${values.length}
-          OR category ILIKE $${values.length}
-          OR description ILIKE $${values.length}
-          OR address ILIKE $${values.length}
-        )
-      `;
-    }
-
-    if (category) {
-      values.push(category);
-
-      query += `
-        AND category ILIKE $${values.length}
-      `;
-    }
-
-    query += `
       ORDER BY created_at DESC
-    `;
-
-    const result = await pool.query(query, values);
-
-    const cards = result.rows.map(b => {
-
-      const image = b.image_url
-        ? `<img src="${escapeHTML(b.image_url)}"
-             style="width:100%;height:160px;object-fit:cover;">`
-        : `<div class="business-image">🏢</div>`;
-
-      return `
-        <div class="business-card">
-
-          ${image}
-
-          <div class="business-content">
-
-            <span class="badge">
-              ${escapeHTML(b.category)}
-            </span>
-
-            <h3>
-              ${escapeHTML(b.name)}
-            </h3>
-
-            <p>
-              ${escapeHTML(
-                b.description || "Aucune description."
-              )}
-            </p>
-
-            <p>
-              📍 ${escapeHTML(b.address || "Adresse non disponible")}
-            </p>
-
-            <a class="btn"
-               href="/business/${b.id}">
-               Voir détails
-            </a>
-
-          </div>
-
-        </div>
-      `;
-    }).join("");
-
-    res.send(`
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Entreprises - HElPY</title>
-
-<style>
-
-body {
-  margin:0;
-  font-family:Arial;
-  background:#f5f7fb;
-  color:#172033;
-}
-
-header {
-  background:#111827;
-  color:white;
-  padding:18px;
-}
-
-.header {
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-}
-
-header a {
-  color:white;
-  text-decoration:none;
-  margin-left:15px;
-}
-
-.container {
-  max-width:1100px;
-  margin:auto;
-  padding:30px 20px;
-}
-
-.search {
-  display:flex;
-  margin-bottom:30px;
-}
-
-.search input {
-  flex:1;
-  padding:14px;
-  border:1px solid #ddd;
-  border-radius:9px 0 0 9px;
-}
-
-.search button {
-  border:none;
-  background:#22c55e;
-  color:white;
-  padding:0 20px;
-  border-radius:0 9px 9px 0;
-}
-
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:18px;
-}
-
-.card {
-  background:white;
-  border-radius:15px;
-  overflow:hidden;
-  box-shadow:0 3px 15px rgba(0,0,0,.07);
-}
-
-.card-img {
-  height:160px;
-  background:#e5e7eb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:50px;
-}
-
-.content {
-  padding:18px;
-}
-
-.badge {
-  background:#dcfce7;
-  color:#166534;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:12px;
-}
-
-.btn {
-  display:inline-block;
-  background:#111827;
-  color:white;
-  padding:10px 14px;
-  border-radius:8px;
-  text-decoration:none;
-}
-
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="header">
-    <strong>HElPY</strong>
-
-    <div>
-      <a href="/">Accueil</a>
-      <a href="/add-business">Ajouter</a>
-    </div>
-  </div>
-</header>
-
-<div class="container">
-
-  <h1>Entreprises & Services</h1>
-
-  <form class="search" method="GET" action="/businesses">
-
-    <input
-      name="search"
-      value="${escapeHTML(search)}"
-      placeholder="Rechercher..."
-    >
-
-    <button>
-      🔎
-    </button>
-
-  </form>
-
-  ${
-    cards
-      ? `<div class="grid">${cards}</div>`
-      : `
-        <div style="
-          background:white;
-          padding:40px;
-          text-align:center;
-          border-radius:15px;
-        ">
-          <h2>Aucune entreprise trouvée</h2>
-
-          <p>
-            Soyez la première entreprise à rejoindre HElPY.
-          </p>
-
-          <a
-            href="/add-business"
-            style="
-              display:inline-block;
-              background:#22c55e;
-              color:white;
-              padding:12px 18px;
-              border-radius:8px;
-              text-decoration:none;
-            "
-          >
-            Ajouter une entreprise
-          </a>
-        </div>
-      `
-  }
-
-</div>
-
-</body>
-</html>
+      LIMIT 6
     `);
+
+    businesses = result.rows;
 
   } catch (error) {
-
-    console.error(error);
-
-    res.status(500).send(`
-      <h1>Erreur serveur</h1>
-      <p>${escapeHTML(error.message)}</p>
-    `);
+    console.error(error.message);
   }
+
+  const cards = businesses.map(businessCard).join("");
+
+  const content = `
+    <section class="hero">
+
+      <h1>Bienvenue sur HELPY 🇭🇹</h1>
+
+      <p>
+        Trouvez rapidement des entreprises, commerces et services
+        près de vous en Haïti.
+      </p>
+
+      <form action="/businesses" method="GET" class="search-box">
+
+        <input
+          type="text"
+          name="q"
+          placeholder="Rechercher une entreprise ou un service..."
+        >
+
+        <button class="btn-light" type="submit">
+          🔎 Rechercher
+        </button>
+
+      </form>
+
+    </section>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+
+      <h2>Entreprises récentes</h2>
+
+      <a class="btn btn-primary" href="/add-business">
+        + Ajouter une entreprise
+      </a>
+
+    </div>
+
+    ${
+      businesses.length
+        ? `<div class="grid">${cards}</div>`
+        : `
+          <div class="card empty">
+            <h3>Aucune entreprise pour le moment</h3>
+            <p>Ajoutez la première entreprise sur HELPY.</p>
+
+            <a class="btn btn-primary" href="/add-business">
+              Ajouter une entreprise
+            </a>
+          </div>
+        `
+    }
+  `;
+
+  res.send(pageTemplate("Accueil", content));
 });
 
-// ============================================================
-// ADD BUSINESS PAGE
-// ============================================================
+// =====================================================
+// BUSINESS CARD
+// =====================================================
 
-app.get("/add-business", (req, res) => {
+function businessCard(business) {
 
-  res.send(`
-<!DOCTYPE html>
-<html lang="fr">
+  const image = business.image_url
+    ? escapeHTML(business.image_url)
+    : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80";
 
-<head>
+  return `
+    <article class="card business-card">
 
-<meta charset="UTF-8">
+      <img
+        class="business-image"
+        src="${image}"
+        alt="${escapeHTML(business.name)}"
+        loading="lazy"
+      >
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1.0"
->
+      <div class="business-content">
 
-<title>Ajouter une entreprise - HElPY</title>
+        <span class="badge">
+          ${escapeHTML(business.category || "Entreprise")}
+        </span>
 
-<style>
+        <div class="business-name">
+          ${escapeHTML(business.name)}
+        </div>
 
-* {
-  box-sizing:border-box;
+        <p class="muted">
+          📍 ${escapeHTML(business.location || "Haïti")}
+        </p>
+
+        <p>
+          ${escapeHTML(
+            business.description
+              ? business.description.substring(0, 120)
+              : "Découvrez cette entreprise sur HELPY."
+          )}
+        </p>
+
+        <a
+          class="btn btn-primary"
+          href="/business/${business.id}"
+        >
+          Voir détails
+        </a>
+
+      </div>
+
+    </article>
+  `;
 }
 
-body {
-  margin:0;
-  font-family:Arial;
-  background:#f5f7fb;
-  color:#172033;
-}
+// =====================================================
+// BUSINESSES PAGE
+// =====================================================
 
-header {
-  background:#111827;
-  color:white;
-  padding:18px;
-}
+app.get("/businesses", async (req, res) => {
 
-.header {
-  max-width:700px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-}
+  const q = String(req.query.q || "").trim();
 
-.header a {
-  color:white;
-  text-decoration:none;
-}
-
-.container {
-  max-width:700px;
-  margin:auto;
-  padding:30px 20px;
-}
-
-.form {
-  background:white;
-  padding:25px;
-  border-radius:18px;
-  box-shadow:0 4px 20px rgba(0,0,0,.08);
-}
-
-label {
-  display:block;
-  margin-top:16px;
-  margin-bottom:7px;
-  font-weight:bold;
-}
-
-input,
-textarea,
-select {
-  width:100%;
-  padding:13px;
-  border:1px solid #d1d5db;
-  border-radius:9px;
-  font-size:15px;
-}
-
-textarea {
-  min-height:100px;
-  resize:vertical;
-}
-
-button {
-  width:100%;
-  margin-top:22px;
-  padding:15px;
-  border:0;
-  border-radius:10px;
-  background:#22c55e;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-}
-
-#message {
-  margin-top:15px;
-  padding:12px;
-  border-radius:9px;
-  display:none;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<header>
-
-<div class="header">
-
-<strong>HElPY</strong>
-
-<a href="/">
-Accueil
-</a>
-
-</div>
-
-</header>
-
-<div class="container">
-
-<h1>Ajouter une entreprise</h1>
-
-<p>
-Présentez votre entreprise ou votre service sur HElPY.
-</p>
-
-<form id="businessForm" class="form">
-
-<label>Nom de l'entreprise *</label>
-
-<input
-  id="name"
-  required
-  placeholder="Ex: Mon Restaurant"
->
-
-<label>Catégorie *</label>
-
-<select id="category" required>
-
-<option value="">Choisir une catégorie</option>
-
-<option>Restaurants</option>
-<option>Informatique</option>
-<option>Beauté</option>
-<option>Transport</option>
-<option>Construction</option>
-<option>Éducation</option>
-<option>Santé</option>
-<option>Commerce</option>
-<option>Autre</option>
-
-</select>
-
-<label>Description</label>
-
-<textarea
-  id="description"
-  placeholder="Décrivez votre entreprise..."
-></textarea>
-
-<label>Adresse</label>
-
-<input
-  id="address"
-  placeholder="Ex: Delmas 33, Haïti"
->
-
-<label>Téléphone</label>
-
-<input
-  id="phone"
-  placeholder="Ex: 37000000"
->
-
-<label>WhatsApp</label>
-
-<input
-  id="whatsapp"
-  placeholder="Ex: 37000000"
->
-
-<label>Email</label>
-
-<input
-  id="email"
-  type="email"
-  placeholder="email@example.com"
->
-
-<label>Site web</label>
-
-<input
-  id="website"
-  placeholder="https://..."
->
-
-<label>URL de l'image</label>
-
-<input
-  id="image_url"
-  placeholder="https://..."
->
-
-<label>Nom du propriétaire</label>
-
-<input
-  id="owner_name"
-  placeholder="Votre nom"
->
-
-<button type="submit">
-  Ajouter l'entreprise
-</button>
-
-<div id="message"></div>
-
-</form>
-
-</div>
-
-<script>
-
-const form = document.getElementById("businessForm");
-const message = document.getElementById("message");
-
-form.addEventListener("submit", async function(e) {
-
-  e.preventDefault();
-
-  message.style.display = "block";
-  message.innerText = "Enregistrement en cours...";
-
-  const data = {
-
-    name:
-      document.getElementById("name").value,
-
-    category:
-      document.getElementById("category").value,
-
-    description:
-      document.getElementById("description").value,
-
-    address:
-      document.getElementById("address").value,
-
-    phone:
-      document.getElementById("phone").value,
-
-    whatsapp:
-      document.getElementById("whatsapp").value,
-
-    email:
-      document.getElementById("email").value,
-
-    website:
-      document.getElementById("website").value,
-
-    image_url:
-      document.getElementById("image_url").value,
-
-    owner_name:
-      document.getElementById("owner_name").value
-
-  };
+  let businesses = [];
 
   try {
 
-    const response = await fetch("/api/businesses", {
+    let result;
 
-      method:"POST",
+    if (q) {
 
-      headers:{
-        "Content-Type":"application/json"
-      },
+      result = await pool.query(
+        `
+        SELECT *
+        FROM businesses
+        WHERE status = 'active'
+        AND (
+          name ILIKE $1
+          OR description ILIKE $1
+          OR category ILIKE $1
+          OR location ILIKE $1
+        )
+        ORDER BY created_at DESC
+        `,
+        [`%${q}%`]
+      );
 
-      body:JSON.stringify(data)
+    } else {
 
-    });
+      result = await pool.query(`
+        SELECT *
+        FROM businesses
+        WHERE status = 'active'
+        ORDER BY created_at DESC
+      `);
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "Erreur");
     }
 
-    message.style.background = "#dcfce7";
-    message.style.color = "#166534";
+    businesses = result.rows;
 
-    message.innerHTML =
-      "✅ Entreprise ajoutée avec succès !<br><br>" +
-      "<a href='/business/" + result.entreprise.id +
-      "'>Voir l'entreprise</a>";
+  } catch (error) {
 
-    form.reset();
+    console.error(error.message);
 
-  } catch(error) {
-
-    message.style.background = "#fee2e2";
-    message.style.color = "#991b1b";
-
-    message.innerText =
-      "❌ " + error.message;
-
+    return res.status(500).send(
+      pageTemplate(
+        "Erreur",
+        `
+        <div class="error">
+          Impossible de récupérer les entreprises.
+        </div>
+        `
+      )
+    );
   }
 
+  const cards = businesses.map(businessCard).join("");
+
+  const content = `
+
+    <div class="card">
+
+      <h1>Entreprises & Services</h1>
+
+      <form action="/businesses" method="GET" class="search-box">
+
+        <input
+          type="text"
+          name="q"
+          value="${escapeHTML(q)}"
+          placeholder="Rechercher..."
+        >
+
+        <button class="btn btn-primary">
+          🔎 Rechercher
+        </button>
+
+      </form>
+
+    </div>
+
+    ${
+      q
+        ? `<p class="muted">
+            Résultats pour : <strong>${escapeHTML(q)}</strong>
+          </p>`
+        : ""
+    }
+
+    ${
+      businesses.length
+        ? `<div class="grid">${cards}</div>`
+        : `
+          <div class="card empty">
+            <h2>Aucun résultat</h2>
+            <p>Aucune entreprise ne correspond à votre recherche.</p>
+          </div>
+        `
+    }
+
+  `;
+
+  res.send(pageTemplate("Entreprises", content));
 });
 
-</script>
+// =====================================================
+// ADD BUSINESS PAGE
+// =====================================================
 
-</body>
-</html>
-  `);
+app.get("/add-business", (req, res) => {
+
+  const content = `
+
+    <div class="card">
+
+      <h1>Ajouter une entreprise</h1>
+
+      <p class="muted">
+        Présentez votre entreprise ou votre service sur HELPY.
+      </p>
+
+      <form action="/api/businesses" method="POST">
+
+        <div class="form-group">
+          <label>Nom de l'entreprise *</label>
+
+          <input
+            name="name"
+            required
+            placeholder="Ex: Boutique Juvensky"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Catégorie *</label>
+
+          <select name="category" required>
+
+            <option value="">Choisir une catégorie</option>
+
+            <option>Restaurant</option>
+            <option>Boutique</option>
+            <option>Technologie</option>
+            <option>Beauté</option>
+            <option>Construction</option>
+            <option>Transport</option>
+            <option>Santé</option>
+            <option>Éducation</option>
+            <option>Services</option>
+            <option>Autre</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Description</label>
+
+          <textarea
+            name="description"
+            placeholder="Décrivez votre entreprise..."
+          ></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Localisation *</label>
+
+          <input
+            name="location"
+            required
+            placeholder="Ex: Delmas, Port-au-Prince"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Téléphone</label>
+
+          <input
+            name="phone"
+            type="tel"
+            placeholder="Ex: 509..."
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>WhatsApp</label>
+
+          <input
+            name="whatsapp"
+            type="tel"
+            placeholder="Ex: 509..."
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input
+            name="email"
+            type="email"
+            placeholder="contact@example.com"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Site web</label>
+
+          <input
+            name="website"
+            type="url"
+            placeholder="https://..."
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>URL de l'image</label>
+
+          <input
+            name="image_url"
+            type="url"
+            placeholder="https://..."
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Nom du propriétaire/contact</label>
+
+          <input
+            name="owner_name"
+            placeholder="Nom du responsable"
+          >
+
+        </div>
+
+        <button class="btn btn-primary" type="submit">
+          🚀 Ajouter l'entreprise
+        </button>
+
+      </form>
+
+    </div>
+
+  `;
+
+  res.send(pageTemplate("Ajouter une entreprise", content));
 });
 
-// ============================================================
+// =====================================================
 // BUSINESS DETAILS
-// ============================================================
+// =====================================================
 
 app.get("/business/:id", async (req, res) => {
+
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).send(
+      pageTemplate(
+        "Erreur",
+        `<div class="error">ID invalide.</div>`
+      )
+    );
+  }
 
   try {
 
@@ -1038,199 +848,52 @@ app.get("/business/:id", async (req, res) => {
       FROM businesses
       WHERE id = $1
       `,
-      [req.params.id]
+      [id]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).send("Entreprise introuvable.");
+    if (!result.rows.length) {
+
+      return res.status(404).send(
+        pageTemplate(
+          "Entreprise introuvable",
+          `
+          <div class="card empty">
+
+            <h2>Entreprise introuvable</h2>
+
+            <a class="btn btn-primary" href="/businesses">
+              Retour aux entreprises
+            </a>
+
+          </div>
+          `
+        )
+      );
+
     }
 
-    const b = result.rows[0];
+    const business = result.rows[0];
 
-    res.send(`
-<!DOCTYPE html>
+    const image = business.image_url
+      ? escapeHTML(business.image_url)
+      : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80";
 
-<html lang="fr">
+    const phone = cleanPhone(business.phone);
+    const whatsapp = whatsappNumber(business.whatsapp);
 
-<head>
+    const phoneButton = phone
+      ? `
+        <a
+          class="btn btn-primary"
+          href="tel:${escapeHTML(phone)}"
+        >
+          📞 Appeler
+        </a>
+      `
+      : "";
 
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1.0"
->
-
-<title>${escapeHTML(b.name)} - HElPY</title>
-
-<style>
-
-body {
-  margin:0;
-  font-family:Arial;
-  background:#f5f7fb;
-  color:#172033;
-}
-
-header {
-  background:#111827;
-  color:white;
-  padding:18px;
-}
-
-.header {
-  max-width:800px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-}
-
-header a {
-  color:white;
-  text-decoration:none;
-}
-
-.container {
-  max-width:800px;
-  margin:auto;
-  padding:30px 20px;
-}
-
-.card {
-  background:white;
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 4px 20px rgba(0,0,0,.08);
-}
-
-.image {
-  width:100%;
-  height:260px;
-  background:#e5e7eb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:70px;
-}
-
-.image img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.content {
-  padding:25px;
-}
-
-.badge {
-  display:inline-block;
-  background:#dcfce7;
-  color:#166534;
-  padding:6px 10px;
-  border-radius:20px;
-}
-
-.contact {
-  margin-top:20px;
-}
-
-.btn {
-  display:inline-block;
-  padding:12px 17px;
-  background:#22c55e;
-  color:white;
-  text-decoration:none;
-  border-radius:9px;
-  margin-right:8px;
-  margin-top:8px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<header>
-
-<div class="header">
-
-<strong>HElPY</strong>
-
-<a href="/businesses">
-← Retour
-</a>
-
-</div>
-
-</header>
-
-<div class="container">
-
-<div class="card">
-
-<div class="image">
-
-${
-  b.image_url
-  ? `<img src="${escapeHTML(b.image_url)}">`
-  : "🏢"
-}
-
-</div>
-
-<div class="content">
-
-<span class="badge">
-${escapeHTML(b.category)}
-</span>
-
-<h1>
-${escapeHTML(b.name)}
-</h1>
-
-<p>
-${escapeHTML(
-  b.description || "Aucune description disponible."
-)}
-</p>
-
-<div class="contact">
-
-<p>
-📍 <strong>Adresse:</strong>
-${escapeHTML(b.address || "Non disponible")}
-</p>
-
-${
-  b.phone
-  ? `
-  <p>
-  📞 <strong>Téléphone:</strong>
-  ${escapeHTML(b.phone)}
-  </p>
-  `
-  : ""
-}
-
-${
-  b.whatsapp
-  ? `
-  <a
-    class="btn"
-    href="https://wa.me/${escapeHTML(b.whatsapp)}"
-    target="_blank"
-  >
-    WhatsApp
-  </a>
-  `
-  : ""
-}
-
-${
-  b.phone
-  ? `
-  <a
-    class="btn"
-    href="tel:${escap
+    const whatsappButton = whatsapp
+      ? `
+        <a
+          class="btn btn-success"
+          href="https://wa.me/${
