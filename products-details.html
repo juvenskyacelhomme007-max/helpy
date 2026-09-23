@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Détails du produit — HELPY</title>
+  <title>Détails du produit - HELPY</title>
 
   <style>
     * {
@@ -15,254 +14,174 @@
     }
 
     body {
-      background: #f5f7fb;
-      color: #172033;
-      padding-bottom: 40px;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
+      background: #f5f7fa;
+      color: #17202a;
     }
 
     header {
       background: white;
-      border-bottom: 1px solid #e5e7eb;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header {
-      max-width: 1100px;
-      height: 65px;
-      margin: auto;
-      padding: 0 18px;
+      padding: 18px 20px;
+      border-bottom: 1px solid #eee;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 9px;
       font-size: 25px;
       font-weight: 900;
-    }
-
-    .logo-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: #2563eb;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+      color: #111827;
     }
 
     .back {
-      color: #2563eb;
-      font-size: 14px;
+      border: none;
+      background: #f1f3f5;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
       font-weight: bold;
     }
 
     main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 25px 18px;
+      max-width: 900px;
+      margin: 25px auto;
+      padding: 0 15px;
     }
 
-    .loading {
-      text-align: center;
-      padding: 80px 20px;
-      color: #6b7280;
-    }
-
-    .product-card {
+    .card {
       background: white;
-      border-radius: 22px;
+      border-radius: 18px;
       overflow: hidden;
-      border: 1px solid #e5e7eb;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      box-shadow: 0 5px 25px rgba(0,0,0,.07);
     }
 
-    .image-area {
-      min-height: 450px;
-      background: #eef2f7;
+    .product-image {
+      width: 100%;
+      height: 350px;
+      background: #eef1f5;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
 
-    .image-area img {
+    .product-image img {
       width: 100%;
       height: 100%;
-      min-height: 450px;
       object-fit: cover;
     }
 
-    .no-image {
-      font-size: 90px;
+    .placeholder {
+      font-size: 70px;
+      opacity: .5;
     }
 
-    .details {
-      padding: 35px;
+    .content {
+      padding: 25px;
     }
 
     .category {
       display: inline-block;
-      background: #eef4ff;
-      color: #2563eb;
-      padding: 7px 11px;
-      border-radius: 8px;
-      font-size: 12px;
+      background: #eef2ff;
+      color: #3742fa;
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 13px;
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
-    .title {
-      font-size: 34px;
-      line-height: 1.15;
-      margin-bottom: 15px;
+    h1 {
+      font-size: 30px;
+      margin-bottom: 12px;
     }
 
     .price {
-      color: #2563eb;
       font-size: 28px;
       font-weight: 900;
       margin-bottom: 20px;
     }
 
     .info {
-      border-top: 1px solid #edf0f4;
-      border-bottom: 1px solid #edf0f4;
-      padding: 18px 0;
-      margin-bottom: 20px;
+      display: grid;
+      gap: 12px;
+      margin: 20px 0;
     }
 
-    .info-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-      font-size: 14px;
+    .info div {
+      padding: 13px;
+      background: #f7f8fa;
+      border-radius: 10px;
     }
 
-    .info-row:last-child {
-      margin-bottom: 0;
+    .label {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 4px;
     }
 
-    .info-label {
-      color: #6b7280;
+    .value {
+      font-weight: bold;
     }
 
     .description {
-      margin-bottom: 25px;
+      margin-top: 25px;
     }
 
-    .description h3 {
-      font-size: 17px;
-      margin-bottom: 8px;
+    .description h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
     }
 
     .description p {
-      color: #6b7280;
-      font-size: 14px;
-      line-height: 1.6;
+      color: #555;
+      line-height: 1.7;
       white-space: pre-wrap;
     }
 
     .seller {
-      background: #f8fafc;
-      border-radius: 13px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-
-    .seller-title {
-      color: #6b7280;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-
-    .seller-name {
-      font-weight: bold;
-      font-size: 16px;
+      margin-top: 25px;
+      padding: 18px;
+      background: #f7f8fa;
+      border-radius: 12px;
     }
 
     .whatsapp {
       display: block;
-      width: 100%;
       text-align: center;
-      background: #16a34a;
+      text-decoration: none;
+      background: #25D366;
       color: white;
-      padding: 14px;
-      border-radius: 11px;
-      font-size: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
       font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-
-    .whatsapp:hover {
-      background: #15803d;
+      font-size: 16px;
     }
 
     .error {
-      text-align: center;
       background: white;
-      border-radius: 18px;
-      padding: 50px 20px;
-      border: 1px solid #e5e7eb;
+      padding: 30px;
+      text-align: center;
+      border-radius: 15px;
     }
 
-    .error-icon {
-      font-size: 50px;
-      margin-bottom: 15px;
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
     }
 
-    .error h2 {
-      margin-bottom: 8px;
-    }
-
-    .error p {
-      color: #6b7280;
-      margin-bottom: 20px;
-    }
-
-    .home-btn {
-      display: inline-block;
-      background: #2563eb;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 750px) {
-
-      .product-card {
-        grid-template-columns: 1fr;
+    @media (max-width: 600px) {
+      .product-image {
+        height: 280px;
       }
 
-      .image-area {
-        min-height: 320px;
-      }
-
-      .image-area img {
-        min-height: 320px;
-      }
-
-      .details {
-        padding: 25px 20px;
-      }
-
-      .title {
-        font-size: 27px;
+      h1 {
+        font-size: 24px;
       }
 
       .price {
@@ -275,365 +194,190 @@
 <body>
 
 <header>
-
-  <div class="header">
-
-    <a href="/" class="logo">
-      <div class="logo-icon">H</div>
-      HELPY
-    </a>
-
-    <a href="/products.html" class="back">
-      ← Produits
-    </a>
-
-  </div>
-
+  <div class="logo">HELPY</div>
+  <button class="back" onclick="history.back()">← Retour</button>
 </header>
 
-
 <main>
-
   <div id="loading" class="loading">
     Chargement du produit...
   </div>
 
-  <div id="content"></div>
+  <div id="error" class="error" style="display:none;">
+    <h2>Produit introuvable</h2>
+    <p id="errorMessage">Impossible de charger ce produit.</p>
+  </div>
 
+  <div id="productCard" class="card" style="display:none;">
+
+    <div class="product-image">
+      <img id="productImage" style="display:none;" alt="Produit">
+      <div id="placeholder" class="placeholder">🛍️</div>
+    </div>
+
+    <div class="content">
+
+      <div id="category" class="category" style="display:none;"></div>
+
+      <h1 id="title"></h1>
+
+      <div id="price" class="price"></div>
+
+      <div class="info">
+
+        <div>
+          <div class="label">📍 Localisation</div>
+          <div id="location" class="value">Non précisé</div>
+        </div>
+
+        <div>
+          <div class="label">📦 Quantité disponible</div>
+          <div id="quantity" class="value">1</div>
+        </div>
+
+      </div>
+
+      <div class="description">
+        <h2>Description</h2>
+        <p id="description">Aucune description disponible.</p>
+      </div>
+
+      <div class="seller">
+        <div class="label">👤 Vendeur</div>
+        <div id="seller" class="value"></div>
+      </div>
+
+      <a id="whatsapp" class="whatsapp" href="#" target="_blank">
+        💬 Contacter le vendeur sur WhatsApp
+      </a>
+
+    </div>
+  </div>
 </main>
-
 
 <script>
 
 const API_URL = "https://helpy-production.up.railway.app";
 
-
-/* Récupérer l'ID dans l'URL */
-
-const params = new URLSearchParams(window.location.search);
-
-const productId = params.get("id");
-
-
-/* Échapper les caractères HTML */
-
-function escapeHTML(value) {
-
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-/* Format du prix */
-
-function formatPrice(price) {
-
-  const number = Number(price);
-
-  if (isNaN(number)) {
-    return escapeHTML(price);
-  }
-
-  return new Intl.NumberFormat("fr-FR").format(number);
-
-}
-
-
-/* Charger le produit */
-
 async function loadProduct() {
 
-  const loading =
-    document.getElementById("loading");
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  const content =
-    document.getElementById("content");
+  console.log("PRODUCT ID:", id);
 
-
-  if (!productId) {
-
-    showError(
-      "Produit introuvable",
-      "Aucun identifiant de produit n'a été fourni."
-    );
-
+  if (!id) {
+    showError("Aucun identifiant de produit trouvé.");
     return;
-
   }
-
 
   try {
 
-    const response =
-      await fetch(
-        API_URL + "/api/products/" +
-        encodeURIComponent(productId)
-      );
+    const response = await fetch(
+      `${API_URL}/api/products/${encodeURIComponent(id)}`
+    );
 
+    console.log("STATUS:", response.status);
 
-    if (!response.ok) {
-      throw new Error("Produit introuvable");
+    const data = await response.json();
+
+    console.log("PRODUCT DATA:", data);
+
+    if (!response.ok || data.status !== "ok" || !data.product) {
+      showError(data.message || "Produit introuvable.");
+      return;
     }
 
+    const product = data.product;
 
-    const data =
-      await response.json();
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("productCard").style.display = "block";
 
+    // TITRE
+    document.getElementById("title").textContent =
+      product.title || "Produit sans nom";
 
-    const product =
-      data.product || data;
+    // PRIX
+    document.getElementById("price").textContent =
+      `${product.price || 0} ${product.currency || "HTG"}`;
 
-
-    if (!product || !product.id) {
-      throw new Error("Produit introuvable");
+    // CATÉGORIE
+    if (product.category) {
+      const category = document.getElementById("category");
+      category.textContent = product.category;
+      category.style.display = "inline-block";
     }
 
+    // LOCALISATION
+    document.getElementById("location").textContent =
+      product.location || "Non précisé";
 
-    displayProduct(product);
+    // QUANTITÉ
+    document.getElementById("quantity").textContent =
+      product.quantity ?? 1;
 
+    // DESCRIPTION
+    document.getElementById("description").textContent =
+      product.description || "Aucune description disponible.";
+
+    // VENDEUR
+    document.getElementById("seller").textContent =
+      product.seller_name || "Vendeur";
+
+    // IMAGE
+    if (product.image_url) {
+
+      const image = document.getElementById("productImage");
+
+      image.src = product.image_url;
+      image.style.display = "block";
+
+      document.getElementById("placeholder").style.display = "none";
+    }
+
+    // WHATSAPP
+    if (product.whatsapp) {
+
+      let number = String(product.whatsapp)
+        .replace(/\D/g, "");
+
+      // Ajoute le code Haïti si nécessaire
+      if (number.length === 8) {
+        number = "509" + number;
+      }
+
+      const whatsapp = document.getElementById("whatsapp");
+
+      whatsapp.href =
+        `https://wa.me/${number}?text=${encodeURIComponent(
+          "Bonjour, je suis intéressé par votre produit : " +
+          (product.title || "")
+        )}`;
+
+    } else {
+
+      document.getElementById("whatsapp").style.display = "none";
+    }
 
   } catch (error) {
 
-    console.error(error);
+    console.error("DETAIL ERROR:", error);
 
     showError(
-      "Produit introuvable",
-      "Ce produit n'est plus disponible ou une erreur est survenue."
+      "Impossible de communiquer avec le serveur."
     );
-
   }
-
 }
 
-
-/* Afficher le produit */
-
-function displayProduct(product) {
-
-  const loading =
-    document.getElementById("loading");
-
-  const content =
-    document.getElementById("content");
-
-
-  loading.style.display = "none";
-
-
-  let imageHTML = `
-    <div class="no-image">🛍️</div>
-  `;
-
-
-  if (product.image_url) {
-
-    imageHTML = `
-      <img
-        src="${escapeHTML(product.image_url)}"
-        alt="${escapeHTML(product.title)}"
-      >
-    `;
-
-  }
-
-
-  const whatsapp =
-    String(product.whatsapp || "")
-      .replace(/\D/g, "");
-
-
-  const whatsappLink =
-    whatsapp
-      ? "https://wa.me/" + whatsapp
-      : "#";
-
-
-  const currency =
-    product.currency || "HTG";
-
-
-  const quantity =
-    product.quantity !== undefined
-      ? product.quantity
-      : "—";
-
-
-  const category =
-    product.category || "Produit";
-
-
-  const location =
-    product.location || "Haïti";
-
-
-  const description =
-    product.description ||
-    "Aucune description disponible pour ce produit.";
-
-
-  const seller =
-    product.seller_name ||
-    "Vendeur HELPY";
-
-
-  content.innerHTML = `
-
-    <div class="product-card">
-
-      <div class="image-area">
-        ${imageHTML}
-      </div>
-
-
-      <div class="details">
-
-        <div class="category">
-          ${escapeHTML(category)}
-        </div>
-
-
-        <h1 class="title">
-          ${escapeHTML(product.title)}
-        </h1>
-
-
-        <div class="price">
-          ${formatPrice(product.price)}
-          ${escapeHTML(currency)}
-        </div>
-
-
-        <div class="info">
-
-          <div class="info-row">
-            <strong>📍</strong>
-            <span>
-              <span class="info-label">Localisation :</span>
-              ${escapeHTML(location)}
-            </span>
-          </div>
-
-
-          <div class="info-row">
-            <strong>📦</strong>
-            <span>
-              <span class="info-label">Quantité :</span>
-              ${escapeHTML(quantity)}
-            </span>
-          </div>
-
-        </div>
-
-
-        <div class="description">
-
-          <h3>Description</h3>
-
-          <p>
-            ${escapeHTML(description)}
-          </p>
-
-        </div>
-
-
-        <div class="seller">
-
-          <div class="seller-title">
-            Vendu par
-          </div>
-
-          <div class="seller-name">
-            👤 ${escapeHTML(seller)}
-          </div>
-
-        </div>
-
-
-        ${
-          whatsapp
-          ?
-          `
-          <a
-            class="whatsapp"
-            href="${whatsappLink}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            💬 Contacter sur WhatsApp
-          </a>
-          `
-          :
-          `
-          <button
-            class="whatsapp"
-            style="background:#9ca3af;cursor:not-allowed;"
-            disabled
-          >
-            WhatsApp non disponible
-          </button>
-          `
-        }
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.title =
-    product.title +
-    " — HELPY";
-
-}
-
-
-/* Afficher une erreur */
-
-function showError(title, message) {
+function showError(message) {
 
   document.getElementById("loading").style.display = "none";
 
-  document.getElementById("content").innerHTML = `
+  document.getElementById("error").style.display = "block";
 
-    <div class="error">
-
-      <div class="error-icon">
-        🔎
-      </div>
-
-      <h2>
-        ${escapeHTML(title)}
-      </h2>
-
-      <p>
-        ${escapeHTML(message)}
-      </p>
-
-      <a
-        href="/products.html"
-        class="home-btn"
-      >
-        ← Retour aux produits
-      </a>
-
-    </div>
-
-  `;
-
+  document.getElementById("errorMessage").textContent =
+    message;
 }
-
-
-/* Lancer */
 
 loadProduct();
 
