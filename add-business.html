@@ -1,436 +1,472 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ajouter une entreprise - HELPY</title>
+  <title>Ajouter une entreprise - HELPY</title>
 
-<style>
-*{
-  box-sizing:border-box;
-  font-family:Arial,sans-serif;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body{
-  margin:0;
-  background:#f5f7fb;
-  color:#172033;
-}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+      min-height: 100vh;
+    }
 
-header{
-  background:#111827;
-  color:white;
-  padding:18px;
-}
+    .header {
+      background: #111827;
+      color: white;
+      padding: 18px 20px;
+      text-align: center;
+    }
 
-.header{
-  max-width:600px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+    .header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
 
-.logo{
-  font-size:24px;
-  font-weight:bold;
-}
+    .header p {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
 
-.back{
-  color:white;
-  text-decoration:none;
-}
+    .container {
+      width: 100%;
+      max-width: 650px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
 
-.container{
-  max-width:600px;
-  margin:auto;
-  padding:25px 18px;
-}
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
 
-.form{
-  background:white;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 5px 20px rgba(0,0,0,.08);
-}
+    .card h2 {
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
 
-h1{
-  margin-top:0;
-}
+    .subtitle {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
 
-p{
-  color:#667085;
-}
+    .form-group {
+      margin-bottom: 17px;
+    }
 
-label{
-  display:block;
-  font-weight:bold;
-  margin-top:16px;
-  margin-bottom:7px;
-}
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
 
-input,
-textarea,
-select{
-  width:100%;
-  padding:13px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:15px;
-}
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      background: white;
+    }
 
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    }
 
-button{
-  width:100%;
-  border:0;
-  background:#2563eb;
-  color:white;
-  padding:15px;
-  border-radius:12px;
-  font-size:16px;
-  font-weight:bold;
-  margin-top:22px;
-}
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
 
-button:disabled{
-  opacity:.6;
-}
+    .required {
+      color: #dc2626;
+    }
 
-#message{
-  margin-top:15px;
-  padding:12px;
-  border-radius:10px;
-  text-align:center;
-  font-weight:bold;
-  display:none;
-}
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 11px;
+      padding: 15px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
 
-.success{
-  display:block !important;
-  background:#dcfce7;
-  color:#166534;
-}
+    .button:hover {
+      background: #1d4ed8;
+    }
 
-.error{
-  display:block !important;
-  background:#fee2e2;
-  color:#991b1b;
-}
+    .button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
 
-.info{
-  display:block !important;
-  background:#dbeafe;
-  color:#1e40af;
-}
-</style>
+    .message {
+      display: none;
+      padding: 13px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 18px;
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 12px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        margin-top: 18px;
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 15px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <div class="header">
-    <div class="logo">HELPY</div>
+  <header class="header">
+    <h1>HELPY</h1>
+    <p>Ajouter une entreprise</p>
+  </header>
 
-    <a class="back" href="businesses.html">
-      ← Retour
-    </a>
-  </div>
-</header>
+  <main class="container">
 
-<div class="container">
+    <div class="card">
 
-  <div class="form">
+      <h2>Créer une entreprise</h2>
 
-    <h1>Ajouter une entreprise</h1>
+      <p class="subtitle">
+        Ajoutez les informations de votre entreprise pour la publier sur HELPY.
+      </p>
 
-    <p>
-      Présentez votre entreprise sur HELPY.
-    </p>
+      <div id="message" class="message"></div>
 
-    <label>Nom de l'entreprise *</label>
-    <input
-      id="name"
-      placeholder="Ex: Juvensky Technologie"
-    >
+      <form id="businessForm">
 
-    <label>Description</label>
-    <textarea
-      id="description"
-      placeholder="Décrivez votre entreprise..."
-    ></textarea>
+        <!-- NOM -->
+        <div class="form-group">
+          <label>
+            Nom de l'entreprise <span class="required">*</span>
+          </label>
 
-    <label>Catégorie</label>
-    <select id="category">
-      <option value="">Sélectionner</option>
-      <option value="Restaurant">Restaurant</option>
-      <option value="Boutique">Boutique</option>
-      <option value="Technologie">Technologie</option>
-      <option value="Beauté">Beauté</option>
-      <option value="Construction">Construction</option>
-      <option value="Transport">Transport</option>
-      <option value="Éducation">Éducation</option>
-      <option value="Autre">Autre</option>
-    </select>
+          <input
+            type="text"
+            id="name"
+            placeholder="Ex: Boulangerie Chez Marie"
+            required
+          >
+        </div>
 
-    <label>Localisation</label>
-    <input
-      id="location"
-      placeholder="Ex: Delmas 33"
-    >
+        <!-- CATÉGORIE -->
+        <div class="form-group">
+          <label>
+            Catégorie <span class="required">*</span>
+          </label>
 
-    <label>Téléphone</label>
-    <input
-      id="phone"
-      type="tel"
-      placeholder="3xxx-xxxx"
-    >
+          <select id="category" required>
+            <option value="">Choisir une catégorie</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Boutique">Boutique</option>
+            <option value="Supermarché">Supermarché</option>
+            <option value="Informatique">Informatique</option>
+            <option value="Téléphones">Téléphones</option>
+            <option value="Beauté">Beauté</option>
+            <option value="Mode">Mode</option>
+            <option value="Transport">Transport</option>
+            <option value="Hôtel">Hôtel</option>
+            <option value="Construction">Construction</option>
+            <option value="Éducation">Éducation</option>
+            <option value="Services">Services</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
 
-    <label>WhatsApp</label>
-    <input
-      id="whatsapp"
-      type="tel"
-      placeholder="Numéro WhatsApp"
-    >
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label>Description</label>
 
-    <label>Email</label>
-    <input
-      id="email"
-      type="email"
-      placeholder="entreprise@email.com"
-    >
+          <textarea
+            id="description"
+            placeholder="Décrivez votre entreprise..."
+          ></textarea>
+        </div>
 
-    <label>Site web</label>
-    <input
-      id="website"
-      type="url"
-      placeholder="https://..."
-    >
+        <!-- TÉLÉPHONE -->
+        <div class="form-group">
+          <label>Téléphone</label>
 
-    <label>URL de l'image/logo</label>
-    <input
-      id="image_url"
-      type="url"
-      placeholder="https://..."
-    >
+          <input
+            type="tel"
+            id="phone"
+            placeholder="Ex: 509 0000 0000"
+          >
+        </div>
 
-    <button id="submit" onclick="createBusiness()">
-      Publier l'entreprise
-    </button>
+        <!-- WHATSAPP -->
+        <div class="form-group">
+          <label>WhatsApp</label>
 
-    <div id="message"></div>
+          <input
+            type="tel"
+            id="whatsapp"
+            placeholder="Ex: 509 0000 0000"
+          >
+        </div>
 
-  </div>
+        <!-- EMAIL -->
+        <div class="form-group">
+          <label>Email</label>
 
-</div>
+          <input
+            type="email"
+            id="email"
+            placeholder="entreprise@email.com"
+          >
+        </div>
+
+        <!-- ADRESSE -->
+        <div class="form-group">
+          <label>Adresse</label>
+
+          <input
+            type="text"
+            id="address"
+            placeholder="Ex: Delmas 33"
+          >
+        </div>
+
+        <!-- VILLE -->
+        <div class="form-group">
+          <label>Ville</label>
+
+          <input
+            type="text"
+            id="city"
+            placeholder="Ex: Port-au-Prince"
+          >
+        </div>
+
+        <!-- IMAGE -->
+        <div class="form-group">
+          <label>URL de l'image</label>
+
+          <input
+            type="url"
+            id="image_url"
+            placeholder="https://..."
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="button"
+          id="submitButton"
+        >
+          Ajouter l'entreprise
+        </button>
+
+        <div id="loading" class="loading">
+          Enregistrement en cours...
+        </div>
+
+      </form>
+
+      <a href="index.html" class="back">
+        ← Retour à HELPY
+      </a>
+
+    </div>
+
+  </main>
 
 <script>
 
-const API =
-"https://helpy-production-c2f2.up.railway.app";
+  // =====================================================
+  // URL DU BACKEND RAILWAY
+  // =====================================================
 
+  const API_URL =
+    "https://helpy-production-c2f2.up.railway.app";
 
-function showMessage(text, type){
+  // =====================================================
+  // FORMULAIRE
+  // =====================================================
 
-  const message =
-    document.getElementById("message");
+  const form = document.getElementById("businessForm");
+  const message = document.getElementById("message");
+  const submitButton = document.getElementById("submitButton");
+  const loading = document.getElementById("loading");
 
-  message.className = "";
+  // =====================================================
+  // AFFICHER MESSAGE
+  // =====================================================
 
-  message.classList.add(type);
+  function showMessage(text, type) {
 
-  message.innerText = text;
+    message.textContent = text;
 
-}
+    message.className = "message " + type;
 
-
-async function createBusiness(){
-
-  const button =
-    document.getElementById("submit");
-
-  const name =
-    document.getElementById("name").value.trim();
-
-  if(!name){
-
-    showMessage(
-      "⚠️ Le nom de l'entreprise est obligatoire.",
-      "error"
-    );
-
-    return;
   }
 
+  // =====================================================
+  // SUBMIT
+  // =====================================================
 
-  const business = {
+  form.addEventListener("submit", async function(event) {
 
-    name: name,
+    event.preventDefault();
 
-    description:
-      document.getElementById("description").value.trim(),
+    message.className = "message";
+    message.textContent = "";
 
-    category:
-      document.getElementById("category").value.trim(),
+    submitButton.disabled = true;
+    submitButton.textContent = "Enregistrement...";
+    loading.style.display = "block";
 
-    location:
-      document.getElementById("location").value.trim(),
+    const businessData = {
 
-    phone:
-      document.getElementById("phone").value.trim(),
+      name:
+        document.getElementById("name").value.trim(),
 
-    whatsapp:
-      document.getElementById("whatsapp").value.trim(),
+      category:
+        document.getElementById("category").value,
 
-    email:
-      document.getElementById("email").value.trim(),
+      description:
+        document.getElementById("description").value.trim(),
 
-    website:
-      document.getElementById("website").value.trim(),
+      phone:
+        document.getElementById("phone").value.trim(),
 
-    image_url:
-      document.getElementById("image_url").value.trim()
+      whatsapp:
+        document.getElementById("whatsapp").value.trim(),
 
-  };
+      email:
+        document.getElementById("email").value.trim(),
 
+      address:
+        document.getElementById("address").value.trim(),
 
-  button.disabled = true;
-  button.innerText = "Connexion au serveur...";
+      city:
+        document.getElementById("city").value.trim(),
 
-  showMessage(
-    "⏳ Création de l'entreprise...",
-    "info"
-  );
+      image_url:
+        document.getElementById("image_url").value.trim()
 
+    };
 
-  try{
+    try {
 
-    const response = await fetch(
-      `${API}/api/businesses`,
-      {
-        method:"POST",
+      const response = await fetch(
+        API_URL + "/api/businesses",
+        {
+          method: "POST",
 
-        headers:{
-          "Content-Type":"application/json",
-          "Accept":"application/json"
-        },
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        body:JSON.stringify(business)
-      }
-    );
-
-
-    const text =
-      await response.text();
-
-
-    let data = {};
-
-    try{
-
-      data =
-        text ? JSON.parse(text) : {};
-
-    }catch(e){
-
-      data = {
-        message:text
-      };
-
-    }
-
-
-    console.log(
-      "STATUS:",
-      response.status
-    );
-
-    console.log(
-      "SERVER RESPONSE:",
-      data
-    );
-
-
-    if(!response.ok){
-
-      throw new Error(
-        data.message ||
-        data.error ||
-        `Erreur serveur (${response.status})`
+          body: JSON.stringify(businessData)
+        }
       );
 
-    }
+      const data = await response.json();
 
+      if (!response.ok) {
 
-    showMessage(
-      "✅ Entreprise créée avec succès !",
-      "success"
-    );
-
-
-    button.innerText =
-      "Entreprise créée ✓";
-
-
-    setTimeout(() => {
-
-      if(data.business && data.business.id){
-
-        window.location.href =
-          `business-details.html?id=${data.business.id}`;
-
-      }else{
-
-        window.location.href =
-          "businesses.html";
+        throw new Error(
+          data.message ||
+          "Impossible d'ajouter l'entreprise."
+        );
 
       }
 
-    },1200);
+      showMessage(
+        "✅ Entreprise ajoutée avec succès !",
+        "success"
+      );
 
+      form.reset();
 
-  }catch(error){
+      console.log("Entreprise créée :", data);
 
-    console.error(
-      "ERREUR CREATION ENTREPRISE:",
-      error
-    );
+    } catch (error) {
 
+      console.error(error);
 
-    let message =
-      error.message ||
-      "Impossible de créer l'entreprise.";
+      showMessage(
+        "❌ " + error.message,
+        "error"
+      );
 
+    } finally {
 
-    if(
-      message.includes("Failed to fetch") ||
-      message.includes("NetworkError")
-    ){
+      submitButton.disabled = false;
 
-      message =
-        "❌ Le serveur HELPY ne répond pas. Vérifiez Railway.";
+      submitButton.textContent =
+        "Ajouter l'entreprise";
+
+      loading.style.display = "none";
 
     }
 
-
-    showMessage(
-      message,
-      "error"
-    );
-
-
-    button.disabled = false;
-
-    button.innerText =
-      "Publier l'entreprise";
-
-  }
-
-}
+  });
 
 </script>
 
