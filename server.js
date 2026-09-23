@@ -67,7 +67,7 @@ function userId(req) {
 }
 
 app.get("/", (req, res) => {
-  res.send("HElPY API OK");
+  res.sendFile(__dirname + "/index.html");
 });
 
 app.get("/api/health", (req, res) => {
