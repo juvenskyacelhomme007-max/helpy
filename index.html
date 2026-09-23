@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY — Votre assistant</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 700px;
+      margin: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 30px;
+      font-weight: 800;
+      color: #5b4bff;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .welcome {
+      text-align: center;
+      margin: 35px 0 25px;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .chat {
+      flex: 1;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      background: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+      line-height: 1.5;
+    }
+
+    .message.user {
+      background: #5b4bff;
+      color: white;
+      margin-left: 35px;
+    }
+
+    .message.bot {
+      margin-right: 35px;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 8px;
+      background: white;
+      padding: 10px;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    button {
+      border: none;
+      background: #5b4bff;
+      color: white;
+      padding: 11px 18px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 12px;
+      color: #16a34a;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="logo">HELPY</div>
+    <div class="subtitle">Votre assistant intelligent</div>
+  </header>
+
+  <main>
+
+    <div class="welcome">
+      <h1>Bonjour 👋</h1>
+      <p>Comment puis-je vous aider aujourd'hui ?</p>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="message bot">
+        Bonjour 👋 Je suis HELPY. Posez-moi votre question.
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Écrivez votre message..."
+        autocomplete="off"
+      >
+
+      <button id="sendButton">Envoyer</button>
+    </div>
+
+    <div class="status" id="status">
+      ● HELPY est en ligne
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  const API_URL = "https://helpy-production.up.railway.app";
+
+  const input = document.getElementById("messageInput");
+  const button = document.getElementById("sendButton");
+  const chat = document.getElementById("chat");
+  const status = document.getElementById("status");
+
+  function addMessage(text, type) {
+    const message = document.createElement("div");
+    message.className = "message " + type;
+    message.textContent = text;
+    chat.appendChild(message);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    addMessage(text, "user");
+
+    input.value = "";
+    button.disabled = true;
+    status.textContent = "● HELPY réfléchit...";
+
+    try {
+      const response = await fetch(API_URL + "/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: text
+        })
+      });
+
+      const data = await response.json();
+
+      addMessage(
+        data.message || data.response || "Je n'ai pas encore de réponse.",
+        "bot"
+      );
+
+      status.textContent = "● HELPY est en ligne";
+
+    } catch (error) {
+
+      addMessage(
+        "Désolé, je n'arrive pas à contacter le serveur HELPY.",
+        "bot"
+      );
+
+      status.textContent = "● Problème de connexion";
+    }
+
+    button.disabled = false;
+    input.focus();
+  }
+
+  button.addEventListener("click", sendMessage);
+
+  input.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+</script>
+
+</body>
+</html>
