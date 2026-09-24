@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entreprise - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container" id="business-container">
+    <p>Chargement...</p>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    async function loadBusiness() {
+      try {
+        const res = await fetch(`${API_BASE}/api/businesses/${id}`);
+        const data = await res.json();
+        if (data.status !== 'ok') return;
+
+        const b = data.business;
+        const reviewsRes = await fetch(`${API_BASE}/api/reviews/${id}`);
+        const reviewsData = await reviewsRes.json();
+
+        document.getElementById('business-container').innerHTML = `
+          <div class="card">
+            <img src="${b.image_url || 'https://via.placeholder.com/300'}" style="width:100%; border-radius:8px; height:180px; object-fit:cover;">
+            <h2 class="mt-2">${b.name}</h2>
+            <span class="badge mt-2">${b.category}</span>
+            <p class="mt-2">${b.description}</p>
+            <p class="mt-2"><strong>Lieu:</strong> ${b.location || 'N/A'}</p>
+            <div class="btn-group mt-4">
+              ${b.phone ? `<a href="tel:${b.phone}" class="btn">Appeler</a>` : ''}
+              ${b.whatsapp ? `<a href="https://wa.me/${b.whatsapp}" class="btn btn-whatsapp" target="_blank">WhatsApp</a>` : ''}
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Avis</h3>
+            <form id="review-form" class="mt-2">
+              <select id="rating" required>
+                <option value="5">5 Étoiles</option>
+                <option value="4">4 Étoiles</option>
+                <option value="3">3 Étoiles</option>
+                <option value="2">2 Étoiles</option>
+                <option value="1">1 Étoile</option>
+              </select>
+              <textarea id="comment" placeholder="Votre avis..." class="mt-2" required></textarea>
+              <button type="submit" class="btn mt-2">Laisser un avis</button>
+            </form>
+            <div class="mt-4">
+              ${reviewsData.reviews ? reviewsData.reviews.map(r => `
+                <div style="border-bottom: 1px solid #dfe1e6; padding: 8px 0;">
+                  <strong>${r.reviewer_name}</strong> -${'⭐'.repeat(r.rating)}
+                  <p>${r.comment}</p>
+                </div>
+              `).join('') : '<p>Aucun avis.</p>'}
+            </div>
+          </div>
+        `;
+
+        document.getElementById('review-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const user = JSON.parse(localStorage.getItem('helpyUser'));
+          if (!user) { alert('Veuillez vous connecter.'); return; }
+
+          await fetch(`${API_BASE}/api/reviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
+            body: JSON.stringify({
+              business_id: id,
+              rating: document.getElementById('rating').value,
+              comment: document.getElementById('comment').value
+            })
+          });
+          loadBusiness();
+        });
+
+      } catch (err) {
+        document.getElementById('business-container').innerHTML = '<p>Erreur.</p>';
+      }
+    }
+
+    loadBusiness();
+  </script>
+</body>
+</html>
