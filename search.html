@@ -1,199 +1,86 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Recherche - HElPY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Recherche</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+    .tab { background: var(--card-bg); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+    .tab.active { background: var(--primary-purple); color: var(--text-white); border-color: var(--primary-purple); }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  </style>
 </head>
 <body>
+  <div class="app-container">
+    <h2 class="hero-title">Que recherchez-vous ?</h2>
 
-  <!-- Header -->
-  <header class="app-header">
-    <a href="index.html" class="logo">HElPY.</a>
-    <a href="profile.html" class="profile-btn" id="user-avatar">👤</a>
-  </header>
-
-  <div class="container">
-    <h1 style="font-size:1.3rem; font-weight:800; margin-bottom:14px;">Rechech & Filtè</h1>
-    
-    <!-- Barre de recherche -->
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="search-input" placeholder="Kisa w ap chèche?" onkeyup="performSearch()">
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="search-input" placeholder="Rechercher un service, un commerce...">
     </div>
 
-    <!-- Filter Categories Chips -->
-    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:12px; margin-bottom:16px;">
-      <button class="filter-chip active" onclick="filterCategory('all', this)">Tout</button>
-      <button class="filter-chip" onclick="filterCategory('product', this)">📦 Pwodwi</button>
-      <button class="filter-chip" onclick="filterCategory('service', this)">🛠️ Sèvis</button>
-      <button class="filter-chip" onclick="filterCategory('business', this)">🏢 Antrepriz</button>
-      <button class="filter-chip" onclick="filterCategory('realestate', this)">🏠 Immobilier</button>
-      <button class="filter-chip" onclick="filterCategory('vehicle', this)">🚗 Machin</button>
+    <div class="filter-tabs">
+      <div class="tab active" onclick="filterSearch('all', this)">Tous</div>
+      <div class="tab" onclick="filterSearch('business', this)">Entreprises</div>
+      <div class="tab" onclick="filterSearch('product', this)">Produits</div>
+      <div class="tab" onclick="filterSearch('service', this)">Services</div>
+      <div class="tab" onclick="filterSearch('real_estate', this)">Immobilier</div>
+      <div class="tab" onclick="filterSearch('vehicle', this)">Véhicules</div>
     </div>
 
-    <!-- Filter Details -->
-    <div style="background:#fff; padding:14px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <div>
-        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">📍 Lokalizasyon</label>
-        <select id="filter-location" class="search-input" style="padding:8px 10px; font-size:0.85rem;" onchange="performSearch()">
-          <option value="">Tout Ayiti</option>
-          <option value="Port-au-Prince">Port-au-Prince</option>
-          <option value="Delmas">Delmas</option>
-          <option value="Pétion-Ville">Pétion-Ville</option>
-          <option value="Cap-Haïtien">Cap-Haïtien</option>
-          <option value="Carrefour">Carrefour</option>
-          <option value="Les Cayes">Les Cayes</option>
-          <option value="Jacmel">Jacmel</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">💰 Triye pa Pri</label>
-        <select id="filter-sort" class="search-input" style="padding:8px 10px; font-size:0.85rem;" onchange="performSearch()">
-          <option value="recent">Moun ki resan yo</option>
-          <option value="asc">Pri: Pi ba an premye</option>
-          <option value="desc">Pri: Pi wo an premye</option>
-        </select>
-      </div>
+    <div class="results-grid" id="search-results">
+      <!-- Les résultats s'affichent ici -->
     </div>
-
-    <!-- Rezilta -->
-    <div id="search-results" class="feed-grid">
-      <p style="text-align:center; color:var(--text-muted); padding:20px;">Antre yon mo nan rechèch la...</p>
-    </div>
-
   </div>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-      <span class="nav-icon">⌂</span>
-      <span>Akèy</span>
-    </a>
-    <a href="search.html" class="nav-item active">
-      <span class="nav-icon">🔍</span>
-      <span>Rechèch</span>
-    </a>
-    <a href="publish.html" class="nav-item nav-item-publish">
-      <span class="nav-icon">+</span>
-      <span>Publier</span>
-    </a>
-    <a href="my-listings.html" class="nav-item">
-      <span class="nav-icon">❤️</span>
-      <span>Favoris</span>
-    </a>
-    <a href="profile.html" class="nav-item">
-      <span class="nav-icon">👤</span>
-      <span>Profil</span>
-    </a>
+    <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Accueil</span></a>
+    <a href="search.html" class="nav-item active"><i class="fa-solid fa-magnifying-glass"></i><span>Rechercher</span></a>
+    <a href="publish.html" class="nav-item nav-publish"><div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div><span>Publier</span></a>
+    <a href="favorites.html" class="nav-item"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></a>
+    <a href="profile.html" class="nav-item"><i class="fa-regular fa-user"></i><span>Profil</span></a>
   </nav>
 
-  <style>
-    .filter-chip {
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      white-space: nowrap;
-      cursor: pointer;
-      color: var(--text-main);
-    }
-    .filter-chip.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-  </style>
-
+  <script src="app.js"></script>
   <script>
-    const API_BASE = window.location.origin;
-    let selectedCategory = 'all';
-    let allListings = [];
+    let currentType = 'all';
 
-    const user = JSON.parse(localStorage.getItem('helpyUser'));
-    if (user && user.name) {
-      document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
+    async function performSearch() {
+      const query = document.getElementById('search-input').value;
+      const data = await apiFetch(`/api/search?q=${encodeURIComponent(query)}&type=${currentType}`);
+      const container = document.getElementById('search-results');
+
+      if (data && data.length > 0) {
+        container.innerHTML = data.map(item => `
+          <div class="card" style="max-width: 100%;">
+            <div class="card-img-container">
+              <img src="${item.image_url || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80'}" class="card-img">
+              <div class="badge-cat">${item.type || 'Annonce'}</div>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">${item.title || item.name}</h4>
+              <div class="card-location"><i class="fa-solid fa-location-dot"></i> ${item.location || 'Haïti'}</div>
+              <a href="listing-details.html?id=${item.id}" class="btn-contact">Voir détails</a>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = '<div class="empty-state">Aucun résultat trouvé.</div>';
+      }
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryParam = urlParams.get('q');
-    if (queryParam) {
-      document.getElementById('search-input').value = queryParam;
-    }
-
-    function filterCategory(cat, btn) {
-      selectedCategory = cat;
-      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    function filterSearch(type, element) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      element.classList.add('active');
+      currentType = type;
       performSearch();
     }
 
-    async function fetchListings() {
-      try {
-        const res = await fetch(`${API_BASE}/api/listings`);
-        const data = await res.json();
-        allListings = data.listings || [];
-        performSearch();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function performSearch() {
-      const q = document.getElementById('search-input').value.toLowerCase();
-      const loc = document.getElementById('filter-location').value;
-      const sort = document.getElementById('filter-sort').value;
-
-      let filtered = allListings.filter(item => {
-        const matchesQuery = !q || (item.title && item.title.toLowerCase().includes(q)) || (item.description && item.description.toLowerCase().includes(q));
-        const matchesCat = selectedCategory === 'all' || (item.type && item.type === selectedCategory) || (item.category && item.category.toLowerCase().includes(selectedCategory));
-        const matchesLoc = !loc || (item.location && item.location.includes(loc));
-        return matchesQuery && matchesCat && matchesLoc;
-      });
-
-      if (sort === 'asc') {
-        filtered.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
-      } else if (sort === 'desc') {
-        filtered.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
-      }
-
-      const container = document.getElementById('search-results');
-      if (filtered.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">Okenn rezilta pa jwenn.</p>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(item => `
-        <div class="listing-card">
-          <div class="card-image-wrap" onclick="location.href='listing-details.html?id=${item.id}'">
-            <img src="${item.image_url || 'https://via.placeholder.com/400x200?text=HElPY'}" class="card-image" alt="${item.title}">
-            <span class="card-badge">${item.category || item.type || 'Anons'}</span>
-          </div>
-          <div class="card-body">
-            <div class="card-title-row" onclick="location.href='listing-details.html?id=${item.id}'">
-              <h3 class="card-title">${item.title}</h3>
-              <span class="card-price">${item.price ? item.price + ' ' + (item.currency || 'HTG') : ''}</span>
-            </div>
-            <div class="card-location">📍 ${item.location || 'Ayiti'}</div>
-            <div class="card-footer">
-              <div class="seller-info">
-                <div class="seller-avatar">${(item.owner_name || 'U').charAt(0).toUpperCase()}</div>
-                <span class="seller-name">${item.owner_name || 'Vandè'}</span>
-              </div>
-              <div class="card-actions">
-                ${item.whatsapp ? `<a href="https://wa.me/${item.whatsapp}" target="_blank" class="btn-sm-wa">WhatsApp</a>` : ''}
-                <a href="listing-details.html?id=${item.id}" class="btn-sm-details">Détails</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    fetchListings();
+    document.getElementById('search-input').addEventListener('input', performSearch);
+    document.addEventListener('DOMContentLoaded', performSearch);
   </script>
 </body>
 </html>
