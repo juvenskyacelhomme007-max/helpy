@@ -2,73 +2,118 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HELPY - Profil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HELPY - Mon Profil</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .menu-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--text-white); text-decoration: none; font-size: 13px; margin-bottom: 8px; }
-  </style>
 </head>
 <body>
-  <div class="app-container">
-    <div id="profile-content" class="empty-state">Chargement du profil...</div>
+
+  <div class="app-container" style="padding-bottom: 90px;">
+    
+    <!-- EN-TÊTE PROFIL -->
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
+      <div style="position: relative; display: inline-block;">
+        <div style="width: 85px; height: 85px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; margin: 0 auto; border: 3px solid #1e293b;">
+          <i class="fa-regular fa-user"></i>
+        </div>
+      </div>
+      <h2 id="user-name" style="font-size: 18px; font-weight: 700; margin-top: 10px;">Chargement...</h2>
+      <p id="user-email" style="font-size: 12px; color: var(--text-gray); margin-top: 2px;">...</p>
+    </div>
+
+    <!-- MENU ET OPTIONS DE COMPTE -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      
+      <a href="publish.html" class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px; text-decoration: none; color: inherit;">
+        <i class="fa-solid fa-plus" style="font-size: 18px; color: var(--light-purple);"></i>
+        <div style="flex: 1;">
+          <h4 style="font-size: 13px; font-weight: 600;">Publier un nouveau service</h4>
+          <p style="font-size: 11px; color: var(--text-gray);">Ajouter une entreprise ou une prestation</p>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: var(--text-gray);"></i>
+      </a>
+
+      <a href="favorites.html" class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px; text-decoration: none; color: inherit;">
+        <i class="fa-regular fa-bookmark" style="font-size: 18px; color: #3b82f6;"></i>
+        <div style="flex: 1;">
+          <h4 style="font-size: 13px; font-weight: 600;">Mes enregistrements</h4>
+          <p style="font-size: 11px; color: var(--text-gray);">Consulter vos annonces mises en favoris</p>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: var(--text-gray);"></i>
+      </a>
+
+      <div class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px;">
+        <i class="fa-solid fa-shield-halved" style="font-size: 18px; color: #10b981;"></i>
+        <div style="flex: 1;">
+          <h4 style="font-size: 13px; font-weight: 600;">Paramètres & Sécurité</h4>
+          <p style="font-size: 11px; color: var(--text-gray);">Gérer vos informations personnelles</p>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: var(--text-gray);"></i>
+      </div>
+
+      <button type="button" onclick="handleLogout()" class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px; border: none; cursor: pointer; text-align: left; width: 100%;">
+        <i class="fa-solid fa-right-from-bracket" style="font-size: 18px; color: #ef4444;"></i>
+        <div style="flex: 1;">
+          <h4 style="font-size: 13px; font-weight: 600; color: #ef4444;">Déconnexion</h4>
+          <p style="font-size: 11px; color: var(--text-gray);">Se déconnecter de la session</p>
+        </div>
+      </button>
+
+    </div>
+
   </div>
 
+  <!-- NAVIGATION INFÉRIEURE -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Accueil</span></a>
-    <a href="search.html" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Rechercher</span></a>
-    <a href="publish.html" class="nav-item nav-publish"><div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div><span>Publier</span></a>
-    <a href="favorites.html" class="nav-item"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></a>
-    <a href="profile.html" class="nav-item active"><i class="fa-regular fa-user"></i><span>Profil</span></a>
+    <a href="index.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Accueil</span>
+    </a>
+    <a href="search.html" class="nav-item">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>Rechercher</span>
+    </a>
+    <a href="publish.html" class="nav-item">
+      <div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div>
+      <span>Publier</span>
+    </a>
+    <a href="favorites.html" class="nav-item">
+      <i class="fa-regular fa-bookmark"></i>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item active">
+      <i class="fa-regular fa-user"></i>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script src="app.js"></script>
   <script>
-    async function loadProfile() {
+    document.addEventListener('DOMContentLoaded', async () => {
       const userId = localStorage.getItem('helpy_user_id');
       if (!userId) {
         window.location.href = 'login.html';
         return;
       }
 
-      const user = await apiFetch('/api/profile');
-      const container = document.getElementById('profile-content');
-
-      if (user) {
-        container.classList.remove('empty-state');
-        container.innerHTML = `
-          <div style="text-align: center; margin-bottom: 20px;">
-            <div style="width: 80px; height: 80px; background: var(--primary-purple); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px;">
-              <i class="fa-solid fa-user"></i>
-            </div>
-            <h2>${user.name || 'Utilisateur'}</h2>
-            <p style="color: var(--text-secondary); font-size: 12px;">${user.email || ''}</p>
-          </div>
-
-          <a href="my-listings.html" class="menu-item">
-            <span><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i> Mes publications</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-          <a href="favorites.html" class="menu-item">
-            <span><i class="fa-regular fa-bookmark" style="margin-right: 8px;"></i> Mes favoris</span>
-            <i class="fa-solid fa-chevron-right"></i>
-          </a>
-          <div class="menu-item" style="cursor: pointer; color: #ff3b30;" onclick="logout()">
-            <span><i class="fa-solid fa-right-from-bracket" style="margin-right: 8px;"></i> Déconnexion</span>
-          </div>
-        `;
+      // Récupération des informations de l'utilisateur depuis l'API
+      const res = await apiFetch(`/api/users/${userId}`);
+      if (res && !res.error) {
+        document.getElementById('user-name').innerText = res.name || res.full_name || "Utilisateur HELPY";
+        document.getElementById('user-email').innerText = res.email || "";
       } else {
+        document.getElementById('user-name').innerText = "Utilisateur HELPY";
+        document.getElementById('user-email').innerText = "Bienvenue sur HELPY";
+      }
+    });
+
+    function handleLogout() {
+      if (confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) {
+        localStorage.removeItem('helpy_user_id');
         window.location.href = 'login.html';
       }
     }
-
-    function logout() {
-      localStorage.removeItem('helpy_user_id');
-      window.location.href = 'login.html';
-    }
-
-    document.addEventListener('DOMContentLoaded', loadProfile);
   </script>
 </body>
 </html>
