@@ -1,75 +1,199 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Recherche - HElPY</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Header -->
   <header class="app-header">
-    <a href="index.html">HElPY</a>
+    <a href="index.html" class="logo">HElPY.</a>
+    <a href="profile.html" class="profile-btn" id="user-avatar">👤</a>
   </header>
 
   <div class="container">
-    <form id="search-form" class="form-group">
-      <input type="text" id="query" placeholder="Que cherchez-vous ?" required>
-      <button type="submit" class="btn mt-2">Rechercher</button>
-    </form>
+    <h1 style="font-size:1.3rem; font-weight:800; margin-bottom:14px;">Rechech & Filtè</h1>
+    
+    <!-- Barre de recherche -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="search-input" placeholder="Kisa w ap chèche?" onkeyup="performSearch()">
+    </div>
 
-    <div id="results" class="grid mt-4"></div>
+    <!-- Filter Categories Chips -->
+    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:12px; margin-bottom:16px;">
+      <button class="filter-chip active" onclick="filterCategory('all', this)">Tout</button>
+      <button class="filter-chip" onclick="filterCategory('product', this)">📦 Pwodwi</button>
+      <button class="filter-chip" onclick="filterCategory('service', this)">🛠️ Sèvis</button>
+      <button class="filter-chip" onclick="filterCategory('business', this)">🏢 Antrepriz</button>
+      <button class="filter-chip" onclick="filterCategory('realestate', this)">🏠 Immobilier</button>
+      <button class="filter-chip" onclick="filterCategory('vehicle', this)">🚗 Machin</button>
+    </div>
+
+    <!-- Filter Details -->
+    <div style="background:#fff; padding:14px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">📍 Lokalizasyon</label>
+        <select id="filter-location" class="search-input" style="padding:8px 10px; font-size:0.85rem;" onchange="performSearch()">
+          <option value="">Tout Ayiti</option>
+          <option value="Port-au-Prince">Port-au-Prince</option>
+          <option value="Delmas">Delmas</option>
+          <option value="Pétion-Ville">Pétion-Ville</option>
+          <option value="Cap-Haïtien">Cap-Haïtien</option>
+          <option value="Carrefour">Carrefour</option>
+          <option value="Les Cayes">Les Cayes</option>
+          <option value="Jacmel">Jacmel</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">💰 Triye pa Pri</label>
+        <select id="filter-sort" class="search-input" style="padding:8px 10px; font-size:0.85rem;" onchange="performSearch()">
+          <option value="recent">Moun ki resan yo</option>
+          <option value="asc">Pri: Pi ba an premye</option>
+          <option value="desc">Pri: Pi wo an premye</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Rezilta -->
+    <div id="search-results" class="feed-grid">
+      <p style="text-align:center; color:var(--text-muted); padding:20px;">Antre yon mo nan rechèch la...</p>
+    </div>
+
   </div>
 
+  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">Accueil</a>
-    <a href="search.html" class="nav-item active">Recherche</a>
-    <a href="publish.html" class="nav-item">+ Publier</a>
-    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
-    <a href="profile.html" class="nav-item">Profil</a>
+    <a href="index.html" class="nav-item">
+      <span class="nav-icon">⌂</span>
+      <span>Akèy</span>
+    </a>
+    <a href="search.html" class="nav-item active">
+      <span class="nav-icon">🔍</span>
+      <span>Rechèch</span>
+    </a>
+    <a href="publish.html" class="nav-item nav-item-publish">
+      <span class="nav-icon">+</span>
+      <span>Publier</span>
+    </a>
+    <a href="my-listings.html" class="nav-item">
+      <span class="nav-icon">❤️</span>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </a>
   </nav>
+
+  <style>
+    .filter-chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+    .filter-chip.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+  </style>
 
   <script>
     const API_BASE = window.location.origin;
-    const urlParams = new URLSearchParams(window.location.search);
-    const q = urlParams.get('q');
+    let selectedCategory = 'all';
+    let allListings = [];
 
-    if (q) {
-      document.getElementById('query').value = q;
-      performSearch(q);
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+    if (user && user.name) {
+      document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
     }
 
-    document.getElementById('search-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      performSearch(document.getElementById('query').value);
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+    if (queryParam) {
+      document.getElementById('search-input').value = queryParam;
+    }
 
-    async function performSearch(query) {
+    function filterCategory(cat, btn) {
+      selectedCategory = cat;
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      performSearch();
+    }
+
+    async function fetchListings() {
       try {
-        const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`${API_BASE}/api/listings`);
         const data = await res.json();
-        const container = document.getElementById('results');
-
-        const all = [...(data.listings || []), ...(data.businesses || [])];
-
-        if (all.length === 0) {
-          container.innerHTML = '<p class="text-center">Aucun résultat trouvé.</p>';
-          return;
-        }
-
-        container.innerHTML = all.map(item => `
-          <div class="item-card" onclick="location.href='listing-details.html?id=${item.id}'">
-            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.title || item.name}">
-            <div class="item-card-content">
-              <div class="item-title">${item.title || item.name}</div>
-              <div class="item-category">${item.category}</div>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        document.getElementById('results').innerHTML = '<p>Erreur.</p>';
+        allListings = data.listings || [];
+        performSearch();
+      } catch (e) {
+        console.error(e);
       }
     }
+
+    function performSearch() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const loc = document.getElementById('filter-location').value;
+      const sort = document.getElementById('filter-sort').value;
+
+      let filtered = allListings.filter(item => {
+        const matchesQuery = !q || (item.title && item.title.toLowerCase().includes(q)) || (item.description && item.description.toLowerCase().includes(q));
+        const matchesCat = selectedCategory === 'all' || (item.type && item.type === selectedCategory) || (item.category && item.category.toLowerCase().includes(selectedCategory));
+        const matchesLoc = !loc || (item.location && item.location.includes(loc));
+        return matchesQuery && matchesCat && matchesLoc;
+      });
+
+      if (sort === 'asc') {
+        filtered.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
+      } else if (sort === 'desc') {
+        filtered.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+      }
+
+      const container = document.getElementById('search-results');
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">Okenn rezilta pa jwenn.</p>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => `
+        <div class="listing-card">
+          <div class="card-image-wrap" onclick="location.href='listing-details.html?id=${item.id}'">
+            <img src="${item.image_url || 'https://via.placeholder.com/400x200?text=HElPY'}" class="card-image" alt="${item.title}">
+            <span class="card-badge">${item.category || item.type || 'Anons'}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title-row" onclick="location.href='listing-details.html?id=${item.id}'">
+              <h3 class="card-title">${item.title}</h3>
+              <span class="card-price">${item.price ? item.price + ' ' + (item.currency || 'HTG') : ''}</span>
+            </div>
+            <div class="card-location">📍 ${item.location || 'Ayiti'}</div>
+            <div class="card-footer">
+              <div class="seller-info">
+                <div class="seller-avatar">${(item.owner_name || 'U').charAt(0).toUpperCase()}</div>
+                <span class="seller-name">${item.owner_name || 'Vandè'}</span>
+              </div>
+              <div class="card-actions">
+                ${item.whatsapp ? `<a href="https://wa.me/${item.whatsapp}" target="_blank" class="btn-sm-wa">WhatsApp</a>` : ''}
+                <a href="listing-details.html?id=${item.id}" class="btn-sm-details">Détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    fetchListings();
   </script>
 </body>
 </html>
