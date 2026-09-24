@@ -1,47 +1,93 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HELPY - Connexion</title>
+  <title>HELPY - Koneksyon</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="app-container" style="justify-content: center;">
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h2 class="hero-title" style="font-size: 24px;">Connexion à HELPY</h2>
+    
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="logo" style="justify-content: center; margin-bottom: 8px;">
+        <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
+        <span>HEL<span class="purple">PY</span></span>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 700;">Byenvini ankò!</h2>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Konekte sou kont HELPY ou an</p>
     </div>
 
+    <!-- Formulaire Koneksyon pa Email -->
     <form onsubmit="handleLogin(event)">
       <div class="form-group">
-        <label>Adresse Email</label>
-        <input type="email" id="email" class="form-control" required placeholder="nom@exemple.com">
+        <label>Adrès Email</label>
+        <input type="email" id="email" class="form-control" required placeholder="non@egzanp.com">
       </div>
+      
       <div class="form-group">
-        <label>Mot de passe</label>
-        <input type="password" id="password" class="form-control" required>
+        <label>Mewoupas (Mot de passe)</label>
+        <input type="password" id="password" class="form-control" required placeholder="••••••••">
       </div>
-      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Se connecter</button>
+
+      <button type="submit" id="login-btn" class="btn-primary" style="width: 100%; margin-top: 10px;">
+        Seコネkte
+      </button>
     </form>
-    <p style="text-align: center; font-size: 12px; margin-top: 15px; color: var(--text-secondary);">
-      Pas encore de compte ? <a href="register.html" style="color: var(--light-purple);">Créer un compte</a>
+
+    <!-- Separateur -->
+    <div class="separator">
+      <div class="separator-line"></div>
+      <span class="separator-text">OUBYEN KONEKTE AK</span>
+      <div class="separator-line"></div>
+    </div>
+
+    <!-- Boutons Rezo Sosyo -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <button type="button" onclick="loginWithProvider('google')" class="btn-social">
+        <i class="fa-brands fa-google" style="color: #ea4335; font-size: 16px;"></i>
+        Konekte ak Google
+      </button>
+
+      <button type="button" onclick="loginWithProvider('facebook')" class="btn-social">
+        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 16px;"></i>
+        Konekte ak Facebook
+      </button>
+    </div>
+
+    <p style="text-align: center; font-size: 12px; margin-top: 20px; color: var(--text-secondary);">
+      Ou pa gen yon kont ankò? <a href="register.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">Kreye yon kont</a>
     </p>
+
   </div>
 
   <script src="app.js"></script>
   <script>
     async function handleLogin(e) {
       e.preventDefault();
+      
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerText = "N ap konekte w...";
+
+      const emailVal = document.getElementById('email').value.trim();
+      const passwordVal = document.getElementById('password').value;
+
       const res = await apiFetch('/api/login', 'POST', {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
+        email: emailVal,
+        password: passwordVal
       });
 
-      if (res && res.user_id) {
-        localStorage.setItem('helpy_user_id', res.user_id);
+      btn.disabled = false;
+      btn.innerText = "Seコネkte";
+
+      if (res && !res.error && (res.user_id || res.id || res.user?.id)) {
+        const userId = res.user_id || res.id || res.user?.id;
+        localStorage.setItem('helpy_user_id', userId);
         window.location.href = 'profile.html';
       } else {
-        alert("Échec de la connexion. Vérifiez vos identifiants.");
+        alert(res?.message || "Echèk nan koneksyon an. Verifye imèl ak mo de pas ou.");
       }
     }
   </script>
