@@ -7,9 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Sèvi tout fichye HTML, CSS, JS ki nan pwojè a
 app.use(express.static(path.join(__dirname)));
 
-// Mass done pou teste anvan nou mete PostgreSQL
+// Memwa tanporè pou itilizatè yo
 const users = [];
 
 // Paj prensipal yo
