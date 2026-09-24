@@ -2,15 +2,12 @@
   "name": "helpy",
   "version": "1.0.0",
   "description": "Helpy Backend App",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
-    "passport": "^0.6.0",
-    "passport-google-oauth20": "^2.0.0"
+    "express": "^4.18.2"
   }
 }
