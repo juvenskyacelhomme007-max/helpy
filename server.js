@@ -97,41 +97,88 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // ================= BUSINESSES =================
-app.get('/api/businesses', async (req, res) => {
-  try {
-    const q = String(req.query.q || '').trim();
-    const params = [];
-    let sql = 'SELECT * FROM businesses';
-    if (q) {
-      params.push(`%${q}%`);
-      sql += ' WHERE name ILIKE $1 OR category ILIKE $1 OR description ILIKE $1 OR location ILIKE $1';
-    }
-    sql += ' ORDER BY created_at DESC';
-    const { rows } = await pool.query(sql, params);
-    res.json({ statut: 'ok', entreprises: rows, businesses: rows });
-  } catch (error) { console.error(error); res.status(500).json({ error: 'Erè chajman antrepriz yo.' }); }
-});
-
 app.post('/api/businesses', async (req, res) => {
   try {
-    const userId = userIdFromRequest(req);
-    const { name, category, description='', phone='', whatsapp='', address='', location='', image_url='' } = req.body;
-    if (!name || !category) return res.status(400).json({ error: 'Non antrepriz la ak kategori a obligatwa.' });
-    const { rows } = await pool.query(
-      `INSERT INTO businesses (user_id,name,category,description,phone,whatsapp,address,location,image_url)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [userId, String(name).trim(), String(category).trim(), description, phone, whatsapp, address, location, image_url]
-    );
-    res.status(201).json({ statut: 'ok', status: 'ok', message: 'Antrepriz ajoute ak siksè!', entreprise: rows[0], business: rows[0] });
-  } catch (error) { console.error(error); res.status(500).json({ error: 'Nou pa ka ajoute antrepriz la.' }); }
-});
+    const {
+      name,
+      category,
+      description = '',
+      phone = '',
+      whatsapp = '',
+      address = '',
+      location = '',
+      image_url = ''
+    } = req.body;
 
-app.get('/api/businesses/:id', async (req, res) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM businesses WHERE id=$1', [Number(req.params.id)]);
-    if (!rows[0]) return res.status(404).json({ error: 'Antrepriz pa jwenn.' });
-    res.json({ statut: 'ok', status: 'ok', entreprise: rows[0], business: rows[0] });
-  } catch (error) { res.status(500).json({ error: 'Erè bazdone.' }); }
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({
+        error: 'Non antrepriz la obligatwa.'
+      });
+    }
+
+    if (!category || !String(category).trim()) {
+      return res.status(400).json({
+        error: 'Kategori a obligatwa.'
+      });
+    }
+
+    const userId = userIdFromRequest(req);
+
+    let result;
+
+    if (userId) {
+      result = await pool.query(
+        `INSERT INTO businesses
+        (user_id,name,category,description,phone,whatsapp,address,location,image_url)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        RETURNING *`,
+        [
+          userId,
+          String(name).trim(),
+          String(category).trim(),
+          String(description).trim(),
+          String(phone).trim(),
+          String(whatsapp).trim(),
+          String(address).trim(),
+          String(location).trim(),
+          String(image_url).trim()
+        ]
+      );
+    } else {
+      result = await pool.query(
+        `INSERT INTO businesses
+        (name,category,description,phone,whatsapp,address,location,image_url)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+        RETURNING *`,
+        [
+          String(name).trim(),
+          String(category).trim(),
+          String(description).trim(),
+          String(phone).trim(),
+          String(whatsapp).trim(),
+          String(address).trim(),
+          String(location).trim(),
+          String(image_url).trim()
+        ]
+      );
+    }
+
+    res.status(201).json({
+      statut: 'ok',
+      status: 'ok',
+      message: 'Antrepriz ajoute ak siksè!',
+      entreprise: result.rows[0],
+      business: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('ERÈ POST /api/businesses:', error);
+
+    res.status(500).json({
+      error: 'Nou pa ka ajoute antrepriz la.',
+      details: error.message
+    });
+  }
 });
 
 // ================= SERVICES =================
