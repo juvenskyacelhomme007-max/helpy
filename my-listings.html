@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Annonces - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container">
+    <h2>Mes Annonces</h2>
+    <div id="my-listings-container" class="mt-4">
+      <p>Chargement...</p>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item active">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+
+    if (!user) {
+      window.location.href = 'login.html';
+    }
+
+    async function loadMyListings() {
+      try {
+        const res = await fetch(`${API_BASE}/api/listings?user_id=${user.id}`);
+        const data = await res.json();
+        const container = document.getElementById('my-listings-container');
+
+        if (!data.listings || data.listings.length === 0) {
+          container.innerHTML = '<p>Vous n\'avez publié aucune annonce.</p>';
+          return;
+        }
+
+        container.innerHTML = data.listings.map(item => `
+          <div class="card">
+            <h3>${item.title}</h3>
+            <p>${item.price ? item.price + ' ' + item.currency : ''}</p>
+            <div class="btn-group mt-2">
+              <a href="listing-details.html?id=${item.id}" class="btn btn-secondary">Voir</a>
+              <button onclick="deleteListing(${item.id})" class="btn btn-danger">Supprimer</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('my-listings-container').innerHTML = '<p>Erreur.</p>';
+      }
+    }
+
+    async function deleteListing(id) {
+      if (!confirm('Voulez-vous supprimer cette annonce ?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/listings/${id}`, {
+          method: 'DELETE',
+          headers: { 'x-user-id': user.id }
+        });
+        const data = await res.json();
+        if (data.status === 'ok') loadMyListings();
+      } catch (err) {
+        alert('Erreur lors de la suppression.');
+      }
+    }
+
+    loadMyListings();
+  </script>
+</body>
+</html>
