@@ -267,11 +267,17 @@ businessForm.addEventListener("submit", async function(event){
 
     if(!response.ok){
 
-      throw new Error(
-        data.error ||
-        data.message ||
-        "Erreur serveur (" +
-        response.status +
+      const serverError = new Error(
+  data.error ||
+  data.message ||
+  "Erreur serveur (" +
+  response.status +
+  ")"
+);
+
+serverError.details = data.details || "";
+
+throw serverError;
         ")"
       );
 
@@ -293,7 +299,8 @@ businessForm.addEventListener("submit", async function(event){
     message.className = "msg err";
 
     message.textContent =
-      "⚠️ " + error.message;
+  "⚠️ " + error.message +
+  (error.details ? " — " + error.details : "");
 
     message.style.display = "block";
 
