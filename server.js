@@ -639,6 +639,308 @@ app.delete("/api/products/:id", async (req, res) => {
   }
 });
 
+// ===============================
+// UNIFIED LISTINGS
+// ===============================
+
+const LISTING_TYPES = [
+  "business",
+  "product",
+  "service",
+  "realestate",
+  "vehicle"
+];
+
+
+// CREATE LISTING
+app.post("/api/listings", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const {
+      type,
+      title,
+      description,
+      category,
+      location,
+      phone,
+      whatsapp,
+      price,
+      currency,
+      image_url
+    } = req.body;
+
+    if (!LISTING_TYPES.includes(type)) {
+      return res.status(400).json({
+        error: "Invalid listing type"
+      });
+    }
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        error: "Title required"
+      });
+    }
+
+    const r = await pool.query(
+      `INSERT INTO listings
+       (
+         user_id,
+         type,
+         title,
+         description,
+         category,
+         location,
+         phone,
+         whatsapp,
+         price,
+         currency,
+         image_url
+       )
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       RETURNING *`,
+      [
+        id,
+        type,
+        title.trim(),
+        description || null,
+        category || null,
+        location || null,
+        phone || null,
+        whatsapp || null,
+        price || 0,
+        currency || "HTG",
+        image_url || null
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      listing: r.rows[0]
+    });
+
+  } catch (e) {
+    console.error("CREATE LISTING ERROR:", e);
+
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// GET ALL LISTINGS
+app.get("/api/listings", async (req, res) => {
+  try {
+    const { type, category } = req.query;
+
+    let query = `
+      SELECT
+        l.*,
+        u.name AS seller_name,
+        u.photo_url AS seller_photo
+      FROM listings l
+      LEFT JOIN users u
+        ON u.id = l.user_id
+    `;
+
+    const values = [];
+    const conditions = [];
+
+    if (type) {
+      conditions.push(`l.type=$${values.length + 1}`);
+      values.push(type);
+    }
+
+    if (category) {
+      conditions.push(`l.category=$${values.length + 1}`);
+      values.push(category);
+    }
+
+    if (conditions.length) {
+      query += " WHERE " + conditions.join(" AND ");
+    }
+
+    query += " ORDER BY l.id DESC";
+
+    const r = await pool.query(query, values);
+
+    res.json({
+      status: "ok",
+      listings: r.rows
+    });
+
+  } catch (e) {
+    console.error("GET LISTINGS ERROR:", e);
+
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// GET ONE LISTING
+app.get("/api/listings/:id", async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT
+         l.*,
+         u.name AS seller_name,
+         u.photo_url AS seller_photo
+       FROM listings l
+       LEFT JOIN users u
+         ON u.id=l.user_id
+       WHERE l.id=$1`,
+      [req.params.id]
+    );
+
+    if (!r.rows.length) {
+      return res.status(404).json({
+        error: "Listing not found"
+      });
+    }
+
+    res.json(r.rows[0]);
+
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// EDIT OWN LISTING
+app.put("/api/listings/:id", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const check = await pool.query(
+      `SELECT id
+       FROM listings
+       WHERE id=$1 AND user_id=$2`,
+      [req.params.id, id]
+    );
+
+    if (!check.rows.length) {
+      return res.status(403).json({
+        error: "Not your listing"
+      });
+    }
+
+    const {
+      type,
+      title,
+      description,
+      category,
+      location,
+      phone,
+      whatsapp,
+      price,
+      currency,
+      image_url
+    } = req.body;
+
+    if (!LISTING_TYPES.includes(type)) {
+      return res.status(400).json({
+        error: "Invalid listing type"
+      });
+    }
+
+    const r = await pool.query(
+      `UPDATE listings
+       SET
+         type=$1,
+         title=$2,
+         description=$3,
+         category=$4,
+         location=$5,
+         phone=$6,
+         whatsapp=$7,
+         price=$8,
+         currency=$9,
+         image_url=$10
+       WHERE id=$11
+         AND user_id=$12
+       RETURNING *`,
+      [
+        type,
+        title,
+        description || null,
+        category || null,
+        location || null,
+        phone || null,
+        whatsapp || null,
+        price || 0,
+        currency || "HTG",
+        image_url || null,
+        req.params.id,
+        id
+      ]
+    );
+
+    res.json({
+      status: "ok",
+      listing: r.rows[0]
+    });
+
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
+
+
+// DELETE OWN LISTING
+app.delete("/api/listings/:id", async (req, res) => {
+  try {
+    const id = userId(req);
+
+    if (!id) {
+      return res.status(401).json({
+        error: "Login required"
+      });
+    }
+
+    const r = await pool.query(
+      `DELETE FROM listings
+       WHERE id=$1
+         AND user_id=$2
+       RETURNING id`,
+      [req.params.id, id]
+    );
+
+    if (!r.rows.length) {
+      return res.status(403).json({
+        error: "Not your listing"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      message: "Listing deleted"
+    });
+
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
+});
 
 // ===============================
 // SEARCH
