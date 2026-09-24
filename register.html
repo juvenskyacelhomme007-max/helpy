@@ -2,56 +2,115 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HELPY - Inscription</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="app-container" style="justify-content: center;">
+  <div class="app-container" style="justify-content: center; min-height: 100vh;">
+    
+    <!-- EN-TÊTE / LOGO -->
     <div style="text-align: center; margin-bottom: 20px;">
-      <h2 class="hero-title" style="font-size: 24px;">Rejoindre HELPY</h2>
+      <div class="logo" style="justify-content: center; margin-bottom: 8px;">
+        <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
+        <span>HEL<span style="color: var(--light-purple);">PY</span></span>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 700;">Rejoindre HELPY</h2>
+      <p style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">Créez votre compte pour utiliser la plateforme</p>
     </div>
 
+    <!-- FORMULAIRE D'INSCRIPTION -->
     <form onsubmit="handleRegister(event)">
       <div class="form-group">
-        <label>Nom complet</label>
-        <input type="text" id="name" class="form-control" required placeholder="Jean Dupont">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Nom complet</label>
+        <input type="text" id="name" class="form-control" style="width: 100%;" required placeholder="Ex: Jean Dupont">
       </div>
-      <div class="form-group">
-        <label>Adresse Email</label>
-        <input type="email" id="email" class="form-control" required placeholder="nom@exemple.com">
+
+      <div class="form-group" style="margin-top: 10px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Adresse Email</label>
+        <input type="email" id="email" class="form-control" style="width: 100%;" required placeholder="nom@exemple.com">
       </div>
-      <div class="form-group">
-        <label>Téléphone</label>
-        <input type="tel" id="phone" class="form-control" required placeholder="+509 ...">
+
+      <div class="form-group" style="margin-top: 10px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Téléphone</label>
+        <input type="tel" id="phone" class="form-control" style="width: 100%;" required placeholder="+509 ...">
       </div>
-      <div class="form-group">
-        <label>Mot de passe</label>
-        <input type="password" id="password" class="form-control" required>
+      
+      <div class="form-group" style="margin-top: 10px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Mot de passe</label>
+        <input type="password" id="password" class="form-control" style="width: 100%;" required placeholder="••••••••">
       </div>
-      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Créer mon compte</button>
+
+      <button type="submit" id="register-btn" class="btn-primary" style="width: 100%; margin-top: 16px; padding: 12px; font-size: 13px; justify-content: center;">
+        Créer mon compte
+      </button>
     </form>
-    <p style="text-align: center; font-size: 12px; margin-top: 15px; color: var(--text-secondary);">
-      Déjà un compte ? <a href="login.html" style="color: var(--light-purple);">Se connecter</a>
+
+    <!-- SÉPARATEUR -->
+    <div style="display: flex; align-items: center; margin: 18px 0;">
+      <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
+      <span style="padding: 0 10px; font-size: 10px; color: var(--text-gray); font-weight: 600;">OU INSCRIVEZ-VOUS AVEC</span>
+      <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
+    </div>
+
+    <!-- BOUTONS RÉSEAUX SOCIAUX -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <button type="button" onclick="loginWithProvider('google')" class="btn-social">
+        <i class="fa-brands fa-google" style="color: #ea4335; font-size: 16px;"></i>
+        S'inscrire avec Google
+      </button>
+
+      <button type="button" onclick="loginWithProvider('facebook')" class="btn-social">
+        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 16px;"></i>
+        S'inscrire avec Facebook
+      </button>
+    </div>
+
+    <!-- LIEN DE CONNEXION -->
+    <p style="text-align: center; font-size: 12px; margin-top: 20px; color: var(--text-gray);">
+      Vous avez déjà un compte ? <a href="login.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">Se connecter</a>
     </p>
+
   </div>
 
   <script src="app.js"></script>
   <script>
     async function handleRegister(e) {
       e.preventDefault();
-      const res = await apiFetch('/api/register', 'POST', {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        password: document.getElementById('password').value
-      });
+      
+      const btn = document.getElementById('register-btn');
+      btn.disabled = true;
+      btn.innerText = "Création du compte...";
 
-      if (res && res.user_id) {
-        localStorage.setItem('helpy_user_id', res.user_id);
-        window.location.href = 'profile.html';
+      const nameVal = document.getElementById('name').value.trim();
+      const emailVal = document.getElementById('email').value.trim();
+      const phoneVal = document.getElementById('phone').value.trim();
+      const passwordVal = document.getElementById('password').value;
+
+      const payload = {
+        name: nameVal,
+        full_name: nameVal,
+        email: emailVal,
+        phone: phoneVal,
+        phone_number: phoneVal,
+        password: passwordVal
+      };
+
+      const res = await apiFetch('/api/register', 'POST', payload);
+
+      btn.disabled = false;
+      btn.innerText = "Créer mon compte";
+
+      if (res && !res.error) {
+        const userId = res.user_id || res.id || res.user?.id;
+        if (userId) {
+          localStorage.setItem('helpy_user_id', userId);
+        }
+        alert("Inscription réussie !");
+        window.location.href = 'index.html';
       } else {
-        alert("Erreur lors de l'inscription.");
+        alert(res?.message || "Erreur lors de l'inscription. Vérifiez si cet email n'est pas déjà enregistré.");
       }
     }
   </script>
