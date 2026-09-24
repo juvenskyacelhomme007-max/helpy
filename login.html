@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Connexion</h2>
+      <form id="login-form" class="mt-4">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" id="password" required>
+        </div>
+        <button type="submit" class="btn">Se connecter</button>
+      </form>
+      <p class="mt-4 text-center">
+        Pas encore de compte? <a href="register.html">S'inscrire</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          localStorage.setItem('helpyUser', JSON.stringify(data.user));
+          window.location.href = 'profile.html';
+        } else {
+          alert(data.error || 'Erreur de connexion');
+        }
+      } catch (err) {
+        alert('Erreur réseau');
+      }
+    });
+  </script>
+</body>
+</html>
