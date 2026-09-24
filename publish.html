@@ -2,111 +2,142 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HELPY - Publier une annonce</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="app-container">
-    <h2 class="hero-title">Publier une annonce</h2>
 
-    <form id="publish-form" onsubmit="submitListing(event)">
+  <div class="app-container" style="padding-bottom: 90px;">
+    
+    <!-- EN-TÊTE -->
+    <header class="header">
+      <div>
+        <div class="logo">
+          <div class="logo-icon"><i class="fa-solid fa-plus"></i></div>
+          <span>Publier sur <span style="color: var(--light-purple);">HELPY</span></span>
+        </div>
+        <p class="tagline">Présentez votre entreprise ou vos services à des milliers d'utilisateurs</p>
+      </div>
+    </header>
+
+    <!-- FORMULAIRE DE PUBLICATION -->
+    <form onsubmit="handlePublish(event)" style="margin-top: 15px;">
+      
+      <!-- TITRE DE L'ENTREPRISE / SERVICE -->
       <div class="form-group">
-        <label>Type d'annonce</label>
-        <select class="form-control" id="pub-type" onchange="adjustFields()">
-          <option value="business">Entreprise</option>
-          <option value="product">Produit</option>
-          <option value="service">Service</option>
-          <option value="real_estate">Immobilier</option>
-          <option value="vehicle">Véhicule</option>
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Nom du service ou commerce</label>
+        <input type="text" id="title" class="form-control" style="width: 100%;" required placeholder="Ex: Restaurant Le Gourmand, Garage Express...">
+      </div>
+
+      <!-- CATÉGORIE -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Catégorie</label>
+        <select id="category" class="form-control" style="width: 100%;" required>
+          <option value="" disabled selected>Sélectionnez une catégorie</option>
+          <option value="restaurants">Restaurants & Bars</option>
+          <option value="magasins">Magasins & Boutiques</option>
+          <option value="logement">Logement & Immobilier</option>
+          <option value="transport">Transport & Véhicules</option>
+          <option value="services">Services & Dépannage</option>
+          <option value="autres">Autres prestations</option>
         </select>
       </div>
 
-      <div class="form-group">
-        <label>Titre / Nom</label>
-        <input type="text" class="form-control" id="pub-title" required placeholder="Ex: Restaurant Le Bon Goût">
+      <!-- LOCALISATION -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Adresse / Ville</label>
+        <input type="text" id="location" class="form-control" style="width: 100%;" required placeholder="Ex: Pétion-Ville, Delmas 33...">
       </div>
 
-      <div class="form-group">
-        <label>URL de la photo (Stockage externe / Cloudinary)</label>
-        <input type="url" class="form-control" id="pub-image" placeholder="https://exemple.com/image.jpg">
+      <!-- NUMÉRO DE TÉLÉPHONE / WHATSAPP -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Numéro de téléphone (WhatsApp)</label>
+        <input type="tel" id="phone" class="form-control" style="width: 100%;" required placeholder="Ex: +509 37 00 0000">
       </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea class="form-control" id="pub-desc" rows="3" required placeholder="Décrivez votre offre..."></textarea>
+      <!-- LIEN PHOTO OU IMAGE -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">URL de l'image / photo</label>
+        <input type="url" id="image_url" class="form-control" style="width: 100%;" placeholder="https://exemple.com/image.jpg">
       </div>
 
-      <div class="form-group">
-        <label>Localisation</label>
-        <input type="text" class="form-control" id="pub-location" required placeholder="Pétion-Ville, Haïti">
+      <!-- DESCRIPTION -->
+      <div class="form-group" style="margin-top: 14px;">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Description détaillée</label>
+        <textarea id="description" class="form-control" style="width: 100%; height: 100px; resize: vertical;" required placeholder="Décrivez vos services, vos horaires d'ouverture, vos tarifs..."></textarea>
       </div>
 
-      <div class="form-group">
-        <label>Téléphone</label>
-        <input type="tel" class="form-control" id="pub-phone" required placeholder="+509 ...">
-      </div>
-
-      <div class="form-group">
-        <label>WhatsApp</label>
-        <input type="tel" class="form-control" id="pub-whatsapp" placeholder="+509 ...">
-      </div>
-
-      <!-- Champ dynamique selon catégorie -->
-      <div id="dynamic-fields"></div>
-
-      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
-        Publier maintenant
+      <!-- BOUTON VALIDER -->
+      <button type="submit" id="publish-btn" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 14px; justify-content: center;">
+        <i class="fa-solid fa-paper-plane"></i> Publier l'annonce
       </button>
+
     </form>
+
   </div>
 
+  <!-- NAVIGATION INFÉRIEURE -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Accueil</span></a>
-    <a href="search.html" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Rechercher</span></a>
-    <a href="publish.html" class="nav-item active nav-publish"><div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div><span>Publier</span></a>
-    <a href="favorites.html" class="nav-item"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></a>
-    <a href="profile.html" class="nav-item"><i class="fa-regular fa-user"></i><span>Profil</span></a>
+    <a href="index.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Accueil</span>
+    </a>
+    <a href="search.html" class="nav-item">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>Rechercher</span>
+    </a>
+    <a href="publish.html" class="nav-item active">
+      <div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div>
+      <span>Publier</span>
+    </a>
+    <a href="favorites.html" class="nav-item">
+      <i class="fa-regular fa-bookmark"></i>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <i class="fa-regular fa-user"></i>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script src="app.js"></script>
   <script>
-    function adjustFields() {
-      const type = document.getElementById('pub-type').value;
-      const container = document.getElementById('dynamic-fields');
-      let html = '';
-
-      if (type === 'product' || type === 'real_estate' || type === 'vehicle' || type === 'service') {
-        html += `
-          <div class="form-group">
-            <label>Prix</label>
-            <input type="text" class="form-control" id="pub-price" placeholder="Ex: $50 / HTG 5000">
-          </div>
-        `;
-      }
-      container.innerHTML = html;
-    }
-
-    async function submitListing(e) {
+    async function handlePublish(e) {
       e.preventDefault();
+
+      const userId = localStorage.getItem('helpy_user_id');
+      if (!userId) {
+        alert("Vous devez être connecté pour publier une annonce.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const btn = document.getElementById('publish-btn');
+      btn.disabled = true;
+      btn.innerText = "Publication en cours...";
+
       const payload = {
-        type: document.getElementById('pub-type').value,
-        title: document.getElementById('pub-title').value,
-        image_url: document.getElementById('pub-image').value,
-        description: document.getElementById('pub-desc').value,
-        location: document.getElementById('pub-location').value,
-        phone: document.getElementById('pub-phone').value,
-        whatsapp: document.getElementById('pub-whatsapp').value,
-        price: document.getElementById('pub-price') ? document.getElementById('pub-price').value : null
+        user_id: userId,
+        title: document.getElementById('title').value.trim(),
+        category: document.getElementById('category').value,
+        location: document.getElementById('location').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        image_url: document.getElementById('image_url').value.trim(),
+        description: document.getElementById('description').value.trim()
       };
 
-      const res = await apiFetch('/api/listings', 'POST', payload);
-      if (res) {
+      const res = await apiFetch('/api/services', 'POST', payload);
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publier l\'annonce';
+
+      if (res && !res.error) {
         alert("Votre annonce a été publiée avec succès !");
-        window.location.href = "index.html";
+        window.location.href = 'index.html';
       } else {
-        alert("Erreur lors de la publication. Veuillez vous connecter.");
+        alert(res?.message || "Erreur lors de la publication. Veuillez réessayer.");
       }
     }
   </script>
