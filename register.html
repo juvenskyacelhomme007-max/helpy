@@ -1,118 +1,83 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY - Inscription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Enskripsyon</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="app-container" style="justify-content: center; min-height: 100vh;">
-    
-    <!-- EN-TÊTE / LOGO -->
-    <div style="text-align: center; margin-bottom: 20px;">
-      <div class="logo" style="justify-content: center; margin-bottom: 8px;">
-        <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
-        <span>HEL<span style="color: var(--light-purple);">PY</span></span>
-      </div>
-      <h2 style="font-size: 20px; font-weight: 700;">Rejoindre HELPY</h2>
-      <p style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">Créez votre compte pour utiliser la plateforme</p>
+  <div class="app-container">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="logo-icon" style="width: 50px; height: 50px; margin: 0 auto 12px; font-weight: bold; font-size: 20px;">H</div>
+      <h2>Kreye yon kont HELPY</h2>
+      <p style="color: var(--text-gray); font-size: 14px; margin-top: 4px;">Antre enfòmasyon w yo pou w ka kòmanse</p>
     </div>
 
-    <!-- FORMULAIRE D'INSCRIPTION -->
-    <form onsubmit="handleRegister(event)">
+    <form id="registerForm" class="card">
       <div class="form-group">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Nom complet</label>
-        <input type="text" id="name" class="form-control" style="width: 100%;" required placeholder="Ex: Jean Dupont">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Non konplè</label>
+        <input type="text" id="fullname" class="form-control" style="width: 100%;" placeholder="Eg: Jean Baptiste" required>
       </div>
 
-      <div class="form-group" style="margin-top: 10px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Adresse Email</label>
-        <input type="email" id="email" class="form-control" style="width: 100%;" required placeholder="nom@exemple.com">
+      <div class="form-group">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Imèl</label>
+        <input type="email" id="email" class="form-control" style="width: 100%;" placeholder="zanmi@email.com" required>
       </div>
 
-      <div class="form-group" style="margin-top: 10px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Téléphone</label>
-        <input type="tel" id="phone" class="form-control" style="width: 100%;" required placeholder="+509 ...">
-      </div>
-      
-      <div class="form-group" style="margin-top: 10px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Mot de passe</label>
-        <input type="password" id="password" class="form-control" style="width: 100%;" required placeholder="••••••••">
+      <div class="form-group">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Mo de pas</label>
+        <input type="password" id="password" class="form-control" style="width: 100%;" placeholder="••••••••" required>
       </div>
 
-      <button type="submit" id="register-btn" class="btn-primary" style="width: 100%; margin-top: 16px; padding: 12px; font-size: 13px; justify-content: center;">
-        Créer mon compte
+      <button type="submit" id="submitBtn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+        Kreye Kont Mwen
       </button>
     </form>
 
-    <!-- SÉPARATEUR -->
-    <div style="display: flex; align-items: center; margin: 18px 0;">
-      <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
-      <span style="padding: 0 10px; font-size: 10px; color: var(--text-gray); font-weight: 600;">OU INSCRIVEZ-VOUS AVEC</span>
-      <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
+    <div id="message" style="margin-top: 12px; text-align: center; font-size: 14px;"></div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-gray);">
+      Ou gen yon kont deja? <a href="login.html">Konekte w</a>
     </div>
-
-    <!-- BOUTONS RÉSEAUX SOCIAUX -->
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <button type="button" onclick="loginWithProvider('google')" class="btn-social">
-        <i class="fa-brands fa-google" style="color: #ea4335; font-size: 16px;"></i>
-        S'inscrire avec Google
-      </button>
-
-      <button type="button" onclick="loginWithProvider('facebook')" class="btn-social">
-        <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 16px;"></i>
-        S'inscrire avec Facebook
-      </button>
-    </div>
-
-    <!-- LIEN DE CONNEXION -->
-    <p style="text-align: center; font-size: 12px; margin-top: 20px; color: var(--text-gray);">
-      Vous avez déjà un compte ? <a href="login.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">Se connecter</a>
-    </p>
-
   </div>
 
-  <script src="app.js"></script>
   <script>
-    async function handleRegister(e) {
+    const form = document.getElementById('registerForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const btn = document.getElementById('register-btn');
-      btn.disabled = true;
-      btn.innerText = "Création du compte...";
+      const name = document.getElementById('fullname').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-      const nameVal = document.getElementById('name').value.trim();
-      const emailVal = document.getElementById('email').value.trim();
-      const phoneVal = document.getElementById('phone').value.trim();
-      const passwordVal = document.getElementById('password').value;
+      messageDiv.style.color = '#94a3b8';
+      messageDiv.innerText = "N ap trete ensripsyon an...";
 
-      const payload = {
-        name: nameVal,
-        full_name: nameVal,
-        email: emailVal,
-        phone: phoneVal,
-        phone_number: phoneVal,
-        password: passwordVal
-      };
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
 
-      const res = await apiFetch('/api/register', 'POST', payload);
+        const data = await response.json();
 
-      btn.disabled = false;
-      btn.innerText = "Créer mon compte";
-
-      if (res && !res.error) {
-        const userId = res.user_id || res.id || res.user?.id;
-        if (userId) {
-          localStorage.setItem('helpy_user_id', userId);
+        if (response.ok) {
+          messageDiv.style.color = '#4ade80';
+          messageDiv.innerText = data.message || "Kont ou kreye ak siksè!";
+          form.reset();
+        } else {
+          messageDiv.style.color = '#ef4444';
+          messageDiv.innerText = data.error || "Gen yon pwoblèm ki rive.";
         }
-        alert("Inscription réussie !");
-        window.location.href = 'index.html';
-      } else {
-        alert(res?.message || "Erreur lors de l'inscription. Vérifiez si cet email n'est pas déjà enregistré.");
+      } catch (err) {
+        messageDiv.style.color = '#ef4444';
+        messageDiv.innerText = "Erè nan koneksyon ak sèvè a.";
       }
-    }
+    });
   </script>
 </body>
 </html>
