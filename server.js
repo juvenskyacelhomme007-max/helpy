@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Sèvi tout fichye estatistik yo (HTML, CSS, imaj, JS)
+// Sèvi tout fichye estatistik yo
 app.use(express.static(path.join(__dirname)));
 
 const users = [];
