@@ -96,6 +96,46 @@ app.get('/api/users/:id', async (req, res) => {
   } catch (error) { res.status(500).json({ error: 'Erè bazdone.' }); }
 });
 
+// =====================================================
+// GET ALL BUSINESSES
+// =====================================================
+app.get("/api/businesses", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        user_id,
+        name,
+        category,
+        description,
+        phone,
+        whatsapp,
+        address,
+        location,
+        image_url,
+        rating,
+        review_count,
+        created_at
+      FROM businesses
+      ORDER BY created_at DESC
+    `);
+
+    res.json({
+      statut: "ok",
+      entreprises: result.rows,
+      businesses: result.rows
+    });
+
+  } catch (error) {
+    console.error("GET /api/businesses error:", error);
+
+    res.status(500).json({
+      error: "Nou pa ka chaje antrepriz yo.",
+      details: error.message
+    });
+  }
+});
+
 // ================= BUSINESSES =================
 app.post('/api/businesses', async (req, res) => {
   try {
