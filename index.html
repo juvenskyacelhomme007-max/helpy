@@ -1,75 +1,155 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HElPY - Marketplace Haïti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HElPY - Marketplace Ayiti</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Header -->
   <header class="app-header">
-    <a href="index.html">HElPY</a>
-    <a href="profile.html" id="user-link">Profil</a>
+    <a href="index.html" class="logo">HElPY.</a>
+    <a href="profile.html" class="profile-btn" id="user-avatar">👤</a>
   </header>
 
   <div class="container">
-    <form action="search.html" method="GET" class="form-group">
-      <input type="text" name="q" placeholder="Rechercher sur HElPY..." required>
-    </form>
-
-    <div class="category-pills">
-      <a href="listings.html?type=business" class="pill">Entreprises</a>
-      <a href="listings.html?type=product" class="pill">Produits</a>
-      <a href="listings.html?type=service" class="pill">Services</a>
-      <a href="listings.html?type=realestate" class="pill">Immobilier</a>
-      <a href="listings.html?type=vehicle" class="pill">Véhicules</a>
+    
+    <!-- Barre de recherche -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="search-input" placeholder="Kisa w ap chèche jodi a?" onkeypress="handleSearch(event)">
     </div>
 
-    <h3>Dernières Publications</h3>
-    <div id="listings-container" class="grid mt-2">
-      <p>Chargement des publications...</p>
+    <!-- Seksyon Catégories -->
+    <div class="categories-title">Kategori yo</div>
+    <div class="categories-grid">
+      <a href="listings.html?type=business" class="category-card">
+        <div class="category-icon">🏢</div>
+        <span class="category-label">Antrepriz</span>
+      </a>
+      <a href="listings.html?type=product" class="category-card">
+        <div class="category-icon">📦</div>
+        <span class="category-label">Pwodwi</span>
+      </a>
+      <a href="listings.html?type=service" class="category-card">
+        <div class="category-icon">🛠️</div>
+        <span class="category-label">Sèvis</span>
+      </a>
+      <a href="listings.html?type=realestate" class="category-card">
+        <div class="category-icon">🏠</div>
+        <span class="category-label">Kay/Tè</span>
+      </a>
+      <a href="listings.html?type=vehicle" class="category-card">
+        <div class="category-icon">🚗</div>
+        <span class="category-label">Machin</span>
+      </a>
     </div>
+
+    <!-- Seksyon Feed -->
+    <div class="section-header">
+      <h2 class="section-title">Piblikasyon Resan</h2>
+    </div>
+
+    <div id="listings-feed" class="feed-grid">
+      <p style="text-align:center; color:var(--text-muted); padding:20px;">Chajman piblikasyon yo...</p>
+    </div>
+
   </div>
 
+  <!-- Bottom Navigation Mobile -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item active">Accueil</a>
-    <a href="search.html" class="nav-item">Recherche</a>
-    <a href="publish.html" class="nav-item">+ Publier</a>
-    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
-    <a href="profile.html" class="nav-item">Profil</a>
+    <a href="index.html" class="nav-item active">
+      <span class="nav-icon">⌂</span>
+      <span>Akèy</span>
+    </a>
+    <a href="search.html" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>Rechèch</span>
+    </a>
+    <a href="publish.html" class="nav-item nav-item-publish">
+      <span class="nav-icon">+</span>
+      <span>Publier</span>
+    </a>
+    <a href="my-listings.html" class="nav-item">
+      <span class="nav-icon">❤️</span>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script>
     const API_BASE = window.location.origin;
 
-    async function loadListings() {
+    // Fè rechèch ak Enter
+    function handleSearch(e) {
+      if (e.key === 'Enter') {
+        const query = document.getElementById('search-input').value;
+        if (query) window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+      }
+    }
+
+    // Tcheke si moun nan konekte pou montre inisyal nan avatar an
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+    if (user && user.name) {
+      document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
+    }
+
+    // Chaje Feed la
+    async function loadFeed() {
       try {
         const res = await fetch(`${API_BASE}/api/listings`);
         const data = await res.json();
-        const container = document.getElementById('listings-container');
+        const container = document.getElementById('listings-feed');
         
         if (!data.listings || data.listings.length === 0) {
-          container.innerHTML = '<p class="text-center mt-4">Aucune publication pour le moment.</p>';
+          container.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">Ankenn piblikasyon pou kounye a.</p>';
           return;
         }
 
         container.innerHTML = data.listings.map(item => `
-          <div class="item-card" onclick="location.href='listing-details.html?id=${item.id}'">
-            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.title}">
-            <div class="item-card-content">
-              <div class="item-title">${item.title}</div>
-              <div class="item-price">${item.price ? item.price + ' ' + item.currency : ''}</div>
-              <div class="item-category">${item.category}</div>
+          <div class="listing-card">
+            <div class="card-image-wrap" onclick="location.href='listing-details.html?id=${item.id}'">
+              <img src="${item.image_url || 'https://via.placeholder.com/400x200?text=HElPY'}" class="card-image" alt="${item.title}">
+              <span class="card-badge">${item.category || 'Pwodwi'}</span>
+              <div class="fav-btn" onclick="event.stopPropagation(); alert('Ajoute nan favoris!')">🤍</div>
+            </div>
+            
+            <div class="card-body">
+              <div class="card-title-row" onclick="location.href='listing-details.html?id=${item.id}'">
+                <h3 class="card-title">${item.title}</h3>
+                <span class="card-price">${item.price ? item.price + ' ' + item.currency : ''}</span>
+              </div>
+              
+              <div class="card-location">
+                📍 ${item.location || 'Ayiti'}
+              </div>
+
+              <div class="card-footer">
+                <div class="seller-info">
+                  <div class="seller-avatar">${(item.owner_name || 'U').charAt(0).toUpperCase()}</div>
+                  <span class="seller-name">${item.owner_name || 'Vandè'}</span>
+                </div>
+                
+                <div class="card-actions">
+                  ${item.whatsapp ? `<a href="https://wa.me/${item.whatsapp}" target="_blank" class="btn-sm-wa">WhatsApp</a>` : ''}
+                  <a href="listing-details.html?id=${item.id}" class="btn-sm-details">Détails</a>
+                </div>
+              </div>
             </div>
           </div>
         `).join('');
+
       } catch (err) {
-        document.getElementById('listings-container').innerHTML = '<p>Erreur de chargement.</p>';
+        document.getElementById('listings-feed').innerHTML = '<p style="text-align:center; color:red;">Erè pandan chajman piblikasyon yo.</p>';
       }
     }
 
-    loadListings();
+    loadFeed();
   </script>
 </body>
 </html>
