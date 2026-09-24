@@ -1,145 +1,80 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY - Publier une annonce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Publier un service</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <div class="app-container">
+    <h2 style="margin-bottom: 20px; font-size: 20px;">Pibliye yon sèvis / biznis</h2>
 
-  <div class="app-container" style="padding-bottom: 90px;">
-    
-    <!-- EN-TÊTE -->
-    <header class="header">
-      <div>
-        <div class="logo">
-          <div class="logo-icon"><i class="fa-solid fa-plus"></i></div>
-          <span>Publier sur <span style="color: var(--light-purple);">HELPY</span></span>
-        </div>
-        <p class="tagline">Présentez votre entreprise ou vos services à des milliers d'utilisateurs</p>
-      </div>
-    </header>
-
-    <!-- FORMULAIRE DE PUBLICATION -->
-    <form onsubmit="handlePublish(event)" style="margin-top: 15px;">
-      
-      <!-- TITRE DE L'ENTREPRISE / SERVICE -->
-      <div class="form-group">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Nom du service ou commerce</label>
-        <input type="text" id="title" class="form-control" style="width: 100%;" required placeholder="Ex: Restaurant Le Gourmand, Garage Express...">
+    <form id="publishForm">
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Tit Sèvis la</label>
+        <input type="text" id="title" class="search-box" style="width: 100%; color: white;" placeholder="Eg: Reparatè Telefòn, Restoran..." required>
       </div>
 
-      <!-- CATÉGORIE -->
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Catégorie</label>
-        <select id="category" class="form-control" style="width: 100%;" required>
-          <option value="" disabled selected>Sélectionnez une catégorie</option>
-          <option value="restaurants">Restaurants & Bars</option>
-          <option value="magasins">Magasins & Boutiques</option>
-          <option value="logement">Logement & Immobilier</option>
-          <option value="transport">Transport & Véhicules</option>
-          <option value="services">Services & Dépannage</option>
-          <option value="autres">Autres prestations</option>
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Kategori</label>
+        <select id="category" class="search-box" style="width: 100%; color: white; background: var(--card-bg);" required>
+          <option value="Restaurants">Restaurants</option>
+          <option value="Magasins">Magasins</option>
+          <option value="Logement">Logement</option>
+          <option value="Services">Services</option>
         </select>
       </div>
 
-      <!-- LOCALISATION -->
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Adresse / Ville</label>
-        <input type="text" id="location" class="form-control" style="width: 100%;" required placeholder="Ex: Pétion-Ville, Delmas 33...">
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Nimewo Telefòn / WhatsApp</label>
+        <input type="tel" id="phone" class="search-box" style="width: 100%; color: white;" placeholder="+509 XXXX-XXXX" required>
       </div>
 
-      <!-- NUMÉRO DE TÉLÉPHONE / WHATSAPP -->
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Numéro de téléphone (WhatsApp)</label>
-        <input type="tel" id="phone" class="form-control" style="width: 100%;" required placeholder="Ex: +509 37 00 0000">
+      <div style="margin-bottom: 20px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Deskripsyon</label>
+        <textarea id="description" class="search-box" style="width: 100%; color: white; height: 90px;" placeholder="Bay detay sou sèvis ou an..." required></textarea>
       </div>
 
-      <!-- LIEN PHOTO OU IMAGE -->
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">URL de l'image / photo</label>
-        <input type="url" id="image_url" class="form-control" style="width: 100%;" placeholder="https://exemple.com/image.jpg">
-      </div>
-
-      <!-- DESCRIPTION -->
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Description détaillée</label>
-        <textarea id="description" class="form-control" style="width: 100%; height: 100px; resize: vertical;" required placeholder="Décrivez vos services, vos horaires d'ouverture, vos tarifs..."></textarea>
-      </div>
-
-      <!-- BOUTON VALIDER -->
-      <button type="submit" id="publish-btn" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 14px; justify-content: center;">
-        <i class="fa-solid fa-paper-plane"></i> Publier l'annonce
+      <button type="submit" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600;">
+        Pibliye Sèvis la
       </button>
-
     </form>
 
+    <div id="pubMessage" style="margin-top: 12px; text-align: center; font-size: 14px;"></div>
   </div>
 
-  <!-- NAVIGATION INFÉRIEURE -->
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-      <i class="fa-solid fa-house"></i>
-      <span>Accueil</span>
-    </a>
-    <a href="search.html" class="nav-item">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <span>Rechercher</span>
-    </a>
-    <a href="publish.html" class="nav-item active">
-      <div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div>
-      <span>Publier</span>
-    </a>
-    <a href="favorites.html" class="nav-item">
-      <i class="fa-regular fa-bookmark"></i>
-      <span>Favoris</span>
-    </a>
-    <a href="profile.html" class="nav-item">
-      <i class="fa-regular fa-user"></i>
-      <span>Profil</span>
-    </a>
-  </nav>
-
-  <script src="app.js"></script>
   <script>
-    async function handlePublish(e) {
+    document.getElementById('publishForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const title = document.getElementById('title').value;
+      const category = document.getElementById('category').value;
+      const phone = document.getElementById('phone').value;
+      const description = document.getElementById('description').value;
+      const msg = document.getElementById('pubMessage');
 
-      const userId = localStorage.getItem('helpy_user_id');
-      if (!userId) {
-        alert("Vous devez être connecté pour publier une annonce.");
-        window.location.href = 'login.html';
-        return;
+      try {
+        const res = await fetch('/api/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, category, phone, description })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          msg.style.color = '#4ade80';
+          msg.innerText = "Sèvis ou pibliye ak siksè!";
+          setTimeout(() => window.location.href = '/', 1500);
+        } else {
+          msg.style.color = '#ef4444';
+          msg.innerText = "Erè pandan piblikasyon an.";
+        }
+      } catch (err) {
+        msg.style.color = '#ef4444';
+        msg.innerText = "Erè nan koneksyon sèvè a.";
       }
-
-      const btn = document.getElementById('publish-btn');
-      btn.disabled = true;
-      btn.innerText = "Publication en cours...";
-
-      const payload = {
-        user_id: userId,
-        title: document.getElementById('title').value.trim(),
-        category: document.getElementById('category').value,
-        location: document.getElementById('location').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        image_url: document.getElementById('image_url').value.trim(),
-        description: document.getElementById('description').value.trim()
-      };
-
-      const res = await apiFetch('/api/services', 'POST', payload);
-
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publier l\'annonce';
-
-      if (res && !res.error) {
-        alert("Votre annonce a été publiée avec succès !");
-        window.location.href = 'index.html';
-      } else {
-        alert(res?.message || "Erreur lors de la publication. Veuillez réessayer.");
-      }
-    }
+    });
   </script>
 </body>
 </html>
