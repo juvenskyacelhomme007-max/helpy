@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recherche - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container">
+    <form id="search-form" class="form-group">
+      <input type="text" id="query" placeholder="Que cherchez-vous ?" required>
+      <button type="submit" class="btn mt-2">Rechercher</button>
+    </form>
+
+    <div id="results" class="grid mt-4"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item active">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('q');
+
+    if (q) {
+      document.getElementById('query').value = q;
+      performSearch(q);
+    }
+
+    document.getElementById('search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      performSearch(document.getElementById('query').value);
+    });
+
+    async function performSearch(query) {
+      try {
+        const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        const container = document.getElementById('results');
+
+        const all = [...(data.listings || []), ...(data.businesses || [])];
+
+        if (all.length === 0) {
+          container.innerHTML = '<p class="text-center">Aucun résultat trouvé.</p>';
+          return;
+        }
+
+        container.innerHTML = all.map(item => `
+          <div class="item-card" onclick="location.href='listing-details.html?id=${item.id}'">
+            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.title || item.name}">
+            <div class="item-card-content">
+              <div class="item-title">${item.title || item.name}</div>
+              <div class="item-category">${item.category}</div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('results').innerHTML = '<p>Erreur.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
