@@ -1,5 +1,5 @@
 /* ==================================================
-   HELPY - STYLES PRINCIPAUX
+   HELPY - STYLES PRINCIPAUX (AMELYORE)
    ================================================== */
 
 :root {
@@ -34,7 +34,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Container principal responsive (mobile-first) */
 .app-container {
   width: 100%;
   max-width: 480px;
@@ -83,10 +82,6 @@ body {
   font-size: 18px;
 }
 
-.logo span {
-  color: var(--text-white);
-}
-
 .logo span.purple {
   color: var(--light-purple);
 }
@@ -96,70 +91,32 @@ body {
   color: var(--text-secondary);
 }
 
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  color: var(--text-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-  text-decoration: none;
-}
-
-.icon-btn .badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  background-color: #ff3b30;
-  border-radius: 50%;
-}
-
-/* --- HERO BANNER --- */
-.hero-banner {
-  background: linear-gradient(135deg, #0b1730 0%, #170b30 100%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-content {
-  max-width: 60%;
+/* --- FORMULAIRES & INPUTS --- */
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 2;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
-.hero-title {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.hero-title span {
-  color: var(--light-purple);
-}
-
-.hero-text {
+.form-group label {
   font-size: 12px;
   color: var(--text-secondary);
-  line-height: 1.4;
+}
+
+.form-control {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  color: var(--text-white);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: var(--light-purple);
 }
 
 .btn-primary {
@@ -167,7 +124,7 @@ body {
   color: var(--text-white);
   border: none;
   border-radius: 20px;
-  padding: 10px 16px;
+  padding: 12px 16px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -175,7 +132,7 @@ body {
   align-items: center;
   gap: 6px;
   text-decoration: none;
-  width: fit-content;
+  justify-content: center;
   transition: opacity 0.2s;
 }
 
@@ -183,256 +140,46 @@ body {
   opacity: 0.8;
 }
 
-.hero-image {
-  width: 120px;
-  height: 120px;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  z-index: 1;
-}
-
-/* --- BARRE DE RECHERCHE --- */
-.search-bar {
-  display: flex;
-  align-items: center;
+/* --- BOUTONS REZO SOSYO --- */
+.btn-social {
+  width: 100%;
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  gap: 12px;
-}
-
-.search-bar input {
-  background: transparent;
-  border: none;
   color: var(--text-white);
-  width: 100%;
-  outline: none;
-  font-size: 13px;
-}
-
-.search-bar input::placeholder {
-  color: var(--text-secondary);
-}
-
-.search-icon, .filter-icon {
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-/* --- CATÉGORIES --- */
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-@media (max-width: 480px) {
-  .categories-grid {
-    grid-template-columns: repeat(6, minmax(70px, 1fr));
-  }
-}
-
-.category-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.category-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: var(--text-white);
-}
-
-.cat-restau { background: linear-gradient(135deg, #a855f7, #7c20ff); }
-.cat-magasin { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-.cat-logement { background: linear-gradient(135deg, #10b981, #059669); }
-.cat-transport { background: linear-gradient(135deg, #f97316, #ea580c); }
-.cat-services { background: linear-gradient(135deg, #ef4444, #dc2626); }
-.cat-autres { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-
-.category-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  text-align: center;
-}
-
-/* --- SECTION TIRES --- */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.see-all {
-  font-size: 12px;
-  color: var(--light-purple);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-/* --- CARTES ENTREPRISES / PUBLICATION --- */
-.cards-scroll {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.card {
-  min-width: 220px;
-  max-width: 240px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.card-img-container {
-  height: 120px;
-  width: 100%;
-  position: relative;
-}
-
-.card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.badge-cat {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: rgba(5, 11, 24, 0.8);
-  border: 1px solid var(--border-color);
-  color: var(--text-white);
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-body {
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.card-title {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.card-rating {
-  font-size: 11px;
-  color: #facc15;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-rating span {
-  color: var(--text-secondary);
-}
-
-.card-location {
-  font-size: 11px;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-desc {
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.btn-contact {
-  margin-top: 6px;
-  background-color: var(--primary-purple);
-  color: var(--text-white);
-  text-align: center;
-  padding: 8px;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-/* --- BANNIÈRE PRO --- */
-.pro-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.pro-info {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.pro-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, var(--primary-purple), var(--light-purple));
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-
-.pro-text h4 {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
-.pro-text p {
+.btn-social:hover {
+  background-color: var(--card-hover);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.separator-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.separator-text {
+  padding: 0 10px;
   font-size: 11px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  font-weight: 600;
 }
 
 /* --- NAVIGATION INFÉRIEURE --- */
@@ -467,10 +214,6 @@ body {
   color: var(--light-purple);
 }
 
-.nav-item i {
-  font-size: 18px;
-}
-
 .nav-publish {
   position: relative;
   top: -15px;
@@ -487,39 +230,4 @@ body {
   color: var(--text-white);
   font-size: 24px;
   box-shadow: 0 4px 15px rgba(124, 32, 255, 0.4);
-}
-
-/* --- FORMULAIRES --- */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.form-group label {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.form-control {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 10px;
-  color: var(--text-white);
-  font-size: 13px;
-  outline: none;
-}
-
-.form-control:focus {
-  border-color: var(--light-purple);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 20px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  width: 100%;
 }
