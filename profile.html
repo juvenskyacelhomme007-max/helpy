@@ -1,109 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mon Profil - HElPY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Profil - HElPY</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Header -->
   <header class="app-header">
-    <a href="index.html">HElPY</a>
-    <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Déconnexion</button>
+    <a href="index.html" class="logo">HElPY.</a>
+    <span style="font-weight:700; font-size:0.95rem;">Profil Mwen</span>
   </header>
 
   <div class="container">
-    <div class="card">
-      <h2>Modifier Mon Profil</h2>
-      <form id="profile-form" class="mt-4">
-        <div class="form-group">
-          <label>Nom complet</label>
-          <input type="text" id="name">
-        </div>
-        <div class="form-group">
-          <label>Téléphone</label>
-          <input type="tel" id="phone">
-        </div>
-        <div class="form-group">
-          <label>WhatsApp</label>
-          <input type="tel" id="whatsapp">
-        </div>
-        <div class="form-group">
-          <label>URL Photo de Profil</label>
-          <input type="url" id="photo_url">
-        </div>
-        <div class="form-group">
-          <label>Localisation</label>
-          <input type="text" id="location">
-        </div>
-        <div class="form-group">
-          <label>Bio</label>
-          <textarea id="bio" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn">Mettre à jour</button>
-      </form>
+    
+    <div id="profile-content">
+      <!-- User Profile Header Card -->
+      <div style="background:#fff; padding:20px; border-radius:var(--radius-lg); border:1px solid var(--border); text-align:center; margin-bottom:20px;">
+        <div id="user-avatar-lg" style="width:72px; height:72px; border-radius:50%; background:var(--primary-light); color:var(--primary); font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto;">👤</div>
+        <h2 id="user-name-display" style="font-size:1.2rem; font-weight:800;">Utilisateur</h2>
+        <p id="user-email-display" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">user@example.com</p>
+        <div style="display:inline-block; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:700;">✓ Kont Verifye</div>
+      </div>
+
+      <!-- Quick Options -->
+      <div style="background:#fff; border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; margin-bottom:20px;">
+        <a href="my-listings.html" style="display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); text-decoration:none; color:var(--text-main); font-weight:600; font-size:0.9rem;">
+          <span>📦 Mes Publications</span>
+          <span>→</span>
+        </a>
+        <a href="#" onclick="alert('Opsyon pou modifye profil ap vini kouvè!')" style="display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); text-decoration:none; color:var(--text-main); font-weight:600; font-size:0.9rem;">
+          <span>⚙️ Modifier Profil</span>
+          <span>→</span>
+        </a>
+        <a href="#" onclick="logout()" style="display:flex; justify-content:space-between; padding:16px 20px; text-decoration:none; color:#ef4444; font-weight:700; font-size:0.9rem;">
+          <span>Déconnexion</span>
+          <span>🚪</span>
+        </a>
+      </div>
     </div>
+
   </div>
 
+  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">Accueil</a>
-    <a href="search.html" class="nav-item">Recherche</a>
-    <a href="publish.html" class="nav-item">+ Publier</a>
-    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
-    <a href="profile.html" class="nav-item active">Profil</a>
+    <a href="index.html" class="nav-item">
+      <span class="nav-icon">⌂</span>
+      <span>Akèy</span>
+    </a>
+    <a href="search.html" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>Rechèch</span>
+    </a>
+    <a href="publish.html" class="nav-item nav-item-publish">
+      <span class="nav-icon">+</span>
+      <span>Publier</span>
+    </a>
+    <a href="my-listings.html" class="nav-item">
+      <span class="nav-icon">❤️</span>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item active">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script>
-    const API_BASE = window.location.origin;
     const user = JSON.parse(localStorage.getItem('helpyUser'));
-
     if (!user) {
       window.location.href = 'login.html';
     } else {
-      document.getElementById('name').value = user.name || '';
-      document.getElementById('phone').value = user.phone || '';
-      document.getElementById('whatsapp').value = user.whatsapp || '';
-      document.getElementById('photo_url').value = user.photo_url || '';
-      document.getElementById('location').value = user.location || '';
-      document.getElementById('bio').value = user.bio || '';
+      document.getElementById('user-name-display').innerText = user.name || 'Itilizatè HElPY';
+      document.getElementById('user-email-display').innerText = user.email || '';
+      document.getElementById('user-avatar-lg').innerText = (user.name || 'U').charAt(0).toUpperCase();
     }
-
-    document.getElementById('profile-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        whatsapp: document.getElementById('whatsapp').value,
-        photo_url: document.getElementById('photo_url').value,
-        location: document.getElementById('location').value,
-        bio: document.getElementById('bio').value
-      };
-
-      try {
-        const res = await fetch(`${API_BASE}/api/profile`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-id': user.id
-          },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-          localStorage.setItem('helpyUser', JSON.stringify(data.user));
-          alert('Profil mis à jour!');
-        } else {
-          alert(data.error);
-        }
-      } catch (err) {
-        alert('Erreur réseau');
-      }
-    });
 
     function logout() {
       localStorage.removeItem('helpyUser');
+      alert('Ou dekonekte ak siksè.');
       window.location.href = 'login.html';
     }
   </script>
