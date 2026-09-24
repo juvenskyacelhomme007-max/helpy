@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détails - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container" id="details-container">
+    <p>Chargement des détails...</p>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    async function loadDetails() {
+      try {
+        const res = await fetch(`${API_BASE}/api/listings/${id}`);
+        const data = await res.json();
+
+        if (data.status !== 'ok' || !data.listing) {
+          document.getElementById('details-container').innerHTML = '<p>Annonce introuvable.</p>';
+          return;
+        }
+
+        const l = data.listing;
+        document.getElementById('details-container').innerHTML = `
+          <div class="card">
+            <img src="${l.image_url || 'https://via.placeholder.com/300'}" style="width:100%; border-radius:8px; height:200px; object-fit:cover;">
+            <h2 class="mt-2">${l.title}</h2>
+            <h3 style="color:var(--primary);" class="mt-2">${l.price ? l.price + ' ' + l.currency : ''}</h3>
+            <span class="badge mt-2">${l.category}</span>
+            <p class="mt-4">${l.description}</p>
+            <p class="mt-2"><strong>Localisation:</strong> ${l.location || 'N/A'}</p>
+          </div>
+
+          <div class="card">
+            <h3>Vendeur</h3>
+            <p class="mt-2"><strong>${l.owner_name}</strong></p>
+            <div class="btn-group mt-4">
+              ${l.phone ? `<a href="tel:${l.phone}" class="btn">Appeler</a>` : ''}
+              ${l.whatsapp ? `<a href="https://wa.me/${l.whatsapp}" class="btn btn-whatsapp" target="_blank">WhatsApp</a>` : ''}
+            </div>
+            <button onclick="shareListing()" class="btn btn-secondary mt-2">Partager</button>
+            <button onclick="reportListing(${l.id})" class="btn btn-danger mt-2">Signaler</button>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('details-container').innerHTML = '<p>Erreur lors du chargement.</p>';
+      }
+    }
+
+    function shareListing() {
+      if (navigator.share) {
+        navigator.share({ title: document.title, url: window.location.href });
+      } else {
+        alert('Lien copié : ' + window.location.href);
+      }
+    }
+
+    async function reportListing(listingId) {
+      const user = JSON.parse(localStorage.getItem('helpyUser'));
+      if (!user) { alert('Connectez-vous pour signaler.'); return; }
+      
+      const reason = prompt('Raison du signalement :');
+      if (!reason) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/reports`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
+          body: JSON.stringify({ listing_id: listingId, reason })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') alert('Signalement envoyé.');
+      } catch (err) {
+        alert('Erreur réseau');
+      }
+    }
+
+    loadDetails();
+  </script>
+</body>
+</html>
