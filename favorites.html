@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HELPY — Favoris</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-container">
+  <h2>Mes favoris</h2>
+  <p style="color:var(--text-gray);margin-bottom:20px">Retrouvez les entreprises et annonces que vous avez enregistrées.</p>
+  <div id="favorites"><p>Chargement...</p></div>
+</div>
+<nav class="bottom-nav">
+<a href="index.html" class="nav-item">Accueil</a><a href="search.html" class="nav-item">Recherche</a><a href="publish.html" class="nav-item">+ Publier</a><a href="favorites.html" class="nav-item active">Favoris</a><a href="profile.html" class="nav-item">Profil</a>
+</nav>
+<script src="app.js"></script>
+<script>
+async function load(){
+ const userId=localStorage.getItem('helpy_user_id');
+ if(!userId){location.href='login.html';return}
+ const box=document.getElementById('favorites');
+ const data=await apiFetch('/api/favorites');
+ if(!data || data.error || !data.favorites?.length){box.innerHTML='<div class="card"><p>Ou poko gen okenn favori.</p></div>';return}
+ box.innerHTML=data.favorites.map(f=>`<div class="card" style="margin-bottom:12px"><strong>${f.item_type}</strong><p style="margin-top:6px">Élément #${f.item_id}</p></div>`).join('');
+}
+load();
+</script>
+</body></html>

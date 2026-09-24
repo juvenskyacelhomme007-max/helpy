@@ -29,7 +29,7 @@
 
   <script>
     const API_BASE = window.location.origin;
-    const user = JSON.parse(localStorage.getItem('helpyUser'));
+    const user = JSON.parse(localStorage.getItem('helpyUser') || localStorage.getItem('helpy_user') || 'null');
 
     if (!user) {
       window.location.href = 'login.html';

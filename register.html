@@ -354,10 +354,9 @@
         // Sove itilizatè a lokalman
         if (data.user) {
 
-          localStorage.setItem(
-            "helpy_user",
-            JSON.stringify(data.user)
-          );
+          localStorage.setItem("helpy_user_id", String(data.user.id));
+          localStorage.setItem("helpyUser", JSON.stringify(data.user));
+          localStorage.setItem("helpy_user", JSON.stringify(data.user));
 
         }
 

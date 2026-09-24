@@ -78,7 +78,7 @@
 
         document.getElementById('review-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const user = JSON.parse(localStorage.getItem('helpyUser'));
+          const user = JSON.parse(localStorage.getItem('helpyUser') || localStorage.getItem('helpy_user') || 'null');
           if (!user) { alert('Veuillez vous connecter.'); return; }
 
           await fetch(`${API_BASE}/api/reviews`, {

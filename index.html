@@ -2,2493 +2,273 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
 <title>HELPY — Services, commerces et professionnels</title>
-
-<meta name="description"
-content="HELPY — Trouvez facilement des services, commerces et professionnels près de chez vous.">
-
-<meta name="theme-color" content="#050a16">
-
 <style>
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
 :root{
-  --bg:#050a16;
-  --card:#0c1629;
-  --card2:#111d33;
-  --border:rgba(125,140,190,.25);
-  --purple:#7b12ff;
-  --purple2:#a000ff;
-  --text:#edf2ff;
-  --muted:#9ba9c8;
+  --bg:#050b18;--panel:#0b1428;--panel2:#101c35;--line:rgba(139,157,210,.22);
+  --text:#f5f7ff;--muted:#aab7d6;--purple:#7b12ff;--purple2:#a500ff;
 }
-
-html{
-  scroll-behavior:smooth;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
-  font-family:
-  Inter,
-  -apple-system,
-  BlinkMacSystemFont,
-  "Segoe UI",
-  Roboto,
-  Arial,
-  sans-serif;
-
-  background:
-  radial-gradient(
-    circle at 50% -10%,
-    rgba(100,0,255,.15),
-    transparent 35%
-  ),
-  var(--bg);
-
-  color:var(--text);
-  min-height:100vh;
-  padding-bottom:100px;
+  min-height:100vh;color:var(--text);background:
+  radial-gradient(circle at 50% -10%,rgba(108,0,255,.18),transparent 34%),#050b18;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  padding-bottom:105px;
 }
-
-button,
-input{
-  font-family:inherit;
+button,input{font:inherit}button{cursor:pointer;border:0}a{text-decoration:none;color:inherit}
+.header{padding:18px 14px 8px}
+.header-inner{max-width:1120px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{
+  width:54px;height:54px;flex:0 0 54px;border-radius:16px;
+  display:grid;place-items:center;background:linear-gradient(145deg,#7600ff,#4100bc);
+  box-shadow:0 10px 30px rgba(122,0,255,.35)
 }
-
-button{
-  cursor:pointer;
+.logo svg{width:37px;height:37px;fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.brand h1{font-size:32px;line-height:1;font-weight:900;letter-spacing:-1.5px}
+.brand h1 span{color:#8d18ff}.brand p{font-size:11px;color:#d1d8e9;margin-top:4px;white-space:nowrap}
+.actions{display:flex;gap:8px}
+.circle{
+  width:47px;height:47px;border-radius:50%;display:grid;place-items:center;color:white;
+  background:linear-gradient(145deg,#0e1a33,#0a1224);border:1px solid var(--line);position:relative
 }
-
-a{
-  text-decoration:none;
-  color:inherit;
-}
-
-
-/* =========================
-   HEADER
-========================= */
-
-.header{
-  width:100%;
-  padding:24px 18px 12px;
-}
-
-.header-inner{
-  max-width:1100px;
-  margin:auto;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.brand-logo{
-  width:58px;
-  height:58px;
-  border-radius:16px;
-
-  background:
-  linear-gradient(
-    145deg,
-    #7b00ff,
-    #3f00b8
-  );
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:30px;
-
-  box-shadow:
-  0 10px 35px
-  rgba(111,0,255,.35);
-}
-
-.brand-text h1{
-  font-size:37px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-1.5px;
-}
-
-.brand-text h1 span{
-  color:#8e16ff;
-}
-
-.brand-text p{
-  margin-top:4px;
-  font-size:14px;
-  color:#d0d8eb;
-}
-
-.header-actions{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.icon-btn,
-.profile-btn{
-  width:52px;
-  height:52px;
-
-  border-radius:50%;
-
-  border:
-  1px solid
-  rgba(120,130,180,.2);
-
-  background:
-  rgba(13,22,43,.85);
-
-  color:white;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:23px;
-
-  position:relative;
-}
-
-.profile-btn{
-  background:
-  linear-gradient(
-    145deg,
-    #1b2d68,
-    #172456
-  );
-
-  font-size:25px;
-}
-
-.notification-dot{
-  position:absolute;
-
-  width:10px;
-  height:10px;
-
-  background:#ff2148;
-
-  border-radius:50%;
-
-  right:9px;
-  top:8px;
-
-  border:2px solid #080d1c;
-}
-
-
-/* =========================
-   MAIN
-========================= */
-
-main{
-  width:100%;
-  max-width:1100px;
-
-  margin:auto;
-
-  padding:
-  15px 18px 0;
-}
-
-/* =========================
-   HERO
-========================= */
-
+.circle svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.profile{background:linear-gradient(145deg,#203574,#162754)}
+.dot{position:absolute;width:9px;height:9px;background:#ff2148;border-radius:50%;right:7px;top:7px;border:2px solid #091123}
+main{max-width:1120px;margin:auto;padding:12px 14px 0}
 .hero{
-  min-height:255px;
-
-  border-radius:25px;
-
-  border:
-  1px solid
-  rgba(115,100,190,.35);
-
+  min-height:257px;border-radius:25px;border:1px solid rgba(142,95,255,.35);
+  overflow:hidden;position:relative;padding:27px 23px;
   background:
-  radial-gradient(
-    circle at 80% 50%,
-    rgba(126,0,255,.4),
-    transparent 40%
-  ),
-  linear-gradient(
-    120deg,
-    #10172d,
-    #241052,
-    #0a1020
-  );
-
-  position:relative;
-
-  overflow:hidden;
-
-  padding:30px;
+    radial-gradient(circle at 78% 40%,rgba(130,0,255,.62),transparent 27%),
+    radial-gradient(circle at 95% 90%,rgba(35,70,255,.24),transparent 30%),
+    linear-gradient(110deg,#10182d 0%,#241050 55%,#090f20 100%);
 }
-
-.hero-content{
-  position:relative;
-  z-index:2;
-  max-width:580px;
+.hero:after{
+  content:"";position:absolute;right:-30px;bottom:-55px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(160,30,255,.35),transparent 62%);
 }
-
-.hero h2{
-  font-size:35px;
-  line-height:1.15;
-  font-weight:850;
-  margin-bottom:10px;
+.hero-copy{position:relative;z-index:2;max-width:580px}
+.hero h2{font-size:30px;line-height:1.1;font-weight:900;margin-bottom:11px}
+.hero h2 span{color:#9219ff}.hero p{font-size:17px;line-height:1.45;color:#d7dcef;max-width:510px;margin-bottom:20px}
+.primary{
+  color:white;background:linear-gradient(100deg,#7210ff,#a800ff);border-radius:30px;
+  padding:14px 21px;font-weight:800;box-shadow:0 12px 30px rgba(124,0,255,.27)
 }
-
-.hero h2 span{
-  color:#8d18ff;
+.hero-art{position:absolute;right:4%;bottom:-2px;width:340px;height:225px;z-index:1;pointer-events:none}
+.glow{position:absolute;inset:20px 15px 0;background:radial-gradient(circle,rgba(143,0,255,.4),transparent 62%)}
+.phone{
+  position:absolute;right:95px;bottom:17px;width:82px;height:142px;border:5px solid #121b31;
+  border-radius:17px;background:linear-gradient(160deg,#182746,#080d18);transform:rotate(-12deg);
+  box-shadow:0 0 35px rgba(148,0,255,.55)
 }
-
-.hero p{
-  font-size:18px;
-  line-height:1.45;
-  color:#d4d9ea;
-  margin-bottom:22px;
+.phone:before{content:"";position:absolute;left:8px;right:8px;top:10px;bottom:10px;border-radius:10px;background:linear-gradient(145deg,#8d20ff,#151b42)}
+.person{
+  position:absolute;right:2px;bottom:0;width:185px;height:210px;border-radius:95px 95px 0 0;
+  background:linear-gradient(145deg,#111b2e,#050912);transform:rotate(-4deg)
 }
-
-.hero-btn,
-.create-btn,
-.contact-btn{
-  border:none;
-  color:white;
-
-  background:
-  linear-gradient(
-    100deg,
-    #7410ff,
-    #a400ff
-  );
-
-  font-weight:750;
-
-  box-shadow:
-  0 10px 30px
-  rgba(127,0,255,.25);
+.person:before{
+  content:"";position:absolute;width:75px;height:75px;border-radius:50%;right:62px;top:-33px;
+  background:radial-gradient(circle at 35% 30%,#493020 0 8%,#241710 55%,#08090d 56%);
+  box-shadow:0 -7px 0 9px #10131a
 }
-
-.hero-btn{
-  border-radius:30px;
-
-  padding:
-  15px 24px;
-
-  font-size:16px;
+.float{
+  position:absolute;width:60px;height:60px;border-radius:17px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#8b19ff,#4210a8);border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 25px rgba(0,0,0,.3)
 }
-
-.hero-btn:active,
-.create-btn:active,
-.contact-btn:active{
-  transform:scale(.98);
+.float svg{width:30px;height:30px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.f1{top:22px;left:35px;transform:rotate(-9deg)}.f2{top:65px;right:5px;transform:rotate(8deg)}
+.f3{bottom:12px;left:30px;transform:rotate(6deg)}.f4{bottom:28px;right:10px;transform:rotate(-7deg)}
+.search{
+  margin-top:21px;height:64px;border-radius:34px;padding:0 10px 0 19px;
+  display:flex;align-items:center;gap:11px;background:linear-gradient(120deg,#101b32,#0b1427);
+  border:1px solid rgba(126,148,210,.36)
 }
-
-
-/* =========================
-   SEARCH
-========================= */
-
-.search-wrapper{
-  margin-top:22px;
-
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  min-height:66px;
-
-  padding:
-  0 12px 0 20px;
-
-  border-radius:35px;
-
-  border:
-  1px solid
-  rgba(125,140,190,.35);
-
-  background:
-  linear-gradient(
-    120deg,
-    #101b31,
-    #0b1427
-  );
+.search svg{width:27px;height:27px;stroke:#dce5ff;fill:none;stroke-width:2.3;flex:0 0 auto}
+.search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:white;font-size:15px}
+.search input::placeholder{color:#91a0c3}
+.filter{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#142343;color:white}
+.filter svg{width:23px;height:23px}
+.categories{margin-top:24px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.category{background:transparent;color:white;text-align:center}
+.cat-icon{
+  width:min(100%,112px);aspect-ratio:1;margin:auto;border-radius:23px;display:grid;place-items:center;
+  box-shadow:0 12px 25px rgba(0,0,0,.16);transition:.15s
 }
-
-.search-icon{
-  font-size:30px;
-  color:#d6e0fa;
+.category:active .cat-icon{transform:scale(.94)}
+.cat-icon svg{width:40%;height:40%;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.c1{background:linear-gradient(145deg,#a600ff,#5a00e8)}.c2{background:linear-gradient(145deg,#087cff,#0753dc)}
+.c3{background:linear-gradient(145deg,#26d982,#0bb46e)}.c4{background:linear-gradient(145deg,#ffac18,#f36b00)}
+.c5{background:linear-gradient(145deg,#ff4263,#df1745)}.c6{background:linear-gradient(145deg,#16d8e8,#00a5c5)}
+.cat-name{display:block;margin-top:9px;font-size:14px;color:#eef2ff}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:34px 2px 15px}
+.section-title{font-size:23px;font-weight:900;display:flex;align-items:center;gap:9px}
+.section-title .fire{color:#a000ff}.see{color:#941aff;background:transparent;font-weight:800;font-size:14px}
+.businesses{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
+.card{
+  overflow:hidden;border-radius:23px;background:linear-gradient(145deg,rgba(17,29,51,.98),rgba(8,16,31,.98));
+  border:1px solid rgba(120,140,190,.24);box-shadow:0 10px 30px rgba(0,0,0,.14)
 }
-
-.search-input{
-  flex:1;
-
-  border:none;
-  outline:none;
-
-  background:transparent;
-
-  color:white;
-
-  font-size:16px;
-
-  min-width:0;
+.card-image{height:175px;position:relative;overflow:hidden;background:linear-gradient(145deg,#17223b,#263451);display:grid;place-items:center}
+.card-image img{width:100%;height:100%;object-fit:cover;display:block}.placeholder{font-size:54px;opacity:.8}
+.badge{position:absolute;left:12px;bottom:11px;border-radius:18px;padding:7px 11px;background:rgba(100,0,230,.9);font-size:12px;font-weight:800}
+.card-body{padding:15px}.card h3{font-size:20px;margin-bottom:7px}.rating{display:flex;align-items:center;gap:6px;font-size:13px}.star{color:#ffc400;font-size:19px}.reviews{color:#8998b8}.loc{color:#abb8d3;font-size:13px;margin:8px 0}.desc{color:#bec8dc;font-size:13px;line-height:1.4;min-height:38px;margin-bottom:13px}
+.contact{width:100%;padding:12px;border-radius:24px;color:#fff;background:linear-gradient(100deg,#7210ff,#a800ff);font-weight:800}
+.empty{grid-column:1/-1;text-align:center;padding:42px 20px;border:1px dashed rgba(130,150,200,.3);border-radius:20px;color:#98a6c5}
+.empty-icon{font-size:43px;margin-bottom:10px}
+.professional{margin-top:25px;border-radius:22px;border:1px solid rgba(120,140,190,.24);background:linear-gradient(120deg,#0c1930,#101a35);padding:18px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.prof-left{display:flex;align-items:center;gap:14px}.rocket{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#4e20a6,#28106c);font-size:29px}
+.prof h3{font-size:17px;margin-bottom:4px}.prof p{color:#aab5ce;font-size:13px}
+.bottom{position:fixed;left:0;right:0;bottom:0;height:82px;z-index:50;background:rgba(6,12,26,.97);backdrop-filter:blur(18px);border-top:1px solid rgba(120,140,190,.18)}
+.bottom-inner{height:100%;max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:center}
+.nav{background:transparent;color:#9aa8c7;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px}.nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.nav.active{color:#9418ff}
+.publish{width:58px;height:58px;border-radius:50%;margin-top:-30px;border:5px solid #050b18;background:linear-gradient(145deg,#7b00ff,#a900ff);color:#fff;font-size:31px;box-shadow:0 8px 25px rgba(126,0,255,.4);display:grid;place-items:center}
+@media(max-width:850px){.hero-art{opacity:.72;right:-80px}.hero-copy{max-width:65%}.businesses{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){
+  .header{padding-top:15px}.brand h1{font-size:29px}.brand p{font-size:10px}.logo{width:49px;height:49px;flex-basis:49px}
+  .circle{width:44px;height:44px}.hero{min-height:255px;padding:23px 19px}.hero h2{font-size:27px}.hero p{font-size:16px;max-width:290px}.hero-art{right:-145px;opacity:.58}.hero-copy{max-width:100%}
+  .categories{grid-template-columns:repeat(6,minmax(66px,1fr));overflow-x:auto;margin-right:-14px;padding-right:14px;scrollbar-width:none}.categories::-webkit-scrollbar{display:none}
+  .cat-icon{width:66px;border-radius:19px}.cat-icon svg{width:28px;height:28px}.cat-name{font-size:12px;white-space:nowrap}
+  .section-title{font-size:20px}.businesses{display:flex;overflow-x:auto;gap:14px;margin-right:-14px;padding-right:14px;scroll-snap-type:x mandatory;scrollbar-width:none}.businesses::-webkit-scrollbar{display:none}
+  .card{min-width:286px;scroll-snap-align:start}.card-image{height:165px}.professional{flex-direction:column;align-items:stretch}.primary{padding:13px 18px}
 }
-
-.search-input::placeholder{
-  color:#8c9abd;
-}
-
-.filter-btn{
-  width:50px;
-  height:50px;
-
-  border:none;
-  border-radius:50%;
-
-  background:
-  linear-gradient(
-    145deg,
-    #17294b,
-    #101b34
-  );
-
-  color:white;
-
-  font-size:21px;
-}
-
-
-/* =========================
-   CATEGORIES
-========================= */
-
-.categories{
-  margin-top:26px;
-
-  display:grid;
-
-  grid-template-columns:
-  repeat(6,1fr);
-
-  gap:14px;
-}
-
-.category{
-  border:none;
-  background:transparent;
-  color:white;
-  text-align:center;
-}
-
-.category-icon{
-  width:100%;
-
-  aspect-ratio:1/1;
-
-  max-width:125px;
-
-  margin:auto;
-
-  border-radius:25px;
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-
-  font-size:37px;
-
-  box-shadow:
-  0 10px 25px
-  rgba(0,0,0,.15);
-
-  transition:.2s;
-}
-
-.category:active
-.category-icon{
-  transform:scale(.94);
-}
-
-.category:nth-child(1)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #a500ff,
-    #5700e9
-  );
-}
-
-.category:nth-child(2)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #087cff,
-    #0753dc
-  );
-}
-
-.category:nth-child(3)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #26d982,
-    #0bb46e
-  );
-}
-
-.category:nth-child(4)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #ffac18,
-    #f36b00
-  );
-}
-
-.category:nth-child(5)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #ff4263,
-    #df1745
-  );
-}
-
-.category:nth-child(6)
-.category-icon{
-  background:
-  linear-gradient(
-    145deg,
-    #16d8e8,
-    #00a5c5
-  );
-}
-
-.category-name{
-  display:block;
-
-  margin-top:10px;
-
-  font-size:15px;
-
-  color:#edf2ff;
-}
-
-
-/* =========================
-   SECTION TITLE
-========================= */
-
-.section-header{
-  display:flex;
-
-  justify-content:space-between;
-  align-items:center;
-
-  margin:
-  38px 2px 17px;
-}
-
-.section-title{
-  display:flex;
-
-  align-items:center;
-
-  gap:10px;
-
-  font-size:26px;
-
-  font-weight:850;
-}
-
-.see-all{
-  border:none;
-
-  background:transparent;
-
-  color:#8f18ff;
-
-  font-weight:700;
-
-  font-size:15px;
-}
-
-/* =========================
-   BUSINESS CARDS
-========================= */
-
-.businesses{
-  display:grid;
-
-  grid-template-columns:
-  repeat(3,1fr);
-
-  gap:18px;
-}
-
-.business-card{
-  background:
-  linear-gradient(
-    145deg,
-    rgba(17,29,51,.98),
-    rgba(8,16,31,.98)
-  );
-
-  border:
-  1px solid
-  rgba(120,140,190,.23);
-
-  border-radius:23px;
-
-  overflow:hidden;
-
-  transition:.2s;
-
-  box-shadow:
-  0 10px 30px
-  rgba(0,0,0,.12);
-}
-
-.business-card:hover{
-  transform:translateY(-3px);
-
-  border-color:
-  rgba(138,20,255,.5);
-}
-
-.business-image{
-  width:100%;
-  height:190px;
-
-  background:
-  linear-gradient(
-    145deg,
-    #171f36,
-    #252f4a
-  );
-
-  position:relative;
-
-  overflow:hidden;
-}
-
-.business-image img{
-  width:100%;
-  height:100%;
-
-  object-fit:cover;
-
-  display:block;
-}
-
-.image-placeholder{
-  width:100%;
-  height:100%;
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-
-  font-size:55px;
-
-  color:#7785a9;
-}
-
-.business-category{
-  position:absolute;
-
-  left:12px;
-  bottom:12px;
-
-  padding:
-  8px 12px;
-
-  border-radius:18px;
-
-  background:
-  rgba(101,0,230,.92);
-
-  color:white;
-
-  font-size:12px;
-
-  font-weight:700;
-}
-
-.business-content{
-  padding:17px;
-}
-
-.business-name{
-  font-size:21px;
-
-  font-weight:800;
-
-  margin-bottom:9px;
-}
-
-.rating{
-  display:flex;
-
-  align-items:center;
-
-  gap:7px;
-
-  margin-bottom:8px;
-
-  font-size:14px;
-}
-
-.star{
-  color:#ffc400;
-  font-size:20px;
-}
-
-.reviews{
-  color:#8e9abd;
-}
-
-.location{
-  color:#aab6d3;
-
-  font-size:14px;
-
-  margin-bottom:11px;
-}
-
-.description{
-  color:#bec8dc;
-
-  font-size:14px;
-
-  line-height:1.4;
-
-  min-height:40px;
-
-  margin-bottom:15px;
-}
-
-.contact-btn{
-  width:100%;
-
-  padding:13px;
-
-  border-radius:25px;
-
-  font-size:15px;
-}
-
-
-/* =========================
-   LOADING
-========================= */
-
-.loading,
-.empty{
-  grid-column:1/-1;
-
-  text-align:center;
-}
-
-.loading{
-  padding:50px 20px;
-
-  color:#98a5c2;
-}
-
-.spinner{
-  width:38px;
-  height:38px;
-
-  border-radius:50%;
-
-  border:
-  4px solid
-  rgba(140,30,255,.2);
-
-  border-top-color:#8d16ff;
-
-  animation:
-  spin .8s linear infinite;
-
-  margin:
-  auto auto 14px;
-}
-
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-.empty{
-  padding:45px 20px;
-
-  border:
-  1px dashed
-  rgba(120,140,190,.3);
-
-  border-radius:20px;
-
-  color:#95a3c2;
-}
-
-.empty-icon{
-  font-size:45px;
-
-  margin-bottom:12px;
-}
-
-
-/* =========================
-   PROFESSIONAL SECTION
-========================= */
-
-.professional{
-  margin-top:28px;
-
-  border-radius:22px;
-
-  border:
-  1px solid
-  rgba(120,140,190,.24);
-
-  background:
-  linear-gradient(
-    120deg,
-    #0c1930,
-    #101a35
-  );
-
-  padding:20px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  gap:20px;
-}
-
-.professional-left{
-  display:flex;
-
-  align-items:center;
-
-  gap:15px;
-}
-
-.rocket{
-  width:62px;
-  height:62px;
-
-  border-radius:18px;
-
-  background:
-  linear-gradient(
-    145deg,
-    #4e20a6,
-    #28106c
-  );
-
-  display:flex;
-
-  align-items:center;
-  justify-content:center;
-
-  font-size:30px;
-}
-
-.professional h3{
-  font-size:18px;
-
-  margin-bottom:5px;
-}
-
-.professional p{
-  color:#aab5ce;
-
-  font-size:14px;
-}
-
-.create-btn{
-  padding:
-  14px 20px;
-
-  border-radius:25px;
-
-  white-space:nowrap;
-}
-
-
-/* =========================
-   BOTTOM NAV
-========================= */
-
-.bottom-nav{
-  position:fixed;
-
-  left:0;
-  right:0;
-  bottom:0;
-
-  z-index:100;
-
-  height:82px;
-
-  background:
-  rgba(7,13,27,.96);
-
-  backdrop-filter:blur(18px);
-
-  border-top:
-  1px solid
-  rgba(120,140,190,.18);
-}
-
-.bottom-inner{
-  max-width:900px;
-
-  height:100%;
-
-  margin:auto;
-
-  display:grid;
-
-  grid-template-columns:
-  repeat(5,1fr);
-
-  align-items:center;
-}
-
-.nav-item{
-  border:none;
-
-  background:transparent;
-
-  color:#9aa8c7;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:4px;
-
-  font-size:12px;
-}
-
-.nav-icon{
-  font-size:24px;
-}
-
-.nav-item.active{
-  color:#8d17ff;
-}
-
-.publish{
-  width:58px;
-  height:58px;
-
-  border-radius:50%;
-
-  margin-top:-30px;
-
-  border:
-  5px solid
-  var(--bg);
-
-  background:
-  linear-gradient(
-    145deg,
-    #7b00ff,
-    #a900ff
-  );
-
-  color:white;
-
-  font-size:32px;
-
-  box-shadow:
-  0 8px 25px
-  rgba(126,0,255,.4);
-}
-
-/* =========================
-   RESPONSIVE TABLET
-========================= */
-
-@media(max-width:800px){
-
-  .categories{
-    grid-template-columns:
-    repeat(3,1fr);
-  }
-
-  .businesses{
-    grid-template-columns:
-    repeat(2,1fr);
-  }
-
-  .hero h2{
-    font-size:29px;
-  }
-
-}
-
-
-/* =========================
-   RESPONSIVE MOBILE
-========================= */
-
-@media(max-width:600px){
-
-  .header{
-    padding:
-    18px 14px 10px;
-  }
-
-  main{
-    padding:
-    10px 12px 0;
-  }
-
-  .brand-logo{
-    width:49px;
-    height:49px;
-
-    font-size:25px;
-  }
-
-  .brand-text h1{
-    font-size:29px;
-  }
-
-  .brand-text p{
-    font-size:11px;
-  }
-
-  .header-actions{
-    gap:7px;
-  }
-
-  .icon-btn,
-  .profile-btn{
-    width:45px;
-    height:45px;
-  }
-
-  .hero{
-    padding:23px 20px;
-
-    min-height:250px;
-  }
-
-  .hero h2{
-    font-size:27px;
-  }
-
-  .hero p{
-    font-size:16px;
-  }
-
-  .categories{
-    gap:10px;
-  }
-
-  .category-icon{
-    border-radius:20px;
-
-    font-size:29px;
-  }
-
-  .category-name{
-    font-size:13px;
-  }
-
-  .section-title{
-    font-size:21px;
-  }
-
-  .businesses{
-
-    display:flex;
-
-    overflow-x:auto;
-
-    scroll-snap-type:x mandatory;
-
-    padding-bottom:8px;
-
-    margin-right:-12px;
-
-    padding-right:12px;
-  }
-
-  .business-card{
-    min-width:285px;
-
-    scroll-snap-align:start;
-  }
-
-  .business-image{
-    height:170px;
-  }
-
-  .professional{
-    flex-direction:column;
-
-    align-items:stretch;
-  }
-
-  .professional-left{
-    align-items:flex-start;
-  }
-
-  .create-btn{
-    width:100%;
-  }
-
-}
-
-
-/* =========================
-   SMALL PHONE
-========================= */
-
-@media(max-width:390px){
-
-  .brand-text p{
-    display:none;
-  }
-
-  .brand-text h1{
-    font-size:27px;
-  }
-
-  .hero h2{
-    font-size:25px;
-  }
-
-  .category-icon{
-    border-radius:17px;
-  }
-
-  .category-name{
-    font-size:12px;
-  }
-
-}
-
 </style>
 </head>
-
 <body>
-
-
-<!-- =========================
-     HEADER
-========================= -->
-
 <header class="header">
-
   <div class="header-inner">
-
-    <a href="index.html" class="brand">
-
-      <div class="brand-logo">
-        🤝
+    <a class="brand" href="index.html">
+      <div class="logo" aria-label="HELPY">
+        <svg viewBox="0 0 48 48"><path d="M8 24l7-7 8 7 5-5 12 10-8 8-9-7-5 5-10-8z"/><path d="M15 31l-4-4m10 9l-5-4m12 5l-5-4"/><path d="M23 24l4-4a4 4 0 0 1 6 0l2 2"/></svg>
       </div>
-
-      <div class="brand-text">
-
-        <h1>
-          HELP<span>Y</span>
-        </h1>
-
-        <p>
-          Tout services. Tout business.
-          En un seul endroit.
-        </p>
-
-      </div>
-
+      <div><h1>HELP<span>Y</span></h1><p>Tout services. Tout business. En un seul endroit.</p></div>
     </a>
-
-
-    <div class="header-actions">
-
-      <button
-        class="icon-btn"
-        type="button"
-        onclick="showNotification()"
-        aria-label="Notifications">
-
-        🔔
-
-        <span class="notification-dot"></span>
-
+    <div class="actions">
+      <button class="circle" onclick="notify()" aria-label="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="dot"></span>
       </button>
-
-
-      <button
-        class="profile-btn"
-        type="button"
-        onclick="goToProfile()"
-        aria-label="Profil">
-
-        👤
-
+      <button class="circle profile" onclick="location.href='login.html'" aria-label="Profil">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.8-4 3-6 7-6s6.2 2 7 6"/></svg>
       </button>
-
     </div>
-
   </div>
-
 </header>
 
-
 <main>
+  <section class="hero">
+    <div class="hero-copy">
+      <h2>Bienvenue sur <span>HELPY</span> !</h2>
+      <p>Trouvez facilement des services, des commerces et des professionnels près de chez vous.</p>
+      <button class="primary" onclick="focusSearch()">⌕ &nbsp; Explorer maintenant</button>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="glow"></div>
+      <div class="float f1"><svg viewBox="0 0 24 24"><path d="M4 10h16v10H4zM6 10V7h4v3m4 0V7h4v3M3 20h18"/></svg></div>
+      <div class="float f2"><svg viewBox="0 0 24 24"><path d="M3 4h18v13H3zM7 20h10M9 17v3m6-3v3"/></svg></div>
+      <div class="float f3"><svg viewBox="0 0 24 24"><path d="M14 6l4 4M4 20l5-1 9-9-4-4-9 9zM13 7l4 4"/></svg></div>
+      <div class="float f4"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 7V4h8v3M9 11h6"/></svg></div>
+      <div class="person"></div><div class="phone"></div>
+    </div>
+  </section>
 
-<!-- =========================
-     HERO
-========================= -->
-
-<section class="hero">
-
-  <div class="hero-content">
-
-    <h2>
-      Bienvenue sur
-      <span>HELPY</span> !
-    </h2>
-
-    <p>
-      Trouvez facilement des services,
-      des commerces et des professionnels
-      près de chez vous.
-    </p>
-
-    <button
-      class="hero-btn"
-      onclick="focusSearch()">
-
-      🔍 &nbsp; Explorer maintenant
-
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="M16 16l5 5"/></svg>
+    <input id="searchInput" type="search" placeholder="Rechercher un service, un commerce, une catégorie..." autocomplete="off">
+    <button class="filter" onclick="showFilters()" aria-label="Filtres">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>
     </button>
-
   </div>
 
-</section>
+  <section class="categories">
+    <button class="category" onclick="filterCategory('Restaurant')"><div class="cat-icon c1"><svg viewBox="0 0 24 24"><path d="M6 3v8m3-8v8m-3 0c0 2 3 2 3 0M7.5 11v10M15 3v18m0-18c4 1 4 7 0 7"/></svg></div><span class="cat-name">Restaurants</span></button>
+    <button class="category" onclick="filterCategory('Magasin')"><div class="cat-icon c2"><svg viewBox="0 0 24 24"><path d="M4 5h2l2 11h9l2-8H7"/><circle cx="10" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg></div><span class="cat-name">Magasins</span></button>
+    <button class="category" onclick="filterCategory('Logement')"><div class="cat-icon c3"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3zM9 20v-6h6v6"/></svg></div><span class="cat-name">Logement</span></button>
+    <button class="category" onclick="filterCategory('Transport')"><div class="cat-icon c4"><svg viewBox="0 0 24 24"><path d="M5 17l1-7 2-4h8l2 4 1 7M4 17h16M7 13h10"/><circle cx="7" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/></svg></div><span class="cat-name">Transport</span></button>
+    <button class="category" onclick="filterCategory('Service')"><div class="cat-icon c5"><svg viewBox="0 0 24 24"><path d="M14 6a5 5 0 0 0-6 6L3 17l4 4 5-5a5 5 0 0 0 6-6l-3 3-4-4z"/></svg></div><span class="cat-name">Services</span></button>
+    <button class="category" onclick="filterCategory('')"><div class="cat-icon c6"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="white"/><circle cx="12" cy="12" r="1.5" fill="white"/><circle cx="19" cy="12" r="1.5" fill="white"/></svg></div><span class="cat-name">Autres</span></button>
+  </section>
 
-
-<!-- =========================
-     SEARCH
-========================= -->
-
-<div class="search-wrapper">
-
-  <span class="search-icon">
-    ⌕
-  </span>
-
-  <input
-    id="searchInput"
-    class="search-input"
-    type="search"
-    placeholder="Rechercher un service, un commerce, une catégorie..."
-    autocomplete="off">
-
-  <button
-    class="filter-btn"
-    type="button"
-    onclick="showFilters()"
-    aria-label="Filtres">
-
-    ☷
-
-  </button>
-
-</div>
-
-
-<!-- =========================
-     CATEGORIES
-========================= -->
-
-<section class="categories">
-
-
-  <button
-    class="category"
-    onclick="filterCategory('Restaurant')">
-
-    <div class="category-icon">
-      🍽️
-    </div>
-
-    <span class="category-name">
-      Restaurants
-    </span>
-
-  </button>
-
-
-  <button
-    class="category"
-    onclick="filterCategory('Magasin')">
-
-    <div class="category-icon">
-      🛒
-    </div>
-
-    <span class="category-name">
-      Magasins
-    </span>
-
-  </button>
-
-
-  <button
-    class="category"
-    onclick="filterCategory('Logement')">
-
-    <div class="category-icon">
-      🏠
-    </div>
-
-    <span class="category-name">
-      Logement
-    </span>
-
-  </button>
-
-
-  <button
-    class="category"
-    onclick="filterCategory('Transport')">
-
-    <div class="category-icon">
-      🚗
-    </div>
-
-    <span class="category-name">
-      Transport
-    </span>
-
-  </button>
-
-
-  <button
-    class="category"
-    onclick="filterCategory('Service')">
-
-    <div class="category-icon">
-      🔧
-    </div>
-
-    <span class="category-name">
-      Services
-    </span>
-
-  </button>
-
-
-  <button
-    class="category"
-    onclick="filterCategory('')">
-
-    <div class="category-icon">
-      •••
-    </div>
-
-    <span class="category-name">
-      Autres
-    </span>
-
-  </button>
-
-
-</section>
-
-
-<!-- =========================
-     BUSINESS HEADER
-========================= -->
-
-<div class="section-header">
-
-  <h2 class="section-title">
-
-    <span>🔥</span>
-
-    Entreprises en vedette
-
-  </h2>
-
-
-  <button
-    class="see-all"
-    onclick="showAllBusinesses()">
-
-    Voir tout ›
-
-  </button>
-
-</div>
-
-
-<!-- =========================
-     BUSINESS LIST
-========================= -->
-
-<section
-  id="businessList"
-  class="businesses">
-
-  <div class="loading">
-
-    <div class="spinner"></div>
-
-    Chargement des entreprises...
-
+  <div class="section-head">
+    <h2 class="section-title"><span class="fire">ϟ</span> Entreprises en vedette</h2>
+    <button class="see" onclick="showAllBusinesses()">Voir tout ›</button>
   </div>
 
-</section>
+  <section id="businessList" class="businesses"><div class="empty"><div class="empty-icon">⏳</div>Chargement des entreprises...</div></section>
 
-
-<!-- =========================
-     PROFESSIONAL
-========================= -->
-
-<section class="professional">
-
-  <div class="professional-left">
-
-    <div class="rocket">
-      🚀
-    </div>
-
-    <div>
-
-      <h3>
-        Vous êtes un professionnel ?
-      </h3>
-
-      <p>
-        Rejoignez HELPY et développez
-        votre activité. Touchez plus de
-        clients, facilement.
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <button
-    class="create-btn"
-    onclick="createBusiness()">
-
-    Créer mon espace &nbsp;›
-
-  </button>
-
-</section>
-
-
+  <section class="professional">
+    <div class="prof-left"><div class="rocket">🚀</div><div class="prof"><h3>Vous êtes un professionnel ?</h3><p>Rejoignez HELPY et développez votre activité.</p></div></div>
+    <button class="primary" onclick="createBusiness()">Créer mon espace ›</button>
+  </section>
 </main>
 
-
-<!-- =========================
-     BOTTOM NAVIGATION
-========================= -->
-
-<nav class="bottom-nav">
-
+<nav class="bottom">
   <div class="bottom-inner">
-
-
-    <button
-      class="nav-item active"
-      onclick="goHome()">
-
-      <span class="nav-icon">
-        ⌂
-      </span>
-
-      <span>
-        Accueil
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-item"
-      onclick="focusSearch()">
-
-      <span class="nav-icon">
-        ⌕
-      </span>
-
-      <span>
-        Rechercher
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-item"
-      onclick="createBusiness()">
-
-      <span class="publish">
-        +
-      </span>
-
-      <span>
-        Publier
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-item"
-      onclick="showFavorites()">
-
-      <span class="nav-icon">
-        ♡
-      </span>
-
-      <span>
-        Favoris
-      </span>
-
-    </button>
-
-
-    <button
-      class="nav-item"
-      onclick="goToProfile()">
-
-      <span class="nav-icon">
-        ♙
-      </span>
-
-      <span>
-        Profil
-      </span>
-
-    </button>
-
-
+    <button class="nav active" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9H5v-9m5 9v-6h4v6"/></svg><span>Accueil</span></button>
+    <button class="nav" onclick="focusSearch()"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="M16 16l5 5"/></svg><span>Rechercher</span></button>
+    <button class="nav" onclick="createBusiness()"><span class="publish">+</span><span>Publier</span></button>
+    <button class="nav" onclick="showFavorites()"><svg viewBox="0 0 24 24"><path d="M20 8c0 5-8 11-8 11S4 13 4 8a4 4 0 0 1 7-2 4 4 0 0 1 9 2z"/></svg><span>Favoris</span></button>
+    <button class="nav" onclick="location.href='login.html'"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.8-4 3-6 7-6s6.2 2 7 6"/></svg><span>Profil</span></button>
   </div>
-
 </nav>
 
-
 <script>
-
-/* =========================
-   HELPY API
-========================= */
-
-const API_BASE_URL =
-  window.location.hostname.includes("railway.app")
-    ? window.location.origin
-    : "https://helpy-production-c2f2.up.railway.app";
-
-
-let allBusinesses = [];
-
-let currentCategory = "";
-
-let currentSearch = "";
-
-
-const businessList =
-  document.getElementById(
-    "businessList"
-  );
-
-
-const searchInput =
-  document.getElementById(
-    "searchInput"
-  );
-
-
-/* =========================
-   LOAD BUSINESSES
-========================= */
+const API_BASE_URL=window.location.hostname.includes("railway.app")?window.location.origin:"https://helpy-production-c2f2.up.railway.app";
+let allBusinesses=[],currentCategory="",currentSearch="";
+const list=document.getElementById("businessList"),input=document.getElementById("searchInput");
 
 async function loadBusinesses(){
-
-  businessList.innerHTML = `
-
-    <div class="loading">
-
-      <div class="spinner"></div>
-
-      Chargement des entreprises...
-
-    </div>
-
-  `;
-
-
+  list.innerHTML='<div class="empty"><div class="empty-icon">⏳</div>Chargement des entreprises...</div>';
   try{
-
-    const response =
-      await fetch(
-        API_BASE_URL +
-        "/api/businesses"
-      );
-
-
-    if(!response.ok){
-
-      throw new Error(
-        "Erreur API : " +
-        response.status
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if(Array.isArray(data)){
-
-      allBusinesses = data;
-
-    }
-
-    else if(
-      Array.isArray(
-        data.entreprises
-      )
-    ){
-
-      allBusinesses =
-        data.entreprises;
-
-    }
-
-    else if(
-      Array.isArray(
-        data.businesses
-      )
-    ){
-
-      allBusinesses =
-        data.businesses;
-
-    }
-
-    else if(
-      Array.isArray(
-        data.data
-      )
-    ){
-
-      allBusinesses =
-        data.data;
-
-    }
-
-    else{
-
-      allBusinesses = [];
-
-    }
-
-
-    renderBusinesses(
-      allBusinesses
-    );
-
-
+    const r=await fetch(API_BASE_URL+"/api/businesses");
+    const d=await r.json();
+    allBusinesses=Array.isArray(d)?d:(d.entreprises||d.businesses||d.data||[]);
+    renderBusinesses(allBusinesses);
+  }catch(e){
+    list.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><h3>Impossible de charger les entreprises</h3><p style="margin-top:7px">Vérifiez la connexion au serveur HELPY.</p><button class="primary" style="margin-top:16px" onclick="loadBusinesses()">Réessayer</button></div>';
   }
-
-  catch(error){
-
-    console.error(
-      "HELPY API ERROR:",
-      error
-    );
-
-
-    businessList.innerHTML = `
-
-      <div class="empty">
-
-        <div class="empty-icon">
-          ⚠️
-        </div>
-
-        <h3>
-          Impossible de charger
-          les entreprises
-        </h3>
-
-        <p style="margin-top:8px;">
-
-          Vérifiez la connexion
-          au serveur HELPY.
-
-        </p>
-
-
-        <button
-          class="hero-btn"
-          style="margin-top:18px;"
-          onclick="loadBusinesses()">
-
-          Réessayer
-
-        </button>
-
-      </div>
-
-    `;
-
-  }
-
 }
-
-
-/* =========================
-   RENDER BUSINESSES
-========================= */
-
-function renderBusinesses(
-  businesses
-){
-
-  businessList.innerHTML = "";
-
-
-  if(
-    !businesses ||
-    businesses.length === 0
-  ){
-
-    businessList.innerHTML = `
-
-      <div class="empty">
-
-        <div class="empty-icon">
-          🏪
-        </div>
-
-        <h3>
-          Aucune entreprise
-          pour le moment
-        </h3>
-
-        <p style="margin-top:8px;">
-
-          Soyez le premier
-          professionnel à rejoindre
-          HELPY.
-
-        </p>
-
-
-        <button
-          class="hero-btn"
-          style="margin-top:18px;"
-          onclick="createBusiness()">
-
-          Ajouter mon entreprise
-
-        </button>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  businesses.forEach(
-    business => {
-
-      businessList.appendChild(
-        createBusinessCard(
-          business
-        )
-      );
-
-    }
-  );
-
+function renderBusinesses(items){
+  list.innerHTML="";
+  if(!items.length){list.innerHTML='<div class="empty"><div class="empty-icon">🏪</div><h3>Aucune entreprise pour le moment</h3><p style="margin-top:7px">Soyez le premier professionnel à rejoindre HELPY.</p><button class="primary" style="margin-top:16px" onclick="createBusiness()">Ajouter mon entreprise</button></div>';return}
+  items.forEach(b=>list.appendChild(card(b)));
 }
-
-
-/* =========================
-   BUSINESS CARD
-========================= */
-
-function createBusinessCard(
-  business
-){
-
-  const name =
-    business.name ||
-    business.nom ||
-    business.business_name ||
-    business.company_name ||
-    business.title ||
-    "Entreprise HELPY";
-
-
-  const category =
-    business.category ||
-    business.categorie ||
-    business.type ||
-    "Service";
-
-
-  const description =
-    business.description ||
-    business.desc ||
-    "Découvrez les services proposés par cette entreprise sur HELPY.";
-
-
-  const location =
-    business.location ||
-    business.localisation ||
-    business.address ||
-    business.adresse ||
-    "Haïti";
-
-
-  const image =
-    business.image_url ||
-    business.image ||
-    business.photo ||
-    business.logo ||
-    "";
-
-
-  const whatsapp =
-    business.whatsapp ||
-    business.phone ||
-    business.telephone ||
-    business.phone_number ||
-    "";
-
-
-  const rating =
-    business.rating ||
-    business.note ||
-    "—";
-
-
-  const reviews =
-    business.reviews ||
-    business.review_count ||
-    business.avis ||
-    0;
-
-
-  let imageHTML = "";
-
-
-  if(image){
-
-    imageHTML = `
-
-      <img
-        src="${escapeHTML(image)}"
-        alt="${escapeHTML(name)}"
-        loading="lazy"
-
-        onerror="
-          this.style.display='none';
-          this.nextElementSibling.style.display='flex';
-        "
-      >
-
-      <div
-        class="image-placeholder"
-        style="display:none;">
-
-        🏪
-
-      </div>
-
-    `;
-
-  }
-
-  else{
-
-    imageHTML = `
-
-      <div class="image-placeholder">
-
-        🏪
-
-      </div>
-
-    `;
-
-  }
-
-
-  const card =
-    document.createElement(
-      "article"
-    );
-
-
-  card.className =
-    "business-card";
-
-
-  card.innerHTML = `
-
-    <div class="business-image">
-
-      ${imageHTML}
-
-      <span
-        class="business-category">
-
-        ${categoryIcon(category)}
-
-        ${escapeHTML(category)}
-
-      </span>
-
-    </div>
-
-
-    <div class="business-content">
-
-
-      <h3 class="business-name">
-
-        ${escapeHTML(name)}
-
-      </h3>
-
-
-      <div class="rating">
-
-        <span class="star">
-          ★
-        </span>
-
-        <strong>
-          ${escapeHTML(
-            String(rating)
-          )}
-        </strong>
-
-        <span class="reviews">
-
-          (${escapeHTML(
-            String(reviews)
-          )} avis)
-
-        </span>
-
-      </div>
-
-
-      <div class="location">
-
-        📍
-        ${escapeHTML(location)}
-
-      </div>
-
-
-      <p class="description">
-
-        ${escapeHTML(
-          truncate(
-            description,
-            100
-          )
-        )}
-
-      </p>
-
-
-      <button
-        class="contact-btn"
-
-        onclick="
-          contactBusiness(
-            ${JSON.stringify(whatsapp)},
-            ${JSON.stringify(name)}
-          )
-        ">
-
-        ☎ &nbsp; Contacter
-
-      </button>
-
-
-    </div>
-
-  `;
-
-
-  return card;
-
+function val(b,...keys){for(const k of keys)if(b?.[k])return b[k];return ""}
+function icon(cat){const c=String(cat).toLowerCase();if(c.includes("restaurant"))return"🍽️";if(c.includes("magasin")||c.includes("commerce"))return"🛒";if(c.includes("logement")||c.includes("immobilier"))return"🏠";if(c.includes("transport"))return"🚗";return"🔧"}
+function card(b){
+  const name=val(b,"name","nom","business_name","company_name","title")||"Entreprise HELPY";
+  const cat=val(b,"category","categorie","type")||"Service";
+  const desc=val(b,"description","desc")||"Découvrez les services proposés par cette entreprise sur HELPY.";
+  const loc=val(b,"location","localisation","address","adresse")||"Haïti";
+  const img=val(b,"image_url","image","photo","logo");
+  const phone=val(b,"whatsapp","phone","telephone","phone_number");
+  const rating=val(b,"rating","note")||"—",reviews=val(b,"reviews","review_count","avis")||0;
+  const el=document.createElement("article");el.className="card";
+  el.innerHTML=`<div class="card-image">${img?`<img src="${esc(img)}" alt="${esc(name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}<div class="placeholder" ${img?'style="display:none"':''}>${icon(cat)}</div><span class="badge">${icon(cat)} ${esc(cat)}</span></div><div class="card-body"><h3>${esc(name)}</h3><div class="rating"><span class="star">★</span><b>${esc(String(rating))}</b><span class="reviews">(${esc(String(reviews))} avis)</span></div><div class="loc">⌖ ${esc(loc)}</div><p class="desc">${esc(truncate(desc,105))}</p><button class="contact" onclick='contactBusiness(${JSON.stringify(String(phone))},${JSON.stringify(String(name))})'>☎ &nbsp; Contacter</button></div>`;
+  return el;
 }
-
-/* =========================
-   CATEGORY ICON
-========================= */
-
-function categoryIcon(
-  category
-){
-
-  const c =
-    String(category)
-    .toLowerCase();
-
-
-  if(
-    c.includes("restaurant") ||
-    c.includes("resto") ||
-    c.includes("food")
-  ){
-
-    return "🍽️";
-
-  }
-
-
-  if(
-    c.includes("magasin") ||
-    c.includes("shop") ||
-    c.includes("commerce")
-  ){
-
-    return "🛒";
-
-  }
-
-
-  if(
-    c.includes("logement") ||
-    c.includes("immobilier") ||
-    c.includes("maison") ||
-    c.includes("hotel")
-  ){
-
-    return "🏠";
-
-  }
-
-
-  if(
-    c.includes("transport") ||
-    c.includes("auto") ||
-    c.includes("voiture")
-  ){
-
-    return "🚗";
-
-  }
-
-
-  if(
-    c.includes("informatique") ||
-    c.includes("tech")
-  ){
-
-    return "💻";
-
-  }
-
-
-  return "🔧";
-
-}
-
-
-/* =========================
-   SEARCH
-========================= */
-
-searchInput.addEventListener(
-  "input",
-  function(){
-
-    currentSearch =
-      this.value
-      .trim()
-      .toLowerCase();
-
-
-    filterBusinesses();
-
-  }
-);
-
-
-/* =========================
-   FILTER BUSINESSES
-========================= */
-
+function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function truncate(t,n){t=String(t||"");return t.length>n?t.slice(0,n)+"…":t}
 function filterBusinesses(){
-
-  let filtered =
-    allBusinesses;
-
-
-  if(currentSearch){
-
-    filtered =
-      filtered.filter(
-        business => {
-
-          const text = `
-
-            ${business.name || ""}
-
-            ${business.nom || ""}
-
-            ${business.business_name || ""}
-
-            ${business.category || ""}
-
-            ${business.categorie || ""}
-
-            ${business.description || ""}
-
-            ${business.location || ""}
-
-            ${business.address || ""}
-
-          `.toLowerCase();
-
-
-          return text.includes(
-            currentSearch
-          );
-
-        }
-      );
-
-  }
-
-
-  if(currentCategory){
-
-    filtered =
-      filtered.filter(
-        business => {
-
-          const category =
-            String(
-              business.category ||
-              business.categorie ||
-              business.type ||
-              ""
-            ).toLowerCase();
-
-
-          return category.includes(
-            currentCategory
-            .toLowerCase()
-          );
-
-        }
-      );
-
-  }
-
-
-  renderBusinesses(
-    filtered
-  );
-
+  let x=allBusinesses.filter(b=>{
+    const text=JSON.stringify(b).toLowerCase();
+    return (!currentSearch||text.includes(currentSearch))&&(!currentCategory||text.includes(currentCategory.toLowerCase()));
+  });renderBusinesses(x)
 }
-
-
-/* =========================
-   CATEGORY FILTER
-========================= */
-
-function filterCategory(
-  category
-){
-
-  currentCategory =
-    category;
-
-
-  currentSearch = "";
-
-
-  searchInput.value = "";
-
-
-  filterBusinesses();
-
-
-  document
-    .getElementById(
-      "businessList"
-    )
-    .scrollIntoView({
-
-      behavior:"smooth",
-
-      block:"start"
-
-    });
-
-}
-
-
-/* =========================
-   CONTACT BUSINESS
-========================= */
-
-function contactBusiness(
-  phone,
-  businessName
-){
-
-  if(!phone){
-
-    alert(
-      "Cette entreprise n'a pas encore ajouté de numéro de contact."
-    );
-
-    return;
-
-  }
-
-
-  let number =
-    String(phone)
-    .replace(/\D/g,"");
-
-
-  if(number.length === 8){
-
-    number =
-      "509" +
-      number;
-
-  }
-
-
-  const message =
-    encodeURIComponent(
-      "Bonjour " +
-      businessName +
-      ", je vous contacte depuis HELPY."
-    );
-
-
-  window.open(
-
-    "https://wa.me/" +
-    number +
-    "?text=" +
-    message,
-
-    "_blank"
-
-  );
-
-}
-
-
-/* =========================
-   CREATE BUSINESS
-========================= */
-
-function createBusiness(){
-
-  window.location.href =
-    "add-business.html";
-
-}
-
-
-/* =========================
-   PROFILE
-========================= */
-
-function goToProfile(){
-
-  window.location.href =
-    "login.html";
-
-}
-
-
-/* =========================
-   FAVORITES
-========================= */
-
-function showFavorites(){
-
-  const favorites =
-    JSON.parse(
-      localStorage.getItem(
-        "helpy_favorites"
-      ) || "[]"
-    );
-
-
-  if(
-    favorites.length === 0
-  ){
-
-    alert(
-      "Vous n'avez encore aucun favori."
-    );
-
-    return;
-
-  }
-
-
-  alert(
-    "Vous avez " +
-    favorites.length +
-    " favori(s)."
-  );
-
-}
-
-
-/* =========================
-   SEARCH FOCUS
-========================= */
-
-function focusSearch(){
-
-  searchInput.focus();
-
-
-  window.scrollTo({
-
-    top:0,
-
-    behavior:"smooth"
-
-  });
-
-}
-
-
-/* =========================
-   SHOW ALL
-========================= */
-
-function showAllBusinesses(){
-
-  currentCategory = "";
-
-  currentSearch = "";
-
-  searchInput.value = "";
-
-
-  renderBusinesses(
-    allBusinesses
-  );
-
-
-  document
-    .getElementById(
-      "businessList"
-    )
-    .scrollIntoView({
-
-      behavior:"smooth"
-
-    });
-
-}
-
-/* =========================
-   FILTERS
-========================= */
-
-function showFilters(){
-
-  alert(
-
-    "Filtres HELPY\n\n" +
-
-    "• Restaurants\n" +
-
-    "• Magasins\n" +
-
-    "• Logement\n" +
-
-    "• Transport\n" +
-
-    "• Services\n" +
-
-    "• Informatique\n" +
-
-    "• Autres"
-
-  );
-
-}
-
-
-/* =========================
-   NOTIFICATIONS
-========================= */
-
-function showNotification(){
-
-  alert(
-    "🔔 Aucune nouvelle notification pour le moment."
-  );
-
-}
-
-
-/* =========================
-   HOME
-========================= */
-
-function goHome(){
-
-  window.scrollTo({
-
-    top:0,
-
-    behavior:"smooth"
-
-  });
-
-}
-
-
-/* =========================
-   TRUNCATE TEXT
-========================= */
-
-function truncate(
-  text,
-  length
-){
-
-  text =
-    String(text || "");
-
-
-  return text.length <= length
-
-    ? text
-
-    : text.substring(
-        0,
-        length
-      ) + "...";
-
-}
-
-
-/* =========================
-   SECURITY
-========================= */
-
-function escapeHTML(
-  value
-){
-
-  return String(
-    value || ""
-  )
-
-  .replace(
-    /&/g,
-    "&amp;"
-  )
-
-  .replace(
-    /</g,
-    "&lt;"
-  )
-
-  .replace(
-    />/g,
-    "&gt;"
-  )
-
-  .replace(
-    /"/g,
-    "&quot;"
-  )
-
-  .replace(
-    /'/g,
-    "&#039;"
-  );
-
-}
-
-
-/* =========================
-   START HELPY
-========================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  loadBusinesses
-);
-
+input.addEventListener("input",e=>{currentSearch=e.target.value.trim().toLowerCase();filterBusinesses()});
+function filterCategory(c){currentCategory=c;currentSearch="";input.value="";filterBusinesses();document.getElementById("businessList").scrollIntoView({behavior:"smooth"})}
+function showAllBusinesses(){currentCategory="";currentSearch="";input.value="";renderBusinesses(allBusinesses);document.getElementById("businessList").scrollIntoView({behavior:"smooth"})}
+function contactBusiness(phone,name){if(!phone){alert("Cette entreprise n'a pas encore ajouté de numéro de contact.");return}let n=String(phone).replace(/\D/g,"");if(n.length===8)n="509"+n;open("https://wa.me/"+n+"?text="+encodeURIComponent("Bonjour "+name+", je vous contacte depuis HELPY."),"_blank")}
+function createBusiness(){location.href="add-business.html"}
+function focusSearch(){input.focus();input.scrollIntoView({behavior:"smooth",block:"center"})}
+function goHome(){scrollTo({top:0,behavior:"smooth"})}
+function notify(){alert("🔔 Aucune nouvelle notification pour le moment.")}
+function showFavorites(){alert("Vos favoris seront disponibles ici.")}
+function showFilters(){alert("Filtres HELPY : Restaurants • Magasins • Logement • Transport • Services • Autres")}
+document.addEventListener("DOMContentLoaded",loadBusinesses);
 </script>
-
 </body>
 </html>
