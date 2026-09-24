@@ -1,155 +1,161 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HElPY - Marketplace Ayiti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Tout services. Tout business.</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="app-header">
-    <a href="index.html" class="logo">HElPY.</a>
-    <a href="profile.html" class="profile-btn" id="user-avatar">👤</a>
-  </header>
-
-  <div class="container">
+  <div class="app-container">
     
-    <!-- Barre de recherche -->
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="search-input" placeholder="Kisa w ap chèche jodi a?" onkeypress="handleSearch(event)">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo">
+          <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
+          <span>HEL<span class="purple">PY</span></span>
+        </div>
+        <p class="tagline">Tout services. Tout business. En un seul endroit.</p>
+      </div>
+      <div class="header-actions">
+        <a href="messages.html" class="icon-btn">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge"></span>
+        </a>
+        <a href="profile.html" class="icon-btn">
+          <i class="fa-regular fa-user"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- BANNIÈRE HERO -->
+    <section class="hero-banner">
+      <div class="hero-content">
+        <h2 class="hero-title">Bienvenue sur <span>HELPY !</span></h2>
+        <p class="hero-text">Trouvez facilement des services, des commerces et des professionnels près de chez vous.</p>
+        <a href="search.html" class="btn-primary">
+          <i class="fa-solid fa-magnifying-glass"></i> Explorer maintenant
+        </a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80" alt="Services HELPY" class="hero-image">
+    </section>
+
+    <!-- BARRE DE RECHERCHE -->
+    <div class="search-bar" onclick="window.location.href='search.html'">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Rechercher un service, un commerce, une catégorie..." readonly>
+      <i class="fa-solid fa-sliders filter-icon"></i>
     </div>
 
-    <!-- Seksyon Catégories -->
-    <div class="categories-title">Kategori yo</div>
-    <div class="categories-grid">
-      <a href="listings.html?type=business" class="category-card">
-        <div class="category-icon">🏢</div>
-        <span class="category-label">Antrepriz</span>
+    <!-- CATÉGORIES -->
+    <section class="categories-grid">
+      <a href="search.html?cat=restaurants" class="category-card">
+        <div class="category-icon cat-restau"><i class="fa-solid fa-utensils"></i></div>
+        <span class="category-label">Restaurants</span>
       </a>
-      <a href="listings.html?type=product" class="category-card">
-        <div class="category-icon">📦</div>
-        <span class="category-label">Pwodwi</span>
+      <a href="search.html?cat=magasins" class="category-card">
+        <div class="category-icon cat-magasin"><i class="fa-solid fa-cart-shopping"></i></div>
+        <span class="category-label">Magasins</span>
       </a>
-      <a href="listings.html?type=service" class="category-card">
-        <div class="category-icon">🛠️</div>
-        <span class="category-label">Sèvis</span>
+      <a href="search.html?cat=logement" class="category-card">
+        <div class="category-icon cat-logement"><i class="fa-solid fa-house"></i></div>
+        <span class="category-label">Logement</span>
       </a>
-      <a href="listings.html?type=realestate" class="category-card">
-        <div class="category-icon">🏠</div>
-        <span class="category-label">Kay/Tè</span>
+      <a href="search.html?cat=transport" class="category-card">
+        <div class="category-icon cat-transport"><i class="fa-solid fa-car"></i></div>
+        <span class="category-label">Transport</span>
       </a>
-      <a href="listings.html?type=vehicle" class="category-card">
-        <div class="category-icon">🚗</div>
-        <span class="category-label">Machin</span>
+      <a href="search.html?cat=services" class="category-card">
+        <div class="category-icon cat-services"><i class="fa-solid fa-wrench"></i></div>
+        <span class="category-label">Services</span>
       </a>
-    </div>
+      <a href="search.html?cat=autres" class="category-card">
+        <div class="category-icon cat-autres"><i class="fa-solid fa-ellipsis"></i></div>
+        <span class="category-label">Autres</span>
+      </a>
+    </section>
 
-    <!-- Seksyon Feed -->
-    <div class="section-header">
-      <h2 class="section-title">Piblikasyon Resan</h2>
-    </div>
+    <!-- ENTREPRISES EN VEDETTE -->
+    <section>
+      <div class="section-header" style="margin-bottom: 12px;">
+        <h3 class="section-title"><i class="fa-solid fa-fire" style="color: var(--light-purple);"></i> Entreprises en vedette</h3>
+        <a href="search.html" class="see-all">Voir tout &gt;</a>
+      </div>
+      
+      <div class="cards-scroll" id="featured-businesses">
+        <!-- Rempli dynamiquement depuis l'API Railway -->
+      </div>
+    </section>
 
-    <div id="listings-feed" class="feed-grid">
-      <p style="text-align:center; color:var(--text-muted); padding:20px;">Chajman piblikasyon yo...</p>
-    </div>
+    <!-- SECTION PROFESSIONNEL -->
+    <section class="pro-card">
+      <div class="pro-info">
+        <div class="pro-icon"><i class="fa-solid fa-rocket"></i></div>
+        <div class="pro-text">
+          <h4>Vous êtes un professionnel ?</h4>
+          <p>Rejoignez HELPY et développez votre activité. Touchez plus de clients, facilement.</p>
+        </div>
+      </div>
+      <a href="publish.html" class="btn-primary" style="white-space: nowrap;">Créer mon espace &gt;</a>
+    </section>
 
   </div>
 
-  <!-- Bottom Navigation Mobile -->
+  <!-- NAVIGATION INFÉRIEURE MOBILE -->
   <nav class="bottom-nav">
     <a href="index.html" class="nav-item active">
-      <span class="nav-icon">⌂</span>
-      <span>Akèy</span>
+      <i class="fa-solid fa-house"></i>
+      <span>Accueil</span>
     </a>
     <a href="search.html" class="nav-item">
-      <span class="nav-icon">🔍</span>
-      <span>Rechèch</span>
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>Rechercher</span>
     </a>
-    <a href="publish.html" class="nav-item nav-item-publish">
-      <span class="nav-icon">+</span>
-      <span>Publier</span>
+    <a href="publish.html" class="nav-item nav-publish">
+      <div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div>
+      <span style="margin-top: 2px;">Publier</span>
     </a>
-    <a href="my-listings.html" class="nav-item">
-      <span class="nav-icon">❤️</span>
+    <a href="favorites.html" class="nav-item">
+      <i class="fa-regular fa-bookmark"></i>
       <span>Favoris</span>
     </a>
     <a href="profile.html" class="nav-item">
-      <span class="nav-icon">👤</span>
+      <i class="fa-regular fa-user"></i>
       <span>Profil</span>
     </a>
   </nav>
 
+  <script src="app.js"></script>
   <script>
-    const API_BASE = window.location.origin;
+    async function loadFeaturedBusinesses() {
+      const container = document.getElementById("featured-businesses");
+      const data = await apiFetch("/api/businesses");
 
-    // Fè rechèch ak Enter
-    function handleSearch(e) {
-      if (e.key === 'Enter') {
-        const query = document.getElementById('search-input').value;
-        if (query) window.location.href = `search.html?q=${encodeURIComponent(query)}`;
-      }
-    }
-
-    // Tcheke si moun nan konekte pou montre inisyal nan avatar an
-    const user = JSON.parse(localStorage.getItem('helpyUser'));
-    if (user && user.name) {
-      document.getElementById('user-avatar').innerText = user.name.charAt(0).toUpperCase();
-    }
-
-    // Chaje Feed la
-    async function loadFeed() {
-      try {
-        const res = await fetch(`${API_BASE}/api/listings`);
-        const data = await res.json();
-        const container = document.getElementById('listings-feed');
-        
-        if (!data.listings || data.listings.length === 0) {
-          container.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">Ankenn piblikasyon pou kounye a.</p>';
-          return;
-        }
-
-        container.innerHTML = data.listings.map(item => `
-          <div class="listing-card">
-            <div class="card-image-wrap" onclick="location.href='listing-details.html?id=${item.id}'">
-              <img src="${item.image_url || 'https://via.placeholder.com/400x200?text=HElPY'}" class="card-image" alt="${item.title}">
-              <span class="card-badge">${item.category || 'Pwodwi'}</span>
-              <div class="fav-btn" onclick="event.stopPropagation(); alert('Ajoute nan favoris!')">🤍</div>
+      if (data && data.length > 0) {
+        container.innerHTML = data.map(b => `
+          <div class="card">
+            <div class="card-img-container">
+              <img src="${b.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80'}" class="card-img" alt="${b.name}">
+              <div class="badge-cat"><i class="fa-solid fa-tag"></i> ${b.category || 'Entreprise'}</div>
             </div>
-            
             <div class="card-body">
-              <div class="card-title-row" onclick="location.href='listing-details.html?id=${item.id}'">
-                <h3 class="card-title">${item.title}</h3>
-                <span class="card-price">${item.price ? item.price + ' ' + item.currency : ''}</span>
-              </div>
-              
-              <div class="card-location">
-                📍 ${item.location || 'Ayiti'}
-              </div>
-
-              <div class="card-footer">
-                <div class="seller-info">
-                  <div class="seller-avatar">${(item.owner_name || 'U').charAt(0).toUpperCase()}</div>
-                  <span class="seller-name">${item.owner_name || 'Vandè'}</span>
-                </div>
-                
-                <div class="card-actions">
-                  ${item.whatsapp ? `<a href="https://wa.me/${item.whatsapp}" target="_blank" class="btn-sm-wa">WhatsApp</a>` : ''}
-                  <a href="listing-details.html?id=${item.id}" class="btn-sm-details">Détails</a>
-                </div>
-              </div>
+              <h4 class="card-title">${b.name}</h4>
+              <div class="card-rating">★ ${b.rating || '4.8'} <span>(${b.reviews_count || 10} avis)</span></div>
+              <div class="card-location"><i class="fa-solid fa-location-dot"></i> ${b.location || 'À proximité'}</div>
+              <p class="card-desc">${b.description || 'Découvrez nos services et produits de qualité.'}</p>
+              <a href="business-details.html?id=${b.id}" class="btn-contact"><i class="fa-solid fa-phone"></i> Contacter</a>
             </div>
           </div>
         `).join('');
-
-      } catch (err) {
-        document.getElementById('listings-feed').innerHTML = '<p style="text-align:center; color:red;">Erè pandan chajman piblikasyon yo.</p>';
+      } else {
+        container.innerHTML = '<div class="empty-state">Aucune entreprise disponible pour le moment.</div>';
       }
     }
 
-    loadFeed();
+    document.addEventListener("DOMContentLoaded", loadFeaturedBusinesses);
   </script>
 </body>
 </html>
