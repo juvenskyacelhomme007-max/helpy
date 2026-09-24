@@ -3,171 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY - Tout services. Tout business.</title>
+  <title>HELPY</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
   <div class="app-container">
-    
-    <!-- EN-TÊTE -->
-    <header class="header">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-badge"><i class="fa-solid fa-handshake"></i></div>
+        HELPY
+      </div>
       <div>
-        <div class="logo">
-          <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
-          <span>HEL<span style="color: var(--light-purple);">PY</span></span>
-        </div>
-        <p class="tagline">Tout services. Tout business. En un seul endroit.</p>
+        <a href="login.html" style="color: var(--primary); font-size: 14px; text-decoration: none; font-weight: 600;">Connexion</a>
       </div>
-      <div class="header-actions">
-        <a href="#" class="icon-btn"><i class="fa-regular fa-bell"></i></a>
-        <a href="profile.html" class="icon-btn"><i class="fa-regular fa-user"></i></a>
-      </div>
-    </header>
-
-    <!-- BANNIÈRE HERO -->
-    <section class="hero-banner">
-      <div class="hero-content">
-        <h2 class="hero-title">Bienvenue sur <span>HELPY !</span></h2>
-        <p class="hero-text">Trouvez facilement des services, des commerces et des professionnels près de chez vous.</p>
-        <a href="search.html" class="btn-primary">
-          <i class="fa-solid fa-magnifying-glass"></i> Explorer maintenant
-        </a>
-      </div>
-      <div class="hero-image-container">
-        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="HELPY" class="hero-img">
-      </div>
-    </section>
-
-    <!-- BARRE DE RECHERCHE -->
-    <div class="search-bar" onclick="window.location.href='search.html'">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Rechercher un service, un commerce, une catégorie..." readonly>
-      <i class="fa-solid fa-sliders"></i>
     </div>
 
-    <!-- GRILLE DES CATÉGORIES -->
-    <section class="categories-grid">
-      <a href="search.html?cat=restaurants" class="category-card">
-        <div class="category-icon cat-restau"><i class="fa-solid fa-utensils"></i></div>
-        <span class="category-label">Restaurants</span>
-      </a>
-      <a href="search.html?cat=magasins" class="category-card">
-        <div class="category-icon cat-magasin"><i class="fa-solid fa-cart-shopping"></i></div>
-        <span class="category-label">Magasins</span>
-      </a>
-      <a href="search.html?cat=logement" class="category-card">
-        <div class="category-icon cat-logement"><i class="fa-solid fa-house"></i></div>
-        <span class="category-label">Logement</span>
-      </a>
-      <a href="search.html?cat=transport" class="category-card">
-        <div class="category-icon cat-transport"><i class="fa-solid fa-car"></i></div>
-        <span class="category-label">Transport</span>
-      </a>
-      <a href="search.html?cat=services" class="category-card">
-        <div class="category-icon cat-services"><i class="fa-solid fa-wrench"></i></div>
-        <span class="category-label">Services</span>
-      </a>
-      <a href="search.html?cat=autres" class="category-card">
-        <div class="category-icon cat-autres"><i class="fa-solid fa-ellipsis"></i></div>
-        <span class="category-label">Autres</span>
-      </a>
-    </section>
+    <div class="hero-card">
+      <h1>Bienvenue sur HELPY !</h1>
+      <p>Trouvez facilement des services et professionnels près de chez vous.</p>
+    </div>
 
-    <!-- ENTREPRISES EN VEDETTE -->
-    <section>
-      <div class="section-header">
-        <h3 class="section-title"><i class="fa-solid fa-fire" style="color: #a855f7;"></i> Entreprises en vedette</h3>
-        <a href="search.html" class="see-all">Voir tout &gt;</a>
-      </div>
-      
-      <div class="cards-scroll">
-        <!-- CARTE 1 -->
-        <div class="card">
-          <div class="card-img-container">
-            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80" class="card-img" alt="Le Bon Goût">
-            <div class="badge-cat" style="background: #a855f7;"><i class="fa-solid fa-utensils"></i> Restaurant</div>
-          </div>
-          <div class="card-body">
-            <h4 class="card-title">Le Bon Goût</h4>
-            <div class="card-rating">★ 4.8 <span>(124 avis)</span></div>
-            <div class="card-location"><i class="fa-solid fa-location-dot"></i> À 2 min de chez vous</div>
-            <p class="card-desc">Cuisine délicieuse, ambiance chaleureuse et service rapide.</p>
-            <a href="#" class="btn-contact"><i class="fa-solid fa-phone"></i> Contacter</a>
-          </div>
-        </div>
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass" style="color: var(--text-gray);"></i>
+      <input type="text" placeholder="Rechercher un service, un commerce...">
+    </div>
 
-        <!-- CARTE 2 -->
-        <div class="card">
-          <div class="card-img-container">
-            <img src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=300&q=80" class="card-img" alt="Tech Solution">
-            <div class="badge-cat" style="background: #3b82f6;"><i class="fa-solid fa-laptop"></i> Informatique</div>
-          </div>
-          <div class="card-body">
-            <h4 class="card-title">Tech Solution</h4>
-            <div class="card-rating">★ 4.7 <span>(89 avis)</span></div>
-            <div class="card-location"><i class="fa-solid fa-location-dot"></i> À 5 min de chez vous</div>
-            <p class="card-desc">Vente et réparation d'ordinateurs, accessoires et solutions IT.</p>
-            <a href="#" class="btn-contact"><i class="fa-solid fa-phone"></i> Contacter</a>
-          </div>
-        </div>
-
-        <!-- CARTE 3 -->
-        <div class="card">
-          <div class="card-img-container">
-            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=300&q=80" class="card-img" alt="Villa Prestige">
-            <div class="badge-cat" style="background: #10b981;"><i class="fa-solid fa-house"></i> Immobilier</div>
-          </div>
-          <div class="card-body">
-            <h4 class="card-title">Villa Prestige</h4>
-            <div class="card-rating">★ 4.6 <span>(76 avis)</span></div>
-            <div class="card-location"><i class="fa-solid fa-location-dot"></i> À 8 min de chez vous</div>
-            <p class="card-desc">Locations et ventes de maisons et appartements de standing.</p>
-            <a href="#" class="btn-contact"><i class="fa-solid fa-phone"></i> Contacter</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CARTE PROFESSIONNEL -->
-    <section class="pro-card">
-      <div class="pro-info">
-        <div class="pro-icon"><i class="fa-solid fa-rocket"></i></div>
-        <div class="pro-text">
-          <h4>Vous êtes un professionnel ?</h4>
-          <p>Rejoignez HELPY et développez votre activité. Touchez plus de clients, facilement.</p>
-        </div>
-      </div>
-      <a href="publish.html" class="btn-primary" style="white-space: nowrap; font-size: 10px; padding: 6px 12px;">Créer mon espace &gt;</a>
-    </section>
-
+    <div class="section-title">Catégories</div>
+    <div class="categories-grid">
+      <div class="category-chip"><i class="fa-solid fa-utensils"></i> Restaurants</div>
+      <div class="category-chip"><i class="fa-solid fa-bag-shopping"></i> Magasins</div>
+      <div class="category-chip"><i class="fa-solid fa-house"></i> Logement</div>
+      <div class="category-chip"><i class="fa-solid fa-wrench"></i> Services</div>
+    </div>
   </div>
 
-  <!-- NAVIGATION INFÉRIEURE -->
-  <nav class="bottom-nav">
+  <div class="bottom-nav">
     <a href="index.html" class="nav-item active">
       <i class="fa-solid fa-house"></i>
       <span>Accueil</span>
     </a>
-    <a href="search.html" class="nav-item">
+    <a href="#" class="nav-item">
       <i class="fa-solid fa-magnifying-glass"></i>
       <span>Rechercher</span>
     </a>
-    <a href="publish.html" class="nav-item">
-      <div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div>
+    <a href="#" class="nav-item">
+      <i class="fa-solid fa-plus-circle" style="font-size: 22px; color: var(--primary);"></i>
       <span>Publier</span>
     </a>
-    <a href="favorites.html" class="nav-item">
-      <i class="fa-regular fa-bookmark"></i>
-      <span>Favoris</span>
-    </a>
-    <a href="profile.html" class="nav-item">
-      <i class="fa-regular fa-user"></i>
+    <a href="register.html" class="nav-item">
+      <i class="fa-solid fa-user"></i>
       <span>Profil</span>
     </a>
-  </nav>
+  </div>
 
-  <script src="app.js"></script>
 </body>
 </html>
