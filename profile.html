@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+    <button onclick="logout()" class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Déconnexion</button>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Modifier Mon Profil</h2>
+      <form id="profile-form" class="mt-4">
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input type="text" id="name">
+        </div>
+        <div class="form-group">
+          <label>Téléphone</label>
+          <input type="tel" id="phone">
+        </div>
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="tel" id="whatsapp">
+        </div>
+        <div class="form-group">
+          <label>URL Photo de Profil</label>
+          <input type="url" id="photo_url">
+        </div>
+        <div class="form-group">
+          <label>Localisation</label>
+          <input type="text" id="location">
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea id="bio" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn">Mettre à jour</button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item active">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+
+    if (!user) {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('name').value = user.name || '';
+      document.getElementById('phone').value = user.phone || '';
+      document.getElementById('whatsapp').value = user.whatsapp || '';
+      document.getElementById('photo_url').value = user.photo_url || '';
+      document.getElementById('location').value = user.location || '';
+      document.getElementById('bio').value = user.bio || '';
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        whatsapp: document.getElementById('whatsapp').value,
+        photo_url: document.getElementById('photo_url').value,
+        location: document.getElementById('location').value,
+        bio: document.getElementById('bio').value
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': user.id
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          localStorage.setItem('helpyUser', JSON.stringify(data.user));
+          alert('Profil mis à jour!');
+        } else {
+          alert(data.error);
+        }
+      } catch (err) {
+        alert('Erreur réseau');
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem('helpyUser');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
