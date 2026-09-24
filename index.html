@@ -1,62 +1,211 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <div class="app-container">
-    <div class="header">
-      <div class="logo">
-        <div class="logo-badge"><i class="fa-solid fa-handshake"></i></div>
-        HELPY
-      </div>
-      <div>
-        <a href="login.html" style="color: var(--primary); font-size: 14px; text-decoration: none; font-weight: 600;">Connexion</a>
-      </div>
-    </div>
+<title>HELPY — Services, commerces et professionnels</title>
 
-    <div class="hero-card">
-      <h1>Bienvenue sur HELPY !</h1>
-      <p>Trouvez facilement des services et professionnels près de chez vous.</p>
-    </div>
+<meta name="description"
+content="HELPY — Trouvez facilement des services, commerces et professionnels près de chez vous.">
 
-    <div class="search-box">
-      <i class="fa-solid fa-magnifying-glass" style="color: var(--text-gray);"></i>
-      <input type="text" placeholder="Rechercher un service, un commerce...">
-    </div>
+<meta name="theme-color" content="#050a16">
 
-    <div class="section-title">Catégories</div>
-    <div class="categories-grid">
-      <div class="category-chip"><i class="fa-solid fa-utensils"></i> Restaurants</div>
-      <div class="category-chip"><i class="fa-solid fa-bag-shopping"></i> Magasins</div>
-      <div class="category-chip"><i class="fa-solid fa-house"></i> Logement</div>
-      <div class="category-chip"><i class="fa-solid fa-wrench"></i> Services</div>
-    </div>
-  </div>
+<style>
 
-  <div class="bottom-nav">
-    <a href="index.html" class="nav-item active">
-      <i class="fa-solid fa-house"></i>
-      <span>Accueil</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <span>Rechercher</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fa-solid fa-plus-circle" style="font-size: 22px; color: var(--primary);"></i>
-      <span>Publier</span>
-    </a>
-    <a href="register.html" class="nav-item">
-      <i class="fa-solid fa-user"></i>
-      <span>Profil</span>
-    </a>
-  </div>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-</body>
-</html>
+:root{
+  --bg:#050a16;
+  --card:#0c1629;
+  --card2:#111d33;
+  --border:rgba(125,140,190,.25);
+  --purple:#7b12ff;
+  --purple2:#a000ff;
+  --text:#edf2ff;
+  --muted:#9ba9c8;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:
+  Inter,
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  Roboto,
+  Arial,
+  sans-serif;
+
+  background:
+  radial-gradient(
+    circle at 50% -10%,
+    rgba(100,0,255,.15),
+    transparent 35%
+  ),
+  var(--bg);
+
+  color:var(--text);
+  min-height:100vh;
+  padding-bottom:100px;
+}
+
+button,
+input{
+  font-family:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  width:100%;
+  padding:24px 18px 12px;
+}
+
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-logo{
+  width:58px;
+  height:58px;
+  border-radius:16px;
+
+  background:
+  linear-gradient(
+    145deg,
+    #7b00ff,
+    #3f00b8
+  );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:30px;
+
+  box-shadow:
+  0 10px 35px
+  rgba(111,0,255,.35);
+}
+
+.brand-text h1{
+  font-size:37px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-1.5px;
+}
+
+.brand-text h1 span{
+  color:#8e16ff;
+}
+
+.brand-text p{
+  margin-top:4px;
+  font-size:14px;
+  color:#d0d8eb;
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.icon-btn,
+.profile-btn{
+  width:52px;
+  height:52px;
+
+  border-radius:50%;
+
+  border:
+  1px solid
+  rgba(120,130,180,.2);
+
+  background:
+  rgba(13,22,43,.85);
+
+  color:white;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:23px;
+
+  position:relative;
+}
+
+.profile-btn{
+  background:
+  linear-gradient(
+    145deg,
+    #1b2d68,
+    #172456
+  );
+
+  font-size:25px;
+}
+
+.notification-dot{
+  position:absolute;
+
+  width:10px;
+  height:10px;
+
+  background:#ff2148;
+
+  border-radius:50%;
+
+  right:9px;
+  top:8px;
+
+  border:2px solid #080d1c;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+  width:100%;
+  max-width:1100px;
+
+  margin:auto;
+
+  padding:
+  15px 18px 0;
+}
