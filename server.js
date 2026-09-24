@@ -81,6 +81,26 @@ async function db() {
     );
 
     );
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS listings (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(30) NOT NULL,
+        title VARCHAR(200) NOT NULL,
+        description TEXT,
+        category VARCHAR(100),
+        location VARCHAR(150),
+        phone VARCHAR(30),
+        whatsapp VARCHAR(30),
+        price NUMERIC(12,2),
+        currency VARCHAR(10) DEFAULT 'HTG',
+        image_url TEXT,
+        status VARCHAR(30) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
   `);
 }
 
