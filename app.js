@@ -1,13 +1,13 @@
 /* ==================================================
-   HELPY - KONEKTÈ API AMELYORE AK OAUTH
+   HELPY - CONNECTEUR API ET OAUTH (EN FRANÇAIS)
    ================================================== */
 
-// Deteksyon otomatik domèn backend lan
+// Détection automatique de l'URL du backend
 const API_BASE_URL = window.location.hostname.includes("railway.app") 
   ? window.location.origin 
   : "https://helpy-production-c2f2.up.railway.app";
 
-// Helper pou tout apèl API yo
+// Helper pour effectuer les appels API
 async function apiFetch(endpoint, method = "GET", data = null) {
   const headers = {
     "Content-Type": "application/json",
@@ -35,22 +35,22 @@ async function apiFetch(endpoint, method = "GET", data = null) {
       return { 
         error: true, 
         status: response.status, 
-        message: result?.message || result?.error || `Erè nan sèvè a (${response.status})` 
+        message: result?.message || result?.error || `Erreur serveur (${response.status})` 
       };
     }
     return result;
   } catch (error) {
-    console.error(`Erè rezo lè n ap rele ${endpoint}:`, error);
-    return { error: true, message: "Li enposib pou nou kontakte sèvè a." };
+    console.error(`Erreur réseau lors de la requête vers ${endpoint}:`, error);
+    return { error: true, message: "Impossible de contacter le serveur backend." };
   }
 }
 
-// Fonksyon pou redirection sou Google oswa Facebook OAuth
+// Redirection vers Google ou Facebook OAuth
 function loginWithProvider(provider) {
   window.location.href = `${API_BASE_URL}/api/auth/${provider}`;
 }
 
-// Rekipere token an si itilizatè a ap tounen soti nan Google/Facebook
+// Récupération du token au retour de la connexion Google/Facebook
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const userId = urlParams.get("user_id") || urlParams.get("token");
@@ -58,6 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (userId) {
     localStorage.setItem("helpy_user_id", userId);
     window.history.replaceState({}, document.title, window.location.pathname);
-    window.location.href = "profile.html";
+    window.location.href = "index.html";
   }
 });
