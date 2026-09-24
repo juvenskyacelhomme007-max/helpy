@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY - Koneksyon</title>
+  <title>HELPY - Connexion</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -16,50 +16,50 @@
         <div class="logo-icon"><i class="fa-solid fa-handshake"></i></div>
         <span>HEL<span style="color: var(--light-purple);">PY</span></span>
       </div>
-      <h2 style="font-size: 20px; font-weight: 700;">Byenvini ankò!</h2>
-      <p style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">Konekte sou kont HELPY ou an</p>
+      <h2 style="font-size: 20px; font-weight: 700;">Bienvenue à nouveau !</h2>
+      <p style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">Connectez-vous à votre compte HELPY</p>
     </div>
 
-    <!-- FORMULAIRE KONEKSYON PA EMAIL -->
+    <!-- FORMULAIRE DE CONNEXION -->
     <form onsubmit="handleLogin(event)">
       <div class="form-group">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Adrès Email</label>
-        <input type="email" id="email" class="form-control" style="width: 100%;" required placeholder="non@egzanp.com">
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Adresse Email</label>
+        <input type="email" id="email" class="form-control" style="width: 100%;" required placeholder="nom@exemple.com">
       </div>
       
       <div class="form-group" style="margin-top: 12px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Mewoupas (Mot de passe)</label>
+        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 4px; display: block;">Mot de passe</label>
         <input type="password" id="password" class="form-control" style="width: 100%;" required placeholder="••••••••">
       </div>
 
       <button type="submit" id="login-btn" class="btn-primary" style="width: 100%; margin-top: 18px; padding: 12px; font-size: 13px; justify-content: center;">
-        Seコネkte
+        Se connecter
       </button>
     </form>
 
-    <!-- SEPARATEUR -->
+    <!-- SÉPARATEUR -->
     <div style="display: flex; align-items: center; margin: 20px 0;">
       <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
-      <span style="padding: 0 10px; font-size: 10px; color: var(--text-gray); font-weight: 600;">OUBYEN KONEKTE AK</span>
+      <span style="padding: 0 10px; font-size: 10px; color: var(--text-gray); font-weight: 600;">OU CONNECTEZ-VOUS AVEC</span>
       <div style="flex: 1; height: 1px; background: var(--card-border, #1a2647);"></div>
     </div>
 
-    <!-- BOUTONS REZO SOSYO -->
+    <!-- BOUTONS RÉSEAUX SOCIAUX -->
     <div style="display: flex; flex-direction: column; gap: 10px;">
       <button type="button" onclick="loginWithProvider('google')" class="btn-social">
         <i class="fa-brands fa-google" style="color: #ea4335; font-size: 16px;"></i>
-        Konekte ak Google
+        Se connecter avec Google
       </button>
 
       <button type="button" onclick="loginWithProvider('facebook')" class="btn-social">
         <i class="fa-brands fa-facebook-f" style="color: #1877f2; font-size: 16px;"></i>
-        Konekte ak Facebook
+        Se connecter avec Facebook
       </button>
     </div>
 
-    <!-- LYEN POU KREYE KONT -->
+    <!-- LIEN D'INSCRIPTION -->
     <p style="text-align: center; font-size: 12px; margin-top: 24px; color: var(--text-gray);">
-      Ou pa gen yon kont ankò? <a href="register.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">Kreye yon kont</a>
+      Vous n'avez pas encore de compte ? <a href="register.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">Créer un compte</a>
     </p>
 
   </div>
@@ -71,7 +71,7 @@
       
       const btn = document.getElementById('login-btn');
       btn.disabled = true;
-      btn.innerText = "N ap konekte w...";
+      btn.innerText = "Connexion en cours...";
 
       const emailVal = document.getElementById('email').value.trim();
       const passwordVal = document.getElementById('password').value;
@@ -82,15 +82,15 @@
       });
 
       btn.disabled = false;
-      btn.innerText = "Seコネkte";
+      btn.innerText = "Se connecter";
 
       if (res && !res.error && (res.user_id || res.id || res.user?.id)) {
         const userId = res.user_id || res.id || res.user?.id;
         localStorage.setItem('helpy_user_id', userId);
-        alert("Koneksyon an reyalize ak siksè!");
+        alert("Connexion réussie !");
         window.location.href = 'index.html';
       } else {
-        alert(res?.message || "Echèk nan koneksyon an. Verifye imèl ak mo de pas ou.");
+        alert(res?.message || "Échec de la connexion. Vérifiez votre adresse email et votre mot de passe.");
       }
     }
   </script>
