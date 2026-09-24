@@ -1,105 +1,113 @@
-const express = require('express');
-const cors = require('cors');
+:root {
+  --bg-dark: #0f172a;
+  --card-bg: #1e293b;
+  --light-purple: #8b5cf6;
+  --purple-hover: #7c3aed;
+  --text-white: #f8fafc;
+  --text-gray: #94a3b8;
+  --border-color: #334155;
+  --danger: #ef4444;
+}
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 
-// MIDDLEWARES DE BASE
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px;
+}
 
-// Sèvi fichye HTML, CSS, JS ki statik yo
-app.use(express.static(__dirname));
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--bg-dark);
+  border-radius: 16px;
+  padding: 16px;
+}
 
-// MEMWA TANPORÈ (W ap ka konekte yon baz de done PostgreSQL isit la)
-const users = [];
-const services = [];
+/* LOGO ICON */
+.logo-icon {
+  background: linear-gradient(135deg, var(--light-purple), #c084fc);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
 
-// 1. ROUTE ENSKRIPSYON (REGISTER)
-app.post('/api/register', (req, res) => {
-  const { name, email, password, phone } = req.body;
-  
-  if (!email || !password || !name) {
-    return res.status(400).json({ error: true, message: "Tanpri ranpli tout chan ki obligatwa yo." });
-  }
+/* FORM STYLES */
+.form-group {
+  margin-bottom: 16px;
+}
 
-  const existingUser = users.find(u => u.email === email.toLowerCase());
-  if (existingUser) {
-    return res.status(400).json({ error: true, message: "Imèl sa a gen yon kont deja." });
-  }
+.form-control {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-white);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
 
-  const newUser = {
-    id: "user_" + Date.now(),
-    name,
-    email: email.toLowerCase(),
-    phone: phone || "",
-    password // Nan vèsyon ak PostgreSQL, n ap hash mo de pas sa a ak bcrypt
-  };
+.form-control:focus {
+  border-color: var(--light-purple);
+}
 
-  users.push(newUser);
-  res.json({ success: true, user_id: newUser.id, name: newUser.name, email: newUser.email });
-});
+.form-control::placeholder {
+  color: #64748b;
+}
 
-// 2. ROUTE KONEKSYON (LOGIN)
-app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
+/* BUTTONS */
+.btn-primary {
+  background-color: var(--light-purple);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
 
-  if (!email || !password) {
-    return res.status(400).json({ error: true, message: "Tanpri antre imèl ak mo de pas ou." });
-  }
+.btn-primary:hover {
+  background-color: var(--purple-hover);
+}
 
-  const user = users.find(u => u.email === email.toLowerCase() && u.password === password);
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-  if (!user) {
-    return res.status(400).json({ error: true, message: "Imèl oswa mo de pas enkorèk." });
-  }
+/* CARDS & CONTAINERS */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
 
-  res.json({ success: true, user_id: user.id, name: user.name, email: user.email });
-});
+/* LINKS */
+a {
+  color: var(--light-purple);
+  text-decoration: none;
+}
 
-// 3. ROUTE PROFIL ITILIZATÈ
-app.get('/api/users/:id', (req, res) => {
-  const userId = req.params.id;
-  const user = users.find(u => u.id === userId);
-  
-  if (user) {
-    res.json({ id: user.id, name: user.name, email: user.email, phone: user.phone });
-  } else {
-    res.json({ id: userId, name: "Utilisateur HELPY", email: "utilisateur@helpy.com" });
-  }
-});
-
-// 4. ROUTE PUBLICATION SERVICE
-app.post('/api/services', (req, res) => {
-  const { title, category, location, phone, image_url, description, user_id } = req.body;
-  
-  if (!title || !category || !location) {
-    return res.status(400).json({ error: true, message: "Tanpri ranpli tout chan ki obligatwa yo." });
-  }
-
-  const newService = {
-    id: "srv_" + Date.now(),
-    title,
-    category,
-    location,
-    phone,
-    image_url: image_url || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80",
-    description,
-    user_id,
-    created_at: new Date()
-  };
-
-  services.push(newService);
-  res.json({ success: true, service: newService });
-});
-
-// 5. ROUTE OBTENIR TOUT SERVICES
-app.get('/api/services', (req, res) => {
-  res.json(services);
-});
-
-// DEMARRAGE DU SERVEUR
-app.listen(PORT, () => {
-  console.log(`Sèvè HELPY ap mache sou pòt ${PORT}`);
-});
+a:hover {
+  text-decoration: underline;
+}
