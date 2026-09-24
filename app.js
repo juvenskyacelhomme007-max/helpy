@@ -1,10 +1,13 @@
 /* ==================================================
-   HELPY - APP & API CONNECTOR
+   HELPY - KONEKTÈ API AMELYORE AK OAUTH
    ================================================== */
 
-const API_BASE_URL = "https://helpy-production-c2f2.up.railway.app";
+// Deteksyon otomatik domèn backend lan
+const API_BASE_URL = window.location.hostname.includes("railway.app") 
+  ? window.location.origin 
+  : "https://helpy-production-c2f2.up.railway.app";
 
-// Helper pour effectuer des appels API
+// Helper pou tout apèl API yo
 async function apiFetch(endpoint, method = "GET", data = null) {
   const headers = {
     "Content-Type": "application/json",
@@ -26,22 +29,35 @@ async function apiFetch(endpoint, method = "GET", data = null) {
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    const result = await response.json().catch(() => null);
+
     if (!response.ok) {
-      throw new Error(`Erreur API: ${response.status}`);
+      return { 
+        error: true, 
+        status: response.status, 
+        message: result?.message || result?.error || `Erè nan sèvè a (${response.status})` 
+      };
     }
-    return await response.json();
+    return result;
   } catch (error) {
-    console.error(`Erreur lors de la requête vers ${endpoint}:`, error);
-    return null;
+    console.error(`Erè rezo lè n ap rele ${endpoint}:`, error);
+    return { error: true, message: "Li enposib pou nou kontakte sèvè a." };
   }
 }
 
-// Vérifier l'état de l'API
-async function checkApiHealth() {
-  const health = await apiFetch("/api/health");
-  console.log("Statut Backend Railway:", health);
+// Fonksyon pou redirection sou Google oswa Facebook OAuth
+function loginWithProvider(provider) {
+  window.location.href = `${API_BASE_URL}/api/auth/${provider}`;
 }
 
+// Rekipere token an si itilizatè a ap tounen soti nan Google/Facebook
 document.addEventListener("DOMContentLoaded", () => {
-  checkApiHealth();
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get("user_id") || urlParams.get("token");
+
+  if (userId) {
+    localStorage.setItem("helpy_user_id", userId);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    window.location.href = "profile.html";
+  }
 });
