@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publier - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container">
+    <div class="card" id="auth-check">
+      <h2>Créer une annonce</h2>
+      
+      <div class="form-group mt-2">
+        <label>Type d'annonce</label>
+        <select id="type" onchange="updateCategories()">
+          <option value="product">Produit</option>
+          <option value="service">Service</option>
+          <option value="realestate">Immobilier</option>
+          <option value="vehicle">Véhicule</option>
+          <option value="business">Entreprise</option>
+        </select>
+      </div>
+
+      <form id="publish-form">
+        <div class="form-group">
+          <label>Titre / Nom</label>
+          <input type="text" id="title" required>
+        </div>
+
+        <div class="form-group">
+          <label>Catégorie</label>
+          <select id="category" required></select>
+        </div>
+
+        <div class="form-group" id="price-group">
+          <label>Prix</label>
+          <input type="number" id="price" step="0.01">
+        </div>
+
+        <div class="form-group" id="currency-group">
+          <label>Devise</label>
+          <select id="currency">
+            <option value="HTG">HTG</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="description" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Localisation</label>
+          <input type="text" id="location" required>
+        </div>
+
+        <div class="form-group">
+          <label>Téléphone</label>
+          <input type="tel" id="phone">
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="tel" id="whatsapp">
+        </div>
+
+        <div class="form-group">
+          <label>URL Image</label>
+          <input type="url" id="image_url" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <button type="submit" class="btn mt-2">Publier maintenant</button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item active">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+
+    if (!user) {
+      document.getElementById('auth-check').innerHTML = `
+        <div class="text-center">
+          <p>Vous devez être connecté pour publier une annonce.</p>
+          <a href="login.html" class="btn mt-4">Se connecter</a>
+        </div>
+      `;
+    }
+
+    const categories = {
+      product: ['Téléphones', 'Vêtements', 'Électronique', 'Matériaux de construction', 'Meubles', 'Alimentation', 'Pièces automobiles'],
+      service: ['Plomberie', 'Électricité', 'Réparation téléphone', 'Coiffure/beauté', 'Transport', 'Nettoyage', 'Photographie', 'Informatique'],
+      realestate: ['Maisons à vendre', 'Maisons à louer', 'Appartements', 'Terrains', 'Locaux commerciaux', 'Bureaux'],
+      vehicle: ['Voitures', 'Motos', 'Camions', 'Pièces/accessoires'],
+      business: ['Commerce', 'Services', 'Restaurant', 'Autre']
+    };
+
+    function updateCategories() {
+      const type = document.getElementById('type').value;
+      const catSelect = document.getElementById('category');
+      catSelect.innerHTML = categories[type].map(c => `<option value="${c}">${c}</option>`).join('');
+      
+      const isBusiness = type === 'business';
+      document.getElementById('price-group').style.display = isBusiness ? 'none' : 'block';
+      document.getElementById('currency-group').style.display = isBusiness ? 'none' : 'block';
+    }
+
+    updateCategories();
+
+    document.getElementById('publish-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        type: document.getElementById('type').value,
+        title: document.getElementById('title').value,
+        category: document.getElementById('category').value,
+        price: document.getElementById('price').value || 0,
+        currency: document.getElementById('currency').value,
+        description: document.getElementById('description').value,
+        location: document.getElementById('location').value,
+        phone: document.getElementById('phone').value,
+        whatsapp: document.getElementById('whatsapp').value,
+        image_url: document.getElementById('image_url').value
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/listings`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': user.id
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+          alert('Annonce publiée avec succès!');
+          window.location.href = 'my-listings.html';
+        } else {
+          alert(data.error);
+        }
+      } catch (err) {
+        alert('Erreur réseau');
+      }
+    });
+  </script>
+</body>
+</html>
