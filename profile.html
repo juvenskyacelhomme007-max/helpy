@@ -1,88 +1,74 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Profil - HElPY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Profil</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .menu-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--text-white); text-decoration: none; font-size: 13px; margin-bottom: 8px; }
+  </style>
 </head>
 <body>
-
-  <!-- Header -->
-  <header class="app-header">
-    <a href="index.html" class="logo">HElPY.</a>
-    <span style="font-weight:700; font-size:0.95rem;">Profil Mwen</span>
-  </header>
-
-  <div class="container">
-    
-    <div id="profile-content">
-      <!-- User Profile Header Card -->
-      <div style="background:#fff; padding:20px; border-radius:var(--radius-lg); border:1px solid var(--border); text-align:center; margin-bottom:20px;">
-        <div id="user-avatar-lg" style="width:72px; height:72px; border-radius:50%; background:var(--primary-light); color:var(--primary); font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto;">👤</div>
-        <h2 id="user-name-display" style="font-size:1.2rem; font-weight:800;">Utilisateur</h2>
-        <p id="user-email-display" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">user@example.com</p>
-        <div style="display:inline-block; background:#ecfdf5; color:#047857; padding:4px 12px; border-radius:12px; font-size:0.75rem; font-weight:700;">✓ Kont Verifye</div>
-      </div>
-
-      <!-- Quick Options -->
-      <div style="background:#fff; border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; margin-bottom:20px;">
-        <a href="my-listings.html" style="display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); text-decoration:none; color:var(--text-main); font-weight:600; font-size:0.9rem;">
-          <span>📦 Mes Publications</span>
-          <span>→</span>
-        </a>
-        <a href="#" onclick="alert('Opsyon pou modifye profil ap vini kouvè!')" style="display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); text-decoration:none; color:var(--text-main); font-weight:600; font-size:0.9rem;">
-          <span>⚙️ Modifier Profil</span>
-          <span>→</span>
-        </a>
-        <a href="#" onclick="logout()" style="display:flex; justify-content:space-between; padding:16px 20px; text-decoration:none; color:#ef4444; font-weight:700; font-size:0.9rem;">
-          <span>Déconnexion</span>
-          <span>🚪</span>
-        </a>
-      </div>
-    </div>
-
+  <div class="app-container">
+    <div id="profile-content" class="empty-state">Chargement du profil...</div>
   </div>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-      <span class="nav-icon">⌂</span>
-      <span>Akèy</span>
-    </a>
-    <a href="search.html" class="nav-item">
-      <span class="nav-icon">🔍</span>
-      <span>Rechèch</span>
-    </a>
-    <a href="publish.html" class="nav-item nav-item-publish">
-      <span class="nav-icon">+</span>
-      <span>Publier</span>
-    </a>
-    <a href="my-listings.html" class="nav-item">
-      <span class="nav-icon">❤️</span>
-      <span>Favoris</span>
-    </a>
-    <a href="profile.html" class="nav-item active">
-      <span class="nav-icon">👤</span>
-      <span>Profil</span>
-    </a>
+    <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Accueil</span></a>
+    <a href="search.html" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i><span>Rechercher</span></a>
+    <a href="publish.html" class="nav-item nav-publish"><div class="publish-btn-circle"><i class="fa-solid fa-plus"></i></div><span>Publier</span></a>
+    <a href="favorites.html" class="nav-item"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></a>
+    <a href="profile.html" class="nav-item active"><i class="fa-regular fa-user"></i><span>Profil</span></a>
   </nav>
 
+  <script src="app.js"></script>
   <script>
-    const user = JSON.parse(localStorage.getItem('helpyUser'));
-    if (!user) {
-      window.location.href = 'login.html';
-    } else {
-      document.getElementById('user-name-display').innerText = user.name || 'Itilizatè HElPY';
-      document.getElementById('user-email-display').innerText = user.email || '';
-      document.getElementById('user-avatar-lg').innerText = (user.name || 'U').charAt(0).toUpperCase();
+    async function loadProfile() {
+      const userId = localStorage.getItem('helpy_user_id');
+      if (!userId) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const user = await apiFetch('/api/profile');
+      const container = document.getElementById('profile-content');
+
+      if (user) {
+        container.classList.remove('empty-state');
+        container.innerHTML = `
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 80px; height: 80px; background: var(--primary-purple); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px;">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <h2>${user.name || 'Utilisateur'}</h2>
+            <p style="color: var(--text-secondary); font-size: 12px;">${user.email || ''}</p>
+          </div>
+
+          <a href="my-listings.html" class="menu-item">
+            <span><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i> Mes publications</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+          <a href="favorites.html" class="menu-item">
+            <span><i class="fa-regular fa-bookmark" style="margin-right: 8px;"></i> Mes favoris</span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+          <div class="menu-item" style="cursor: pointer; color: #ff3b30;" onclick="logout()">
+            <span><i class="fa-solid fa-right-from-bracket" style="margin-right: 8px;"></i> Déconnexion</span>
+          </div>
+        `;
+      } else {
+        window.location.href = 'login.html';
+      }
     }
 
     function logout() {
-      localStorage.removeItem('helpyUser');
-      alert('Ou dekonekte ak siksè.');
+      localStorage.removeItem('helpy_user_id');
       window.location.href = 'login.html';
     }
+
+    document.addEventListener('DOMContentLoaded', loadProfile);
   </script>
 </body>
 </html>
