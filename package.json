@@ -1,15 +1,16 @@
 {
   "name": "helpy",
   "version": "1.0.0",
-  "description": "HElPY - Marketplace & Services Platform for Haiti",
-  "main": "server.js",
+  "description": "Helpy Backend App",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
-   "dependencies": {
-  "cors": "^2.8.5",
-  "express": "^4.18.2",
-  "express-session": "^1.17.3",
-  "passport": "^0.6.0",
-  "passport-google-oauth20": "^2.0.0"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0"
+  }
 }
