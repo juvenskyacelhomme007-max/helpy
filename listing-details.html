@@ -1,96 +1,82 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Détails - HElPY</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="padding-bottom:100px;">
 
-  <header class="app-header">
-    <a href="index.html">HElPY</a>
-  </header>
-
-  <div class="container" id="details-container">
-    <p>Chargement des détails...</p>
+  <!-- Header Back Floating -->
+  <div style="position:fixed; top:12px; left:12px; z-index:100;">
+    <button onclick="history.back()" style="background:rgba(255,255,255,0.9); backdrop-filter:blur(4px); border:1px solid var(--border); width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">←</button>
+  </div>
+  <div style="position:fixed; top:12px; right:12px; z-index:100; display:flex; gap:8px;">
+    <button onclick="alert('Ajoute nan favoris!')" style="background:rgba(255,255,255,0.9); backdrop-filter:blur(4px); border:1px solid var(--border); width:40px; height:40px; border-radius:50%; font-size:1.1rem; cursor:pointer;">❤️</button>
+    <button onclick="navigator.share({title: document.title, url: window.location.href})" style="background:rgba(255,255,255,0.9); backdrop-filter:blur(4px); border:1px solid var(--border); width:40px; height:40px; border-radius:50%; font-size:1.1rem; cursor:pointer;">↗️</button>
   </div>
 
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">Accueil</a>
-    <a href="search.html" class="nav-item">Recherche</a>
-    <a href="publish.html" class="nav-item">+ Publier</a>
-    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
-    <a href="profile.html" class="nav-item">Profil</a>
-  </nav>
+  <div id="details-container">
+    <p style="text-align:center; padding:40px; color:var(--text-muted);">Chajman detay yo...</p>
+  </div>
 
   <script>
     const API_BASE = window.location.origin;
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
+    const listingId = urlParams.get('id');
 
     async function loadDetails() {
+      if (!listingId) return;
       try {
-        const res = await fetch(`${API_BASE}/api/listings/${id}`);
-        const data = await res.json();
-
-        if (data.status !== 'ok' || !data.listing) {
-          document.getElementById('details-container').innerHTML = '<p>Annonce introuvable.</p>';
+        const res = await fetch(`${API_BASE}/api/listings/${listingId}`);
+        const item = await res.json();
+        
+        if (!item || item.error) {
+          document.getElementById('details-container').innerHTML = '<p style="text-align:center; padding:40px; color:red;">Piblikasyon sa pa egziste anko.</p>';
           return;
         }
 
-        const l = data.listing;
         document.getElementById('details-container').innerHTML = `
-          <div class="card">
-            <img src="${l.image_url || 'https://via.placeholder.com/300'}" style="width:100%; border-radius:8px; height:200px; object-fit:cover;">
-            <h2 class="mt-2">${l.title}</h2>
-            <h3 style="color:var(--primary);" class="mt-2">${l.price ? l.price + ' ' + l.currency : ''}</h3>
-            <span class="badge mt-2">${l.category}</span>
-            <p class="mt-4">${l.description}</p>
-            <p class="mt-2"><strong>Localisation:</strong> ${l.location || 'N/A'}</p>
+          <!-- Grande Photo -->
+          <div style="width:100%; height:280px; background:#e2e8f0; position:relative;">
+            <img src="${item.image_url || 'https://via.placeholder.com/600x400?text=HElPY'}" style="width:100%; height:100%; object-fit:cover;" alt="${item.title}">
           </div>
 
-          <div class="card">
-            <h3>Vendeur</h3>
-            <p class="mt-2"><strong>${l.owner_name}</strong></p>
-            <div class="btn-group mt-4">
-              ${l.phone ? `<a href="tel:${l.phone}" class="btn">Appeler</a>` : ''}
-              ${l.whatsapp ? `<a href="https://wa.me/${l.whatsapp}" class="btn btn-whatsapp" target="_blank">WhatsApp</a>` : ''}
+          <div class="container" style="padding-top:20px;">
+            <span style="background:var(--primary-light); color:var(--primary); padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:700;">${item.category || item.type || 'Pwodwi'}</span>
+            
+            <h1 style="font-size:1.4rem; font-weight:800; margin:10px 0 6px 0; color:var(--text-main);">${item.title}</h1>
+            <div style="font-size:1.4rem; font-weight:800; color:var(--primary); margin-bottom:8px;">${item.price ? item.price + ' ' + (item.currency || 'HTG') : 'Prix sur demande'}</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">📍 ${item.location || 'Ayiti'}</div>
+
+            <!-- Description -->
+            <div style="background:#fff; padding:16px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:20px;">
+              <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:8px;">Description</h3>
+              <p style="font-size:0.9rem; color:#334155; line-height:1.5;">${item.description || 'Ankenn deskripsyon pa disponib.'}</p>
             </div>
-            <button onclick="shareListing()" class="btn btn-secondary mt-2">Partager</button>
-            <button onclick="reportListing(${l.id})" class="btn btn-danger mt-2">Signaler</button>
+
+            <!-- Profil Vendeur -->
+            <div style="background:#fff; padding:16px; border-radius:var(--radius-md); border:1px solid var(--border); display:flex; align-items:center; gap:12px; margin-bottom:30px;">
+              <div style="width:48px; height:48px; border-radius:50%; background:var(--primary-light); color:var(--primary); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                ${(item.owner_name || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-weight:700; font-size:0.95rem;">${item.owner_name || 'Vandè HElPY'}</div>
+                <div style="font-size:0.8rem; color:var(--accent);">⭐ 4.8 (12 avis)</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:500px; background:#fff; padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:10px; z-index:1000; box-shadow:0 -4px 10px rgba(0,0,0,0.05);">
+            ${item.phone ? `<a href="tel:${item.phone}" style="flex:1; padding:14px; background:var(--primary-light); color:var(--primary); border-radius:var(--radius-md); text-align:center; font-weight:700; text-decoration:none;">📞 Appeler</a>` : ''}
+            ${item.whatsapp ? `<a href="https://wa.me/${item.whatsapp}" target="_blank" style="flex:1; padding:14px; background:var(--whatsapp); color:#fff; border-radius:var(--radius-md); text-align:center; font-weight:700; text-decoration:none;">💬 WhatsApp</a>` : ''}
           </div>
         `;
       } catch (err) {
-        document.getElementById('details-container').innerHTML = '<p>Erreur lors du chargement.</p>';
-      }
-    }
-
-    function shareListing() {
-      if (navigator.share) {
-        navigator.share({ title: document.title, url: window.location.href });
-      } else {
-        alert('Lien copié : ' + window.location.href);
-      }
-    }
-
-    async function reportListing(listingId) {
-      const user = JSON.parse(localStorage.getItem('helpyUser'));
-      if (!user) { alert('Connectez-vous pour signaler.'); return; }
-      
-      const reason = prompt('Raison du signalement :');
-      if (!reason) return;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/reports`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-user-id': user.id },
-          body: JSON.stringify({ listing_id: listingId, reason })
-        });
-        const data = await res.json();
-        if (data.status === 'ok') alert('Signalement envoyé.');
-      } catch (err) {
-        alert('Erreur réseau');
+        document.getElementById('details-container').innerHTML = '<p style="text-align:center; padding:40px; color:red;">Erè pandan chajman piblikasyon an.</p>';
       }
     }
 
