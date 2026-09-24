@@ -5,46 +5,303 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050b18">
 <title>Ajouter une entreprise — HELPY</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#050b18;color:#f5f7ff;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}
-.wrap{max-width:620px;margin:auto}.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}.back{width:44px;height:44px;border-radius:50%;border:1px solid #263657;background:#0d1830;color:#fff;font-size:22px}.logo{font-weight:900;font-size:29px}.logo span{color:#8e18ff}.sub{color:#9eacc9;font-size:13px;margin-top:3px}
-.card{background:linear-gradient(145deg,#0d1830,#081121);border:1px solid rgba(130,150,205,.22);border-radius:24px;padding:22px}
-h1{font-size:25px;margin:0 0 7px}p{color:#aebbd5;margin-top:0}label{display:block;font-size:13px;font-weight:700;margin:17px 0 7px}input,textarea,select{width:100%;border:1px solid #293a5d;background:#0a1428;color:white;border-radius:13px;padding:13px;outline:none;font-size:15px}textarea{min-height:110px;resize:vertical}button.submit{width:100%;margin-top:20px;padding:14px;border:0;border-radius:28px;background:linear-gradient(100deg,#7210ff,#a800ff);color:#fff;font-weight:800;font-size:16px}.msg{margin-top:15px;padding:12px;border-radius:12px;display:none}.ok{background:#0d3a2a;color:#91ffd1}.err{background:#3b1520;color:#ffb0bd}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#050b18;
+  color:#f5f7ff;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  padding:20px
+}
+.wrap{max-width:620px;margin:auto}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.back{
+  width:44px;height:44px;border-radius:50%;
+  border:1px solid #263657;background:#0d1830;
+  color:#fff;font-size:22px
+}
+.logo{font-weight:900;font-size:29px}
+.logo span{color:#8e18ff}
+.sub{color:#9eacc9;font-size:13px;margin-top:3px}
+.card{
+  background:linear-gradient(145deg,#0d1830,#081121);
+  border:1px solid rgba(130,150,205,.22);
+  border-radius:24px;
+  padding:22px
+}
+h1{font-size:25px;margin:0 0 7px}
+p{color:#aebbd5;margin-top:0}
+label{
+  display:block;font-size:13px;font-weight:700;
+  margin:17px 0 7px
+}
+input,textarea,select{
+  width:100%;
+  border:1px solid #293a5d;
+  background:#0a1428;
+  color:white;
+  border-radius:13px;
+  padding:13px;
+  outline:none;
+  font-size:15px
+}
+textarea{min-height:110px;resize:vertical}
+button.submit{
+  width:100%;
+  margin-top:20px;
+  padding:14px;
+  border:0;
+  border-radius:28px;
+  background:linear-gradient(100deg,#7210ff,#a800ff);
+  color:#fff;
+  font-weight:800;
+  font-size:16px
+}
+.msg{
+  margin-top:15px;
+  padding:12px;
+  border-radius:12px;
+  display:none
+}
+.ok{background:#0d3a2a;color:#91ffd1}
+.err{background:#3b1520;color:#ffb0bd}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
-  <div class="top"><button class="back" onclick="history.back()">‹</button><div><div class="logo">HELP<span>Y</span></div><div class="sub">Créer votre espace professionnel</div></div></div>
+
+  <div class="top">
+    <button class="back" type="button" onclick="history.back()">‹</button>
+
+    <div>
+      <div class="logo">HELP<span>Y</span></div>
+      <div class="sub">Créer votre espace professionnel</div>
+    </div>
+  </div>
+
   <div class="card">
-    <h1>Ajouter votre entreprise</h1><p>Présentez votre activité aux utilisateurs de HELPY.</p>
-    <form id="form">
-      <label>Nom de l'entreprise *</label><input id="name" required placeholder="Ex. Tech Solution">
-      <label>Catégorie *</label><select id="category" required><option value="">Choisir une catégorie</option><option>Restaurant</option><option>Magasin</option><option>Logement</option><option>Transport</option><option>Service</option><option>Informatique</option><option>Immobilier</option><option>Autres</option></select>
-      <label>Description</label><textarea id="description" placeholder="Décrivez votre activité..."></textarea>
-      <label>Téléphone</label><input id="phone" inputmode="tel" placeholder="Ex. 3269 9268">
-      <label>WhatsApp</label><input id="whatsapp" inputmode="tel" placeholder="Ex. 3269 9268">
-      <label>Adresse / localisation</label><input id="location" placeholder="Ex. Delmas, Haïti">
-      <label>URL de l'image (facultatif)</label><input id="image_url" type="url" placeholder="https://...">
-      <button class="submit">Créer mon espace</button>
-      <div id="msg" class="msg"></div>
+
+    <h1>Ajouter votre entreprise</h1>
+
+    <p>
+      Présentez votre activité aux utilisateurs de HELPY.
+    </p>
+
+    <form id="businessForm">
+
+      <label for="businessName">Nom de l'entreprise *</label>
+      <input
+        id="businessName"
+        required
+        placeholder="Ex. Tech Solution"
+      >
+
+      <label for="businessCategory">Catégorie *</label>
+      <select id="businessCategory" required>
+        <option value="">Choisir une catégorie</option>
+        <option>Restaurant</option>
+        <option>Magasin</option>
+        <option>Logement</option>
+        <option>Transport</option>
+        <option>Service</option>
+        <option>Informatique</option>
+        <option>Immobilier</option>
+        <option>Autres</option>
+      </select>
+
+      <label for="businessDescription">Description</label>
+      <textarea
+        id="businessDescription"
+        placeholder="Décrivez votre activité..."
+      ></textarea>
+
+      <label for="businessPhone">Téléphone</label>
+      <input
+        id="businessPhone"
+        inputmode="tel"
+        placeholder="Ex. 3269 9268"
+      >
+
+      <label for="businessWhatsapp">WhatsApp</label>
+      <input
+        id="businessWhatsapp"
+        inputmode="tel"
+        placeholder="Ex. 3269 9268"
+      >
+
+      <label for="businessLocation">Adresse / localisation</label>
+      <input
+        id="businessLocation"
+        placeholder="Ex. Delmas, Haïti"
+      >
+
+      <label for="businessImage">URL de l'image (facultatif)</label>
+      <input
+        id="businessImage"
+        type="url"
+        placeholder="https://..."
+      >
+
+      <button class="submit" type="submit">
+        Créer mon espace
+      </button>
+
+      <div id="message" class="msg"></div>
+
     </form>
+
   </div>
 </div>
+
 <script>
-const API=location.hostname.includes("railway.app")?location.origin:"https://helpy-production-c2f2.up.railway.app";
-form.addEventListener("submit",async e=>{
- e.preventDefault();msg.style.display="none";
- const body={name:name.value.trim(),category:category.value,description:description.value.trim(),phone:phone.value.trim(),whatsapp:whatsapp.value.trim(),location:location.value.trim(),image_url:image_url.value.trim()};
- try{
-  const headers={"Content-Type":"application/json"};
-  const uid=localStorage.getItem("helpy_user_id"); if(uid) headers["x-user-id"]=uid;
-  const r=await fetch(API+"/api/businesses",{method:"POST",headers,body:JSON.stringify(body)});
-  const d=await r.json();
-  if(!r.ok)throw new Error(d.error||d.message||"Erreur serveur");
-  msg.className="msg ok";msg.textContent="✓ Entreprise ajoutée avec succès.";msg.style.display="block";
-  form.reset();setTimeout(()=>location.href="index.html",900);
- }catch(err){msg.className="msg err";msg.textContent="⚠️ "+err.message;msg.style.display="block"}
+
+const API_BASE =
+  "https://helpy-production-c2f2.up.railway.app";
+
+const businessForm =
+  document.getElementById("businessForm");
+
+const message =
+  document.getElementById("message");
+
+const businessName =
+  document.getElementById("businessName");
+
+const businessCategory =
+  document.getElementById("businessCategory");
+
+const businessDescription =
+  document.getElementById("businessDescription");
+
+const businessPhone =
+  document.getElementById("businessPhone");
+
+const businessWhatsapp =
+  document.getElementById("businessWhatsapp");
+
+const businessLocation =
+  document.getElementById("businessLocation");
+
+const businessImage =
+  document.getElementById("businessImage");
+
+
+businessForm.addEventListener("submit", async function(event){
+
+  event.preventDefault();
+
+  message.style.display = "none";
+  message.textContent = "";
+
+  const body = {
+
+    name: businessName.value.trim(),
+
+    category: businessCategory.value,
+
+    description:
+      businessDescription.value.trim(),
+
+    phone:
+      businessPhone.value.trim(),
+
+    whatsapp:
+      businessWhatsapp.value.trim(),
+
+    location:
+      businessLocation.value.trim(),
+
+    image_url:
+      businessImage.value.trim()
+
+  };
+
+  try {
+
+    message.className = "msg";
+    message.style.display = "block";
+    message.textContent = "⏳ Création en cours...";
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    const userId =
+      localStorage.getItem("helpy_user_id");
+
+    if(userId){
+
+      headers["x-user-id"] = userId;
+
+    }
+
+    const response = await fetch(
+      API_BASE + "/api/businesses",
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body)
+      }
+    );
+
+    const text =
+      await response.text();
+
+    let data = {};
+
+    try {
+
+      data = JSON.parse(text);
+
+    } catch(e) {
+
+      data = {
+        message: text
+      };
+
+    }
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Erreur serveur (" +
+        response.status +
+        ")"
+      );
+
+    }
+
+    message.className = "msg ok";
+
+    message.textContent =
+      "✓ Entreprise ajoutée avec succès.";
+
+    message.style.display = "block";
+
+    businessForm.reset();
+
+  } catch(error){
+
+    console.error(error);
+
+    message.className = "msg err";
+
+    message.textContent =
+      "⚠️ " + error.message;
+
+    message.style.display = "block";
+
+  }
+
 });
+
 </script>
+
 </body>
 </html>
