@@ -1,76 +1,73 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HELPY - Connexion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HELPY - Koneksyon</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-  <div class="app-container" style="padding-top: 40px;">
-    
-    <!-- EN-TÊTE -->
-    <div style="text-align: center; margin-bottom: 30px;">
-      <div class="logo-icon" style="margin: 0 auto 10px auto; width: 50px; height: 50px; font-size: 24px;">
-        <i class="fa-solid fa-handshake"></i>
-      </div>
-      <h2 style="font-size: 22px; font-weight: 700;">Connexion à <span style="color: var(--light-purple);">HELPY</span></h2>
-      <p style="font-size: 13px; color: var(--text-gray); margin-top: 4px;">Accédez à votre compte pour continuer</p>
+  <div class="app-container">
+    <div style="text-align: center; margin-bottom: 24px; margin-top: 40px;">
+      <div class="logo-badge" style="width: 50px; height: 50px; margin: 0 auto 12px; font-weight: bold; font-size: 20px;">H</div>
+      <h2>Konekte sou HELPY</h2>
+      <p style="color: var(--text-gray); font-size: 14px; margin-top: 4px;">Antre imèl ak mo de pas ou</p>
     </div>
 
-    <!-- FORMULAIRE DE CONNEXION -->
-    <form onsubmit="handleLogin(event)">
-      
-      <div class="form-group">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Adresse e-mail</label>
-        <input type="email" id="email" class="form-control" style="width: 100%;" required placeholder="nom@exemple.com">
+    <form id="loginForm">
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Imèl</label>
+        <input type="email" id="loginEmail" class="search-box" style="width: 100%; color: white;" placeholder="zanmi@email.com" required>
       </div>
 
-      <div class="form-group" style="margin-top: 14px;">
-        <label style="font-size: 12px; color: var(--text-gray); margin-bottom: 6px; display: block;">Mot de passe</label>
-        <input type="password" id="password" class="form-control" style="width: 100%;" required placeholder="••••••••">
+      <div style="margin-bottom: 20px;">
+        <label style="display:block; margin-bottom:6px; font-size:14px; color:var(--text-gray);">Mo de pas</label>
+        <input type="password" id="loginPassword" class="search-box" style="width: 100%; color: white;" placeholder="••••••••" required>
       </div>
 
-      <button type="submit" id="login-btn" class="btn-primary" style="width: 100%; margin-top: 24px; padding: 14px; font-size: 14px; justify-content: center;">
-        <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+      <button type="submit" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer;">
+        Konekte
       </button>
-
     </form>
 
-    <!-- LIEN INSCRIPTION -->
-    <div style="text-align: center; margin-top: 30px; font-size: 13px; color: var(--text-gray);">
-      Vous n'avez pas de compte ? 
-      <a href="register.html" style="color: var(--light-purple); font-weight: 600; text-decoration: none;">S'inscrire</a>
-    </div>
+    <div id="loginMessage" style="margin-top: 12px; text-align: center; font-size: 14px;"></div>
 
+    <div style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-gray);">
+      Ou pa gen kont? <a href="register.html" style="color: var(--primary);">Kreye yon kont</a>
+    </div>
   </div>
 
-  <script src="app.js"></script>
   <script>
-    async function handleLogin(e) {
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const msg = document.getElementById('loginMessage');
 
-      const btn = document.getElementById('login-btn');
-      btn.disabled = true;
-      btn.innerText = "Connexion en cours...";
+      msg.style.color = '#94a3b8';
+      msg.innerText = "Verifikasyon...";
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
 
-      const res = await apiFetch('/api/login', 'POST', { email, password });
-
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Se connecter';
-
-      if (res && res.success) {
-        localStorage.setItem('helpy_user_id', res.user_id);
-        window.location.href = 'index.html';
-      } else {
-        alert(res?.message || "Identifiants incorrects. Veuillez réessayer.");
+        if (res.ok) {
+          msg.style.color = '#4ade80';
+          msg.innerText = "Koneksyon reyisi! N ap redirije w...";
+          setTimeout(() => window.location.href = '/', 1500);
+        } else {
+          msg.style.color = '#ef4444';
+          msg.innerText = data.error || "Pwoblèm nan koneksyon an.";
+        }
+      } catch (err) {
+        msg.style.color = '#ef4444';
+        msg.innerText = "Erè sèvè.";
       }
-    }
+    });
   </script>
 </body>
 </html>
