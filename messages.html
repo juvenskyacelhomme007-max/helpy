@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages - HElPY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="index.html">HElPY</a>
+  </header>
+
+  <div class="container">
+    <h2>Mes Messages</h2>
+    <div id="messages-container" class="mt-4">
+      <p>Chargement des messages...</p>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">Accueil</a>
+    <a href="search.html" class="nav-item">Recherche</a>
+    <a href="publish.html" class="nav-item">+ Publier</a>
+    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
+    <a href="profile.html" class="nav-item">Profil</a>
+  </nav>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const user = JSON.parse(localStorage.getItem('helpyUser'));
+
+    if (!user) {
+      window.location.href = 'login.html';
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch(`${API_BASE}/api/messages`, {
+          headers: { 'x-user-id': user.id }
+        });
+        const data = await res.json();
+        const container = document.getElementById('messages-container');
+
+        if (!data.messages || data.messages.length === 0) {
+          container.innerHTML = '<p>Aucun message.</p>';
+          return;
+        }
+
+        container.innerHTML = data.messages.map(m => `
+          <div class="card">
+            <strong>${m.sender_id === user.id ? 'À: ' + m.receiver_name : 'De: ' + m.sender_name}</strong>
+            <p class="mt-2">${m.message}</p>
+            <small style="color:var(--text-muted);">${new Date(m.created_at).toLocaleString()}</small>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('messages-container').innerHTML = '<p>Erreur.</p>';
+      }
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
