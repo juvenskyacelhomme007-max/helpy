@@ -1,164 +1,220 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Publier - HElPY</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Header -->
   <header class="app-header">
-    <a href="index.html">HElPY</a>
+    <a href="index.html" class="logo">HElPY.</a>
+    <span style="font-weight:700; font-size:0.95rem;">Nouvèl Piblikasyon</span>
   </header>
 
   <div class="container">
-    <div class="card" id="auth-check">
-      <h2>Créer une annonce</h2>
-      
-      <div class="form-group mt-2">
-        <label>Type d'annonce</label>
-        <select id="type" onchange="updateCategories()">
-          <option value="product">Produit</option>
-          <option value="service">Service</option>
-          <option value="realestate">Immobilier</option>
-          <option value="vehicle">Véhicule</option>
-          <option value="business">Entreprise</option>
-        </select>
+
+    <!-- Step 1: Type Selection -->
+    <div id="step-1" class="wizard-step">
+      <h2 style="font-size:1.1rem; font-weight:800; margin-bottom:14px;">Kisa ou vle pibliye?</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div class="type-selector-card" onclick="selectType('product')">
+          <span style="font-size:2rem;">📦</span>
+          <span style="font-weight:700; font-size:0.9rem;">Pwodwi</span>
+        </div>
+        <div class="type-selector-card" onclick="selectType('service')">
+          <span style="font-size:2rem;">🛠️</span>
+          <span style="font-weight:700; font-size:0.9rem;">Sèvis</span>
+        </div>
+        <div class="type-selector-card" onclick="selectType('business')">
+          <span style="font-size:2rem;">🏢</span>
+          <span style="font-weight:700; font-size:0.9rem;">Antrepriz</span>
+        </div>
+        <div class="type-selector-card" onclick="selectType('realestate')">
+          <span style="font-size:2rem;">🏠</span>
+          <span style="font-weight:700; font-size:0.9rem;">Immobilier</span>
+        </div>
+        <div class="type-selector-card" onclick="selectType('vehicle')" style="grid-column: span 2;">
+          <span style="font-size:2rem;">🚗</span>
+          <span style="font-weight:700; font-size:0.9rem;">Véhicules</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Form Details -->
+    <div id="step-2" class="wizard-step" style="display:none;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+        <button onclick="goBackStep1()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">←</button>
+        <h2 style="font-size:1.1rem; font-weight:800;" id="form-type-title">Detay Piblikasyon</h2>
       </div>
 
-      <form id="publish-form">
-        <div class="form-group">
-          <label>Titre / Nom</label>
-          <input type="text" id="title" required>
+      <form id="publish-form" onsubmit="handlePublish(event)">
+        <!-- Photo Upload Box -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">📷 URL Foto (oswa Upload)</label>
+          <input type="text" id="image_url" class="search-input" placeholder="https://example.com/photo.jpg" style="margin-bottom:8px;">
         </div>
 
-        <div class="form-group">
-          <label>Catégorie</label>
-          <select id="category" required></select>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Titre *</label>
+          <input type="text" id="title" class="search-input" placeholder="Eg: iPhone 13 Pro Max" required>
         </div>
 
-        <div class="form-group" id="price-group">
-          <label>Prix</label>
-          <input type="number" id="price" step="0.01">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Prix (HTG/$USD)</label>
+            <input type="number" id="price" class="search-input" placeholder="Eg: 45000">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Monnaie</label>
+            <select id="currency" class="search-input" style="padding:14px 10px;">
+              <option value="HTG">HTG</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
         </div>
 
-        <div class="form-group" id="currency-group">
-          <label>Devise</label>
-          <select id="currency">
-            <option value="HTG">HTG</option>
-            <option value="USD">USD</option>
-          </select>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">📍 Localisation *</label>
+          <input type="text" id="location" class="search-input" placeholder="Eg: Delmas 33, Port-au-Prince" required>
         </div>
 
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="description" rows="4" required></textarea>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Description</label>
+          <textarea id="description" class="search-input" rows="4" style="height:auto;" placeholder="Eskplike detay yo trè byen..."></textarea>
         </div>
 
-        <div class="form-group">
-          <label>Localisation</label>
-          <input type="text" id="location" required>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Téléphone *</label>
+            <input type="tel" id="phone" class="search-input" placeholder="+509...." required>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">WhatsApp</label>
+            <input type="tel" id="whatsapp" class="search-input" placeholder="509....">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Téléphone</label>
-          <input type="tel" id="phone">
-        </div>
-
-        <div class="form-group">
-          <label>WhatsApp</label>
-          <input type="tel" id="whatsapp">
-        </div>
-
-        <div class="form-group">
-          <label>URL Image</label>
-          <input type="url" id="image_url" placeholder="https://example.com/image.jpg">
-        </div>
-
-        <button type="submit" class="btn mt-2">Publier maintenant</button>
+        <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:var(--radius-md); font-weight:800; font-size:1rem; cursor:pointer;">
+          PUBLIER 🚀
+        </button>
       </form>
     </div>
+
   </div>
 
+  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">Accueil</a>
-    <a href="search.html" class="nav-item">Recherche</a>
-    <a href="publish.html" class="nav-item active">+ Publier</a>
-    <a href="my-listings.html" class="nav-item">Mes Annonces</a>
-    <a href="profile.html" class="nav-item">Profil</a>
+    <a href="index.html" class="nav-item">
+      <span class="nav-icon">⌂</span>
+      <span>Akèy</span>
+    </a>
+    <a href="search.html" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>Rechèch</span>
+    </a>
+    <a href="publish.html" class="nav-item nav-item-publish active">
+      <span class="nav-icon">+</span>
+      <span>Publier</span>
+    </a>
+    <a href="my-listings.html" class="nav-item">
+      <span class="nav-icon">❤️</span>
+      <span>Favoris</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>Profil</span>
+    </a>
   </nav>
+
+  <style>
+    .type-selector-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .type-selector-card:active {
+      transform: scale(0.96);
+      border-color: var(--primary);
+    }
+  </style>
 
   <script>
     const API_BASE = window.location.origin;
-    const user = JSON.parse(localStorage.getItem('helpyUser'));
+    let selectedType = 'product';
 
-    if (!user) {
-      document.getElementById('auth-check').innerHTML = `
-        <div class="text-center">
-          <p>Vous devez être connecté pour publier une annonce.</p>
-          <a href="login.html" class="btn mt-4">Se connecter</a>
-        </div>
-      `;
-    }
-
-    const categories = {
-      product: ['Téléphones', 'Vêtements', 'Électronique', 'Matériaux de construction', 'Meubles', 'Alimentation', 'Pièces automobiles'],
-      service: ['Plomberie', 'Électricité', 'Réparation téléphone', 'Coiffure/beauté', 'Transport', 'Nettoyage', 'Photographie', 'Informatique'],
-      realestate: ['Maisons à vendre', 'Maisons à louer', 'Appartements', 'Terrains', 'Locaux commerciaux', 'Bureaux'],
-      vehicle: ['Voitures', 'Motos', 'Camions', 'Pièces/accessoires'],
-      business: ['Commerce', 'Services', 'Restaurant', 'Autre']
-    };
-
-    function updateCategories() {
-      const type = document.getElementById('type').value;
-      const catSelect = document.getElementById('category');
-      catSelect.innerHTML = categories[type].map(c => `<option value="${c}">${c}</option>`).join('');
+    function selectType(type) {
+      selectedType = type;
+      document.getElementById('step-1').style.display = 'none';
+      document.getElementById('step-2').style.display = 'block';
       
-      const isBusiness = type === 'business';
-      document.getElementById('price-group').style.display = isBusiness ? 'none' : 'block';
-      document.getElementById('currency-group').style.display = isBusiness ? 'none' : 'block';
+      const titles = {
+        product: '📦 Detay Pwodwi',
+        service: '🛠️ Detay Sèvis',
+        business: '🏢 Detay Antrepriz',
+        realestate: '🏠 Detay Immobilier',
+        vehicle: '🚗 Detay Véhicule'
+      };
+      document.getElementById('form-type-title').innerText = titles[type] || 'Detay Piblikasyon';
     }
 
-    updateCategories();
+    function goBackStep1() {
+      document.getElementById('step-2').style.display = 'none';
+      document.getElementById('step-1').style.display = 'block';
+    }
 
-    document.getElementById('publish-form').addEventListener('submit', async (e) => {
+    async function handlePublish(e) {
       e.preventDefault();
       
+      const user = JSON.parse(localStorage.getItem('helpyUser'));
+      if (!user) {
+        alert('Ou dwe konekte an premye!');
+        window.location.href = 'login.html';
+        return;
+      }
+
       const payload = {
-        type: document.getElementById('type').value,
+        type: selectedType,
+        category: selectedType,
         title: document.getElementById('title').value,
-        category: document.getElementById('category').value,
-        price: document.getElementById('price').value || 0,
+        price: document.getElementById('price').value,
         currency: document.getElementById('currency').value,
-        description: document.getElementById('description').value,
         location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
         phone: document.getElementById('phone').value,
         whatsapp: document.getElementById('whatsapp').value,
-        image_url: document.getElementById('image_url').value
+        image_url: document.getElementById('image_url').value,
+        user_id: user.id,
+        owner_name: user.name
       };
 
       try {
         const res = await fetch(`${API_BASE}/api/listings`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-id': user.id
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-          alert('Annonce publiée avec succès!');
-          window.location.href = 'my-listings.html';
+        
+        if (res.ok) {
+          alert('Piblikasyon an fèt ak siksè! 🚀');
+          window.location.href = 'index.html';
         } else {
-          alert(data.error);
+          alert('Gen yon erè ki fèt, tanpri eseye ankò.');
         }
       } catch (err) {
-        alert('Erreur réseau');
+        alert('Erè rezo: ' + err.message);
       }
-    });
+    }
   </script>
 </body>
 </html>
