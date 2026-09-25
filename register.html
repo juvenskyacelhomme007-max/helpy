@@ -1,1 +1,358 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script><script src="/supabase.js"></script><title>Créer un compte — HELPY</title></head><body><main class="auth-wrap"><section class="auth panel"><a class="brand" href="/" style="justify-content:center"><span class="logo">H</span><span class="brand-name">HELPY</span></a><h1>Créer ton compte</h1><p>Rejoins HELPY et commence à découvrir le monde.</p><div id="msg"></div><form id="form" class="form"><div class="field"><label>Nom complet</label><input id="name" required></div><div class="field"><label>E-mail</label><input id="email" type="email" required></div><div class="field"><label>Mot de passe</label><input id="password" type="password" minlength="6" required></div><button class="primary">Créer mon compte</button></form><p>Déjà inscrit ? <a style="color:var(--blue);font-weight:800" href="/login.html">Se connecter</a></p></section></main><script>form.onsubmit=async e=>{e.preventDefault();const db=await HELPY.init();if(!db){msg.className="notice error";msg.textContent="Supabase n’est pas configuré.";return}const {data,error}=await db.auth.signUp({email:email.value.trim(),password:password.value,options:{data:{name:name.value.trim()}}});if(error){msg.className="notice error";msg.textContent=error.message;return}msg.className="notice ok";msg.textContent=data.session?"Compte créé !":"Compte créé. Vérifie ton e-mail si nécessaire.";setTimeout(()=>location.href="/",1000)}</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Créer un compte - HELPY</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-radius: 28px;
+      padding: 35px 28px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 35px;
+    }
+
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      background: #071a2d;
+      color: white;
+      border-radius: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 34px;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .logo-icon::after {
+      content: "";
+      width: 15px;
+      height: 15px;
+      background: #ffb51b;
+      border-radius: 50%;
+      position: absolute;
+      top: 9px;
+      right: 8px;
+    }
+
+    .logo-text {
+      font-size: 34px;
+      font-weight: 800;
+      color: #101828;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      color: #101828;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #667085;
+      font-size: 17px;
+      margin-bottom: 28px;
+    }
+
+    .message {
+      display: none;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .error {
+      display: block;
+      background: #fff0f0;
+      color: #c62828;
+    }
+
+    .success {
+      display: block;
+      background: #ecfdf3;
+      color: #027a48;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      color: #101828;
+      margin: 18px 0 8px;
+    }
+
+    input {
+      width: 100%;
+      height: 58px;
+      border: 1px solid #d0d5dd;
+      border-radius: 15px;
+      padding: 0 18px;
+      font-size: 17px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus {
+      border-color: #5846e8;
+      box-shadow: 0 0 0 3px rgba(88,70,232,0.12);
+    }
+
+    button {
+      width: 100%;
+      height: 58px;
+      margin-top: 28px;
+      border: none;
+      border-radius: 15px;
+      background: #ffb51b;
+      color: #111;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .bottom {
+      text-align: center;
+      margin-top: 24px;
+      color: #667085;
+      font-size: 16px;
+    }
+
+    .bottom a {
+      color: #175cd3;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="logo">
+      <div class="logo-icon">H</div>
+      <div class="logo-text">HELPY</div>
+    </div>
+
+    <h1>Créer ton compte</h1>
+
+    <p class="subtitle">
+      Rejoins HELPY et commence à découvrir le monde.
+    </p>
+
+    <div id="message" class="message"></div>
+
+    <form id="registerForm">
+
+      <label for="name">Nom complet</label>
+      <input
+        type="text"
+        id="name"
+        placeholder="Ton nom complet"
+        autocomplete="name"
+        required
+      >
+
+      <label for="email">E-mail</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="exemple@email.com"
+        autocomplete="email"
+        required
+      >
+
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Minimum 6 caractères"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <label for="confirmPassword">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        placeholder="Confirme ton mot de passe"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <button type="submit" id="registerButton">
+        Créer mon compte
+      </button>
+
+    </form>
+
+    <div class="bottom">
+      Déjà inscrit ?
+      <a href="login.html">Se connecter</a>
+    </div>
+
+  </div>
+
+  <script>
+    /*
+      HELPY
+      Connexion directe au backend Railway
+      Aucun Supabase
+    */
+
+    const API_BASE_URL = window.location.origin;
+
+    const form = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("registerButton");
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message " + type;
+    }
+
+    form.addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+      message.className = "message";
+      message.textContent = "";
+
+      if (!name || !email || !password || !confirmPassword) {
+        showMessage("Veuillez remplir tous les champs.", "error");
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage(
+          "Le mot de passe doit contenir au moins 6 caractères.",
+          "error"
+        );
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage(
+          "Les mots de passe ne correspondent pas.",
+          "error"
+        );
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Création du compte...";
+
+      try {
+
+        const response = await fetch(
+          API_BASE_URL + "/api/auth/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              password: password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            data.error ||
+            "Impossible de créer le compte."
+          );
+        }
+
+        if (data.token) {
+          localStorage.setItem("helpy_token", data.token);
+        }
+
+        if (data.user) {
+          localStorage.setItem(
+            "helpy_user",
+            JSON.stringify(data.user)
+          );
+        }
+
+        showMessage(
+          "Compte créé avec succès !",
+          "success"
+        );
+
+        setTimeout(function() {
+          window.location.href = "index.html";
+        }, 1200);
+
+      } catch (error) {
+
+        console.error("HELPY register error:", error);
+
+        showMessage(
+          error.message ||
+          "Une erreur est survenue. Vérifie ta connexion.",
+          "error"
+        );
+
+      } finally {
+
+        button.disabled = false;
+        button.textContent = "Créer mon compte";
+
+      }
+
+    });
+  </script>
+
+</body>
+</html>
