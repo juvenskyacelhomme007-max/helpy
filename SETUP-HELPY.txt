@@ -1,0 +1,11 @@
+HELPY FINAL
+
+1) Supabase: run supabase-schema.sql.
+2) public/config.js: put Supabase URL + anon key.
+3) Push all files to GitHub.
+4) Deploy repo on Vercel.
+5) Put the Vercel URL in android/app/src/main/java/com/helpy/global/MainActivity.java.
+6) GitHub > Actions > Build HELPY APK > Run workflow.
+7) Download artifact helpy-release-apk and install app-release.apk.
+
+No private Supabase key is included. No fake Vercel URL is included.
