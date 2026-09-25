@@ -1473,3 +1473,751 @@ app.get(
       res.status(500).json({
         error: "Unable to load business"
       });
+
+// ============================================================
+// LISTINGS
+// ============================================================
+
+app.post("/api/listings", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const {
+      type,
+      title,
+      description,
+      category,
+      location,
+      phone,
+      whatsapp,
+      price,
+      currency,
+      image_url
+    } = req.body;
+
+    const allowedTypes = [
+      "business",
+      "product",
+      "service",
+      "realestate",
+      "vehicle"
+    ];
+
+    if (!type || !allowedTypes.includes(type)) {
+      return res.status(400).json({
+        error: "Invalid listing type"
+      });
+    }
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        error: "Title is required"
+      });
+    }
+
+    if (!whatsapp || !whatsapp.trim()) {
+      return res.status(400).json({
+        error: "WhatsApp number is required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO listings
+      (
+        user_id,
+        type,
+        title,
+        description,
+        category,
+        location,
+        phone,
+        whatsapp,
+        price,
+        currency,
+        image_url,
+        status
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'active')
+      RETURNING *
+      `,
+      [
+        userId,
+        type,
+        cleanText(title),
+        cleanText(description),
+        cleanText(category),
+        cleanText(location),
+        cleanText(phone),
+        cleanText(whatsapp),
+        price || 0,
+        currency || "HTG",
+        cleanText(image_url)
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      listing: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("CREATE LISTING ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to create listing"
+    });
+  }
+});
+
+
+// ============================================================
+// GET LISTINGS
+// ============================================================
+
+app.get("/api/listings", async (req, res) => {
+  try {
+    const { type, category } = req.query;
+
+    let query = `
+      SELECT
+        l.*,
+        u.name AS seller_name
+      FROM listings l
+      LEFT JOIN users u
+        ON u.id = l.user_id
+      WHERE l.status = 'active'
+    `;
+
+    const values = [];
+
+    if (type) {
+      values.push(type);
+      query += ` AND l.type = $${values.length}`;
+    }
+
+    if (category) {
+      values.push(category);
+      query += ` AND l.category ILIKE $${values.length}`;
+    }
+
+    query += `
+      ORDER BY l.created_at DESC
+    `;
+
+    const result = await pool.query(query, values);
+
+    res.json({
+      status: "ok",
+      listings: result.rows
+    });
+
+  } catch (error) {
+    console.error("GET LISTINGS ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to load listings"
+    });
+  }
+});
+
+
+// ============================================================
+// GET SINGLE LISTING
+// ============================================================
+
+app.get("/api/listings/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        l.*,
+        u.name AS seller_name
+      FROM listings l
+      LEFT JOIN users u
+        ON u.id = l.user_id
+      WHERE l.id = $1
+      `,
+      [req.params.id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Listing not found"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      listing: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("GET LISTING ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to load listing"
+    });
+  }
+});
+
+
+// ============================================================
+// UPDATE LISTING
+// ============================================================
+
+app.put("/api/listings/:id", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const {
+      title,
+      description,
+      category,
+      location,
+      phone,
+      whatsapp,
+      price,
+      currency,
+      image_url
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE listings
+      SET
+        title = COALESCE($1, title),
+        description = COALESCE($2, description),
+        category = COALESCE($3, category),
+        location = COALESCE($4, location),
+        phone = COALESCE($5, phone),
+        whatsapp = COALESCE($6, whatsapp),
+        price = COALESCE($7, price),
+        currency = COALESCE($8, currency),
+        image_url = COALESCE($9, image_url),
+        updated_at = NOW()
+      WHERE id = $10
+        AND user_id = $11
+      RETURNING *
+      `,
+      [
+        cleanText(title),
+        cleanText(description),
+        cleanText(category),
+        cleanText(location),
+        cleanText(phone),
+        cleanText(whatsapp),
+        price,
+        currency,
+        cleanText(image_url),
+        req.params.id,
+        userId
+      ]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Listing not found or not owned by user"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      listing: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("UPDATE LISTING ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to update listing"
+    });
+  }
+});
+
+
+// ============================================================
+// DELETE LISTING
+// ============================================================
+
+app.delete("/api/listings/:id", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const result = await pool.query(
+      `
+      DELETE FROM listings
+      WHERE id = $1
+        AND user_id = $2
+      RETURNING id
+      `,
+      [
+        req.params.id,
+        userId
+      ]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Listing not found or not owned by user"
+      });
+    }
+
+    res.json({
+      status: "ok",
+      message: "Listing deleted"
+    });
+
+  } catch (error) {
+    console.error("DELETE LISTING ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to delete listing"
+    });
+  }
+});
+
+
+// ============================================================
+// GLOBAL SEARCH
+// ============================================================
+
+app.get("/api/search", async (req, res) => {
+  try {
+    const q = cleanText(req.query.q);
+
+    if (!q) {
+      return res.json({
+        status: "ok",
+        businesses: [],
+        products: [],
+        services: [],
+        listings: []
+      });
+    }
+
+    const search = `%${q}%`;
+
+    const businesses = await pool.query(
+      `
+      SELECT *
+      FROM businesses
+      WHERE status = 'active'
+      AND (
+        name ILIKE $1
+        OR description ILIKE $1
+        OR category ILIKE $1
+        OR location ILIKE $1
+      )
+      ORDER BY created_at DESC
+      LIMIT 50
+      `,
+      [search]
+    );
+
+    const products = await pool.query(
+      `
+      SELECT
+        p.*,
+        u.name AS seller_name
+      FROM products p
+      LEFT JOIN users u
+        ON u.id = p.user_id
+      WHERE p.status = 'active'
+      AND (
+        p.name ILIKE $1
+        OR p.description ILIKE $1
+        OR p.category ILIKE $1
+        OR p.location ILIKE $1
+      )
+      ORDER BY p.created_at DESC
+      LIMIT 50
+      `,
+      [search]
+    );
+
+    const services = await pool.query(
+      `
+      SELECT
+        s.*,
+        u.name AS provider_name
+      FROM services s
+      LEFT JOIN users u
+        ON u.id = s.user_id
+      WHERE s.status = 'active'
+      AND (
+        s.name ILIKE $1
+        OR s.description ILIKE $1
+        OR s.category ILIKE $1
+        OR s.location ILIKE $1
+      )
+      ORDER BY s.created_at DESC
+      LIMIT 50
+      `,
+      [search]
+    );
+
+    const listings = await pool.query(
+      `
+      SELECT
+        l.*,
+        u.name AS seller_name
+      FROM listings l
+      LEFT JOIN users u
+        ON u.id = l.user_id
+      WHERE l.status = 'active'
+      AND (
+        l.title ILIKE $1
+        OR l.description ILIKE $1
+        OR l.category ILIKE $1
+        OR l.location ILIKE $1
+      )
+      ORDER BY l.created_at DESC
+      LIMIT 50
+      `,
+      [search]
+    );
+
+    res.json({
+      status: "ok",
+      query: q,
+      businesses: businesses.rows,
+      products: products.rows,
+      services: services.rows,
+      listings: listings.rows
+    });
+
+  } catch (error) {
+    console.error("SEARCH ERROR:", error);
+
+    res.status(500).json({
+      error: "Search failed"
+    });
+  }
+});
+
+
+// ============================================================
+// REVIEWS
+// ============================================================
+
+app.post("/api/reviews", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const {
+      business_id,
+      rating,
+      comment
+    } = req.body;
+
+    if (!business_id) {
+      return res.status(400).json({
+        error: "business_id is required"
+      });
+    }
+
+    const numericRating = Number(rating);
+
+    if (
+      !Number.isInteger(numericRating) ||
+      numericRating < 1 ||
+      numericRating > 5
+    ) {
+      return res.status(400).json({
+        error: "Rating must be between 1 and 5"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO reviews
+      (
+        business_id,
+        user_id,
+        rating,
+        comment
+      )
+      VALUES
+      ($1,$2,$3,$4)
+      RETURNING *
+      `,
+      [
+        business_id,
+        userId,
+        numericRating,
+        cleanText(comment)
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      review: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("CREATE REVIEW ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to create review"
+    });
+  }
+});
+
+
+// ============================================================
+// GET BUSINESS REVIEWS
+// ============================================================
+
+app.get("/api/reviews/:businessId", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        r.*,
+        u.name AS user_name
+      FROM reviews r
+      LEFT JOIN users u
+        ON u.id = r.user_id
+      WHERE r.business_id = $1
+      ORDER BY r.created_at DESC
+      `,
+      [req.params.businessId]
+    );
+
+    res.json({
+      status: "ok",
+      reviews: result.rows
+    });
+
+  } catch (error) {
+    console.error("GET REVIEWS ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to load reviews"
+    });
+  }
+});
+
+
+// ============================================================
+// MESSAGES
+// ============================================================
+
+app.post("/api/messages", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const {
+      receiver_id,
+      message
+    } = req.body;
+
+    if (!receiver_id || !message || !message.trim()) {
+      return res.status(400).json({
+        error: "receiver_id and message are required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO messages
+      (
+        sender_id,
+        receiver_id,
+        message
+      )
+      VALUES
+      ($1,$2,$3)
+      RETURNING *
+      `,
+      [
+        userId,
+        receiver_id,
+        cleanText(message)
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      message: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("SEND MESSAGE ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to send message"
+    });
+  }
+});
+
+
+// ============================================================
+// GET USER MESSAGES
+// ============================================================
+
+app.get("/api/messages/:userId", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    if (String(userId) !== String(req.params.userId)) {
+      return res.status(403).json({
+        error: "Access denied"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        m.*,
+        sender.name AS sender_name,
+        receiver.name AS receiver_name
+      FROM messages m
+      LEFT JOIN users sender
+        ON sender.id = m.sender_id
+      LEFT JOIN users receiver
+        ON receiver.id = m.receiver_id
+      WHERE m.sender_id = $1
+         OR m.receiver_id = $1
+      ORDER BY m.created_at DESC
+      `,
+      [userId]
+    );
+
+    res.json({
+      status: "ok",
+      messages: result.rows
+    });
+
+  } catch (error) {
+    console.error("GET MESSAGES ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to load messages"
+    });
+  }
+});
+
+
+// ============================================================
+// REPORTS
+// ============================================================
+
+app.post("/api/reports", async (req, res) => {
+  try {
+    const userId = requireUser(req, res);
+    if (!userId) return;
+
+    const {
+      listing_id,
+      reason
+    } = req.body;
+
+    if (!listing_id || !reason || !reason.trim()) {
+      return res.status(400).json({
+        error: "listing_id and reason are required"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO reports
+      (
+        listing_id,
+        user_id,
+        reason,
+        status
+      )
+      VALUES
+      ($1,$2,$3,'pending')
+      RETURNING *
+      `,
+      [
+        listing_id,
+        userId,
+        cleanText(reason)
+      ]
+    );
+
+    res.status(201).json({
+      status: "ok",
+      report: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error("CREATE REPORT ERROR:", error);
+
+    res.status(500).json({
+      error: "Unable to create report"
+    });
+  }
+});
+
+
+// ============================================================
+// API 404
+// ============================================================
+
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    error: "API route not found"
+  });
+});
+
+
+// ============================================================
+// GLOBAL ERROR HANDLER
+// ============================================================
+
+app.use((error, req, res, next) => {
+  console.error("SERVER ERROR:", error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  res.status(500).json({
+    error: "Internal server error"
+  });
+});
+
+
+// ============================================================
+// START SERVER
+// ============================================================
+
+async function startServer() {
+  try {
+    await pool.query("SELECT 1");
+
+    await initializeDatabase();
+
+    app.listen(
+      PORT,
+      "0.0.0.0",
+      () => {
+        console.log(
+          `HELPY running on port ${PORT}`
+        );
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "HELPY could not start:",
+      error
+    );
+
+    process.exit(1);
+  }
+}
+
+startServer();
