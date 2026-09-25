@@ -1,11 +1,18 @@
 {
-  "name": "helpy-global",
-  "version": "4.0.0",
-  "private": true,
+  "name": "helpy",
+  "version": "1.0.0",
+  "description": "HELPY global marketplace platform",
+  "main": "server.js",
   "scripts": {
-    "dev": "vercel dev"
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.0"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "pg": "^8.16.3"
   }
 }
