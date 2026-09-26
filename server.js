@@ -268,6 +268,44 @@ await client.query(`
       ADD COLUMN IF NOT EXISTS image TEXT DEFAULT ''
     `);
 
+await client.query(`
+  ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS title VARCHAR(255)
+`);
+
+await client.query(`
+  ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS currency VARCHAR(10) DEFAULT 'USD'
+`);
+
+await client.query(`
+  ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]'
+`);
+
+await client.query(`
+  ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW()
+`);
+
+await client.query(`
+  UPDATE products
+  SET title = name
+  WHERE title IS NULL
+`);
+
+await client.query(`
+  UPDATE products
+  SET images =
+    CASE
+      WHEN image IS NOT NULL
+       AND image <> ''
+      THEN json_build_array(image)::text
+      ELSE '[]'
+    END
+  WHERE images IS NULL
+     OR images = ''
+`);
     await client.query(`
       ALTER TABLE products
       ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'active'
@@ -1197,7 +1235,7 @@ app.post("/api/register", async (req, res) => {
         $2,
         $3,
         $4,
-        'user',
+        'user'
         'active',
         FALSE
       )
@@ -2149,30 +2187,34 @@ app.post(
         await pool.query(
           `
           INSERT INTO products
-          (
-            user_id,
-            title,
-            description,
-            price,
-            currency,
-            category,
-            location,
-            whatsapp,
-            images,
-            status
-          )
+(
+  user_id,
+  name,
+  title,
+  description,
+  price,
+  currency,
+  category,
+  location,
+  whatsapp,
+  images,
+  status
+)
           VALUES
-          (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6,
-            $7,
-            $8,
-            $9,
-            $10
+(
+  $1,
+  $2,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9,
+  $10,
+  $11
+)
           )
           RETURNING *
           `,
