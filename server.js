@@ -2215,7 +2215,6 @@ app.post(
   $10,
   $11
 )
-          )
           RETURNING *
           `,
           [
