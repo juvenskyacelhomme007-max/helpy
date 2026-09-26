@@ -1,5 +1,2896 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script><script src="/supabase.js"></script><title>Publier — HELPY</title></head><body><header class="topbar"><div class="inner"><a class="brand" href="/"><span class="logo">H</span><span class="brand-name">HELPY</span></a><a href="/" class="outline-btn">Annuler</a></div></header><main class="container page"><div class="panel"><h1>Publier sur HELPY</h1><p class="muted">Choisis ce que tu veux partager.</p><div class="quick"><button class="quick-card" onclick="setType('product')"><span class="quick-icon q-blue">🛒</span><span><b>Vendre un produit</b><small>Article neuf ou d'occasion</small></span></button><button class="quick-card" onclick="setType('service')"><span class="quick-icon q-green">🛠️</span><span><b>Offrir un service</b><small>Compétence ou prestation</small></span></button><button class="quick-card" onclick="document.getElementById('bizForm').scrollIntoView()"><span class="quick-icon q-orange">🏢</span><span><b>Créer une entreprise</b><small>Présenter ton business</small></span></button></div><div id="msg"></div><form id="listingForm" class="form" style="margin-top:25px"><h2 id="formTitle">Nouvelle annonce produit</h2><input type="hidden" id="type" value="product"><div class="field"><label>Titre</label><input id="title" required></div><div class="field"><label>Description</label><textarea id="description"></textarea></div><div class="two"><div class="field"><label>Prix</label><input id="price" type="number" min="0" step="0.01" value="0"></div><div class="field"><label>Devise</label><select id="currency"><option>USD</option><option>EUR</option><option>CAD</option><option>GBP</option><option>HTG</option><option>MXN</option><option>BRL</option><option>INR</option><option>NGN</option></select></div></div><div class="two"><div class="field"><label>Catégorie</label><input id="category"></div><div class="field"><label>Quantité</label><input id="quantity" type="number" min="1" value="1"></div></div><div class="two"><div class="field"><label>Ville / zone</label><input id="location"></div><div class="field"><label>Pays</label><input id="country"></div></div><div class="field"><label>Contact / WhatsApp</label><input id="contact"></div><div class="field"><label>URL de l'image (optionnel)</label><input id="image_url" placeholder="https://…"></div><button class="primary">Publier l'annonce</button></form><hr style="border:0;border-top:1px solid var(--line);margin:35px 0"><h2 id="bizForm">Créer une entreprise</h2><form id="businessForm" class="form"><div class="field"><label>Nom</label><input id="bname" required></div><div class="field"><label>Catégorie</label><input id="bcategory"></div><div class="field"><label>Description</label><textarea id="bdesc"></textarea></div><div class="two"><div class="field"><label>Téléphone</label><input id="bphone"></div><div class="field"><label>WhatsApp</label><input id="bwa"></div></div><div class="two"><div class="field"><label>Pays</label><input id="bcountry"></div><div class="field"><label>Ville / zone</label><input id="blocation"></div></div><div class="field"><label>Adresse</label><input id="baddress"></div><div class="field"><label>URL de l'image</label><input id="bimage"></div><button class="primary">Créer l'entreprise</button></form></div></main><nav class="bottom-nav"><a href="/"><div>⌂</div><span>Accueil</span></a><a href="/search.html"><div>⌕</div><span>Recherche</span></a><a class="publish-fab" href="/publish.html"><div>＋</div><span>Publier</span></a><a href="/messages.html"><div>💬</div><span>Messages</span></a><a href="/profile.html"><div>♙</div><span>Profil</span></a></nav><script>
-function setType(t){type.value=t;formTitle.textContent=t==="service"?"Nouvelle offre de service":"Nouvelle annonce produit"}
-listingForm.onsubmit=async e=>{e.preventDefault();const u=await HELPY.requireAuth();if(!u)return;const db=await HELPY.init();const {error}=await db.from("listings").insert({user_id:u.id,type:type.value,title:title.value.trim(),description:description.value.trim(),price:Number(price.value)||0,currency:currency.value,category:category.value.trim(),location:location.value.trim(),country:country.value.trim(),contact:contact.value.trim(),image_url:image_url.value.trim(),quantity:Number(quantity.value)||1,status:"active"});msg.className=error?"notice error":"notice ok";msg.textContent=error?error.message:"Annonce publiée !";if(!error)setTimeout(()=>location.href="/",800)}
-businessForm.onsubmit=async e=>{e.preventDefault();const u=await HELPY.requireAuth();if(!u)return;const db=await HELPY.init();const {error}=await db.from("businesses").insert({user_id:u.id,name:bname.value.trim(),category:bcategory.value.trim(),description:bdesc.value.trim(),phone:bphone.value.trim(),whatsapp:bwa.value.trim(),country:bcountry.value.trim(),location:blocation.value.trim(),address:baddress.value.trim(),image_url:bimage.value.trim()});msg.className=error?"notice error":"notice ok";msg.textContent=error?error.message:"Entreprise créée !";if(!error)setTimeout(()=>location.href="/businesses.html",800)}
-</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Publier sur HELPY</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+      padding-bottom: 80px;
+    }
+
+    /* ==============================
+       HEADER
+       ============================== */
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 15px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-content {
+      max-width: 760px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+      color: #5846e8;
+    }
+
+    .back-button {
+      border: none;
+      background: none;
+      color: #555;
+      font-size: 15px;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    /* ==============================
+       MAIN
+       ============================== */
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 25px 16px 35px;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 27px;
+    }
+
+    .page-subtitle {
+      text-align: center;
+      color: #777;
+      margin: 0 auto 28px;
+      line-height: 1.5;
+      font-size: 14px;
+      max-width: 500px;
+    }
+
+    /* ==============================
+       CHOIX
+       ============================== */
+
+    #choiceScreen {
+      display: block;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .choice-card {
+      width: 100%;
+      border: 1px solid #e3e3e3;
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 17px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+    }
+
+    .choice-card:hover {
+      border-color: #5846e8;
+      box-shadow: 0 7px 22px rgba(0,0,0,.07);
+      transform: translateY(-1px);
+    }
+
+    .choice-icon {
+      width: 58px;
+      height: 58px;
+      min-width: 58px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0eeff;
+      font-size: 28px;
+    }
+
+    .choice-content {
+      flex: 1;
+    }
+
+    .choice-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .choice-description {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .choice-arrow {
+      color: #999;
+      font-size: 23px;
+    }
+
+    /* ==============================
+       FORMULAIRES
+       ============================== */
+
+    .form-screen {
+      display: none;
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.06);
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 23px;
+    }
+
+    .form-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #f0eeff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+    }
+
+    .form-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .form-description {
+      color: #777;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .back-choice {
+      border: none;
+      background: none;
+      color: #5846e8;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 17px 0 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      color: #222;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #5846e8;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .price-row {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 10px;
+    }
+
+    .submit-button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 11px;
+      background: #5846e8;
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .submit-button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .cancel-button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 11px;
+      background: white;
+      color: #555;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ==============================
+       MESSAGES
+       ============================== */
+
+    .message {
+      display: none;
+      padding: 13px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .message.error {
+      background: #ffe8e8;
+      color: #a60000;
+    }
+
+    .message.success {
+      background: #e8f8ed;
+      color: #147a35;
+    }
+
+    /* ==============================
+       CONNEXION
+       ============================== */
+
+    #loginRequired {
+      display: none;
+      background: #fff;
+      border-radius: 18px;
+      padding: 35px 20px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(0,0,0,.06);
+    }
+
+    #loginRequired h2 {
+      margin: 0 0 10px;
+    }
+
+    #loginRequired p {
+      color: #777;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .login-button {
+      display: inline-block;
+      text-decoration: none;
+      background: #5846e8;
+      color: #fff;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    /* ==============================
+       BOTTOM NAV
+       ============================== */
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: center;
+      z-index: 30;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 760px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .nav-item {
+      text-decoration: none;
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 11px;
+    }
+
+    .nav-icon {
+      font-size: 21px;
+    }
+
+    .nav-item.active {
+      color: #5846e8;
+      font-weight: 700;
+    }
+
+    /* ==============================
+       MOBILE
+       ============================== */
+
+    @media (max-width: 600px) {
+
+      main {
+        padding-top: 20px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .form-card {
+        padding: 18px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .price-row {
+        grid-template-columns: 1fr;
+      }
+
+      .choice-card {
+        padding: 17px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+<!-- ==========================================
+     HEADER
+     ========================================== -->
+
+<header>
+
+  <div class="header-content">
+
+    <button
+      id="headerBack"
+      class="back-button"
+      type="button"
+    >
+      ← Retour
+    </button>
+
+    <div class="logo">
+      HELPY
+    </div>
+
+    <div style="width:55px;"></div>
+
+  </div>
+
+</header>
+
+
+<main>
+
+  <!-- ==========================================
+       CONNEXION
+       ========================================== -->
+
+  <div id="loginRequired">
+
+    <h2>
+      Connexion requise
+    </h2>
+
+    <p>
+      Connecte-toi à ton compte HELPY pour publier une annonce.
+    </p>
+
+    <a
+      href="/login.html?redirect=/publish.html"
+      class="login-button"
+    >
+      🔑 Se connecter
+    </a>
+
+  </div>
+
+
+  <!-- ==========================================
+       CHOIX
+       ========================================== -->
+
+  <section id="choiceScreen">
+
+    <h1 class="page-title">
+      Publier sur HELPY
+    </h1>
+
+    <p class="page-subtitle">
+      Choisis ce que tu veux proposer.
+    </p>
+
+
+    <div class="choice-list">
+
+      <!-- PRODUIT -->
+
+      <button
+        type="button"
+        class="choice-card"
+        id="chooseProduct"
+      >
+
+        <div class="choice-icon">
+          🛒
+        </div>
+
+        <div class="choice-content">
+
+          <div class="choice-title">
+            Vendre un produit
+          </div>
+
+          <div class="choice-description">
+            Vends un article neuf ou d'occasion.
+          </div>
+
+        </div>
+
+        <div class="choice-arrow">
+          ›
+        </div>
+
+      </button>
+
+
+      <!-- SERVICE -->
+
+      <button
+        type="button"
+        class="choice-card"
+        id="chooseService"
+      >
+
+        <div class="choice-icon">
+          🛠️
+        </div>
+
+        <div class="choice-content">
+
+          <div class="choice-title">
+            Offrir un service
+          </div>
+
+          <div class="choice-description">
+            Propose tes compétences ou tes prestations.
+          </div>
+
+        </div>
+
+        <div class="choice-arrow">
+          ›
+        </div>
+
+      </button>
+
+
+      <!-- ENTREPRISE -->
+
+      <button
+        type="button"
+        class="choice-card"
+        id="chooseBusiness"
+      >
+
+        <div class="choice-icon">
+          🏢
+        </div>
+
+        <div class="choice-content">
+
+          <div class="choice-title">
+            Créer une entreprise
+          </div>
+
+          <div class="choice-description">
+            Présente ton entreprise et ton activité.
+          </div>
+
+        </div>
+
+        <div class="choice-arrow">
+          ›
+        </div>
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==========================================
+       FORMULAIRE PRODUIT
+       ========================================== -->
+
+  <section
+    id="productScreen"
+    class="form-screen"
+  >
+
+    <button
+      type="button"
+      class="back-choice"
+      data-back
+    >
+      ← Retour aux choix
+    </button>
+
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          🛒
+        </div>
+
+        <div>
+
+          <div class="form-title">
+            Vendre un produit
+          </div>
+
+          <div class="form-description">
+            Ajoute les informations de ton article.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="productMessage"
+        class="message"
+      ></div>
+
+
+      <form id="productForm">
+
+        <label for="productTitle">
+          Nom du produit
+        </label>
+
+        <input
+          type="text"
+          id="productTitle"
+          placeholder="Exemple : Smartphone, chaussures..."
+          required
+        >
+
+
+        <label for="productDescription">
+          Description
+        </label>
+
+        <textarea
+          id="productDescription"
+          placeholder="Décris ton produit..."
+          required
+        ></textarea>
+
+
+        <label>
+          Prix
+        </label>
+
+        <div class="price-row">
+
+          <input
+            type="number"
+            id="productPrice"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            required
+          >
+
+          <select id="productCurrency">
+
+            <option value="USD">
+              USD
+            </option>
+
+            <option value="EUR">
+              EUR
+            </option>
+
+            <option value="HTG">
+              HTG
+            </option>
+
+            <option value="CAD">
+              CAD
+            </option>
+
+            <option value="GBP">
+              GBP
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="productCategory">
+              Catégorie
+            </label>
+
+            <input
+              type="text"
+              id="productCategory"
+              placeholder="Exemple : Téléphones"
+              required
+            >
+
+          </div>
+
+
+          <div>
+
+            <label for="productQuantity">
+              Quantité
+            </label>
+
+            <input
+              type="number"
+              id="productQuantity"
+              value="1"
+              min="1"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="productCity">
+              Ville / zone
+            </label>
+
+            <input
+              type="text"
+              id="productCity"
+              placeholder="Ville ou zone"
+              required
+            >
+
+          </div>
+
+
+          <div>
+
+            <label for="productCountry">
+              Pays
+            </label>
+
+            <input
+              type="text"
+              id="productCountry"
+              placeholder="Pays"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <label for="productWhatsapp">
+          Contact / WhatsApp
+        </label>
+
+        <input
+          type="tel"
+          id="productWhatsapp"
+          placeholder="+..."
+          required
+        >
+
+
+        <label for="productImage">
+          URL de l'image
+          <span style="color:#999;font-weight:normal;">
+            (optionnel)
+          </span>
+        </label>
+
+        <input
+          type="url"
+          id="productImage"
+          placeholder="https://..."
+        >
+
+
+        <button
+          type="submit"
+          class="submit-button"
+          id="productSubmit"
+        >
+          🛒 Publier le produit
+        </button>
+
+
+        <button
+          type="button"
+          class="cancel-button"
+          data-back
+        >
+          Annuler
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==========================================
+       FORMULAIRE SERVICE
+       ========================================== -->
+
+  <section
+    id="serviceScreen"
+    class="form-screen"
+  >
+
+    <button
+      type="button"
+      class="back-choice"
+      data-back
+    >
+      ← Retour aux choix
+    </button>
+
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          🛠️
+        </div>
+
+        <div>
+
+          <div class="form-title">
+            Offrir un service
+          </div>
+
+          <div class="form-description">
+            Présente ton service et ce que tu proposes.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="serviceMessage"
+        class="message"
+      ></div>
+
+
+      <form id="serviceForm">
+
+        <label for="serviceTitle">
+          Nom du service
+        </label>
+
+        <input
+          type="text"
+          id="serviceTitle"
+          placeholder="Exemple : Réparation téléphone"
+          required
+        >
+
+
+        <label for="serviceDescription">
+          Description
+        </label>
+
+        <textarea
+          id="serviceDescription"
+          placeholder="Décris ton service..."
+          required
+        ></textarea>
+
+
+        <label>
+          Prix / Tarif
+        </label>
+
+        <div class="price-row">
+
+          <input
+            type="number"
+            id="servicePrice"
+            min="0"
+            step="0.01"
+            placeholder="0"
+            required
+          >
+
+          <select id="serviceCurrency">
+
+            <option value="USD">
+              USD
+            </option>
+
+            <option value="EUR">
+              EUR
+            </option>
+
+            <option value="HTG">
+              HTG
+            </option>
+
+            <option value="CAD">
+              CAD
+            </option>
+
+            <option value="GBP">
+              GBP
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <label for="serviceCategory">
+          Catégorie
+        </label>
+
+        <input
+          type="text"
+          id="serviceCategory"
+          placeholder="Exemple : Réparation"
+          required
+        >
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="serviceCity">
+              Ville / zone
+            </label>
+
+            <input
+              type="text"
+              id="serviceCity"
+              placeholder="Ville ou zone"
+              required
+            >
+
+          </div>
+
+
+          <div>
+
+            <label for="serviceCountry">
+              Pays
+            </label>
+
+            <input
+              type="text"
+              id="serviceCountry"
+              placeholder="Pays"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <label for="serviceWhatsapp">
+          Contact / WhatsApp
+        </label>
+
+        <input
+          type="tel"
+          id="serviceWhatsapp"
+          placeholder="+..."
+          required
+        >
+
+
+        <label for="serviceImage">
+          URL de l'image
+          <span style="color:#999;font-weight:normal;">
+            (optionnel)
+          </span>
+        </label>
+
+        <input
+          type="url"
+          id="serviceImage"
+          placeholder="https://..."
+        >
+
+
+        <button
+          type="submit"
+          class="submit-button"
+          id="serviceSubmit"
+        >
+          🛠️ Publier le service
+        </button>
+
+
+        <button
+          type="button"
+          class="cancel-button"
+          data-back
+        >
+          Annuler
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==========================================
+       FORMULAIRE ENTREPRISE
+       ========================================== -->
+
+  <section
+    id="businessScreen"
+    class="form-screen"
+  >
+
+    <button
+      type="button"
+      class="back-choice"
+      data-back
+    >
+      ← Retour aux choix
+    </button>
+
+
+    <div class="form-card">
+
+      <div class="form-header">
+
+        <div class="form-icon">
+          🏢
+        </div>
+
+        <div>
+
+          <div class="form-title">
+            Créer une entreprise
+          </div>
+
+          <div class="form-description">
+            Présente ton entreprise et ton activité.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="businessMessage"
+        class="message"
+      ></div>
+
+
+      <form id="businessForm">
+
+        <label for="businessName">
+          Nom de l'entreprise
+        </label>
+
+        <input
+          type="text"
+          id="businessName"
+          placeholder="Nom de ton entreprise"
+          required
+        >
+
+
+        <label for="businessCategory">
+          Catégorie
+        </label>
+
+        <input
+          type="text"
+          id="businessCategory"
+          placeholder="Exemple : Technologie, Restaurant..."
+          required
+        >
+
+
+        <label for="businessDescription">
+          Description
+        </label>
+
+        <textarea
+          id="businessDescription"
+          placeholder="Présente ton entreprise..."
+          required
+        ></textarea>
+
+
+        <label for="businessPhone">
+          Téléphone
+        </label>
+
+        <input
+          type="tel"
+          id="businessPhone"
+          placeholder="+..."
+        >
+
+
+        <label for="businessWhatsapp">
+          WhatsApp
+        </label>
+
+        <input
+          type="tel"
+          id="businessWhatsapp"
+          placeholder="+..."
+        >
+
+
+        <div class="row">
+
+          <div>
+
+            <label for="businessCountry">
+              Pays
+            </label>
+
+            <input
+              type="text"
+              id="businessCountry"
+              placeholder="Pays"
+              required
+            >
+
+                    <div>
+
+            <label for="businessCity">
+              Ville / zone
+            </label>
+
+            <input
+              type="text"
+              id="businessCity"
+              placeholder="Ville ou zone"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <label for="businessAddress">
+          Adresse
+        </label>
+
+        <input
+          type="text"
+          id="businessAddress"
+          placeholder="Adresse de l'entreprise"
+        >
+
+
+        <label for="businessImage">
+          URL de l'image
+          <span style="color:#999;font-weight:normal;">
+            (optionnel)
+          </span>
+        </label>
+
+        <input
+          type="url"
+          id="businessImage"
+          placeholder="https://..."
+        >
+
+
+        <button
+          type="submit"
+          class="submit-button"
+          id="businessSubmit"
+        >
+          🏢 Créer l'entreprise
+        </button>
+
+
+        <button
+          type="button"
+          class="cancel-button"
+          data-back
+        >
+          Annuler
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- ==========================================
+     NAVIGATION
+     ========================================== -->
+
+<nav class="bottom-nav">
+
+  <div class="nav-inner">
+
+    <a
+      href="/"
+      class="nav-item"
+    >
+      <span class="nav-icon">⌂</span>
+      <span>Accueil</span>
+    </a>
+
+
+    <a
+      href="/search.html"
+      class="nav-item"
+    >
+      <span class="nav-icon">⌕</span>
+      <span>Recherche</span>
+    </a>
+
+
+    <a
+      href="/publish.html"
+      class="nav-item active"
+    >
+      <span class="nav-icon">＋</span>
+      <span>Publier</span>
+    </a>
+
+
+    <a
+      href="/messages.html"
+      class="nav-item"
+    >
+      <span class="nav-icon">💬</span>
+      <span>Messages</span>
+    </a>
+
+
+    <a
+      href="/profile.html"
+      class="nav-item"
+    >
+      <span class="nav-icon">♙</span>
+      <span>Profil</span>
+    </a>
+
+  </div>
+
+</nav>
+
+
+<script>
+
+  /* =====================================================
+     HELPY - PUBLICATION
+     ===================================================== */
+
+  const API_BASE_URL =
+    window.location.origin;
+
+
+  let currentUser =
+    null;
+
+
+  /* =====================================================
+     ELEMENTS
+     ===================================================== */
+
+  const choiceScreen =
+    document.getElementById(
+      "choiceScreen"
+    );
+
+  const productScreen =
+    document.getElementById(
+      "productScreen"
+    );
+
+  const serviceScreen =
+    document.getElementById(
+      "serviceScreen"
+    );
+
+  const businessScreen =
+    document.getElementById(
+      "businessScreen"
+    );
+
+  const loginRequired =
+    document.getElementById(
+      "loginRequired"
+    );
+
+  const headerBack =
+    document.getElementById(
+      "headerBack"
+    );
+
+
+  /* =====================================================
+     UTILISATEUR
+     ===================================================== */
+
+  function getCurrentUser() {
+
+    const saved =
+      localStorage.getItem(
+        "helpy_user"
+      );
+
+
+    if (!saved) {
+
+      return null;
+
+    }
+
+
+    try {
+
+      return JSON.parse(saved);
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      return null;
+
+    }
+
+  }
+
+
+  /* =====================================================
+     AFFICHER ÉCRAN
+     ===================================================== */
+
+  function hideAllScreens() {
+
+    choiceScreen.style.display =
+      "none";
+
+    productScreen.style.display =
+      "none";
+
+    serviceScreen.style.display =
+      "none";
+
+    businessScreen.style.display =
+      "none";
+
+  }
+
+
+  function showChoiceScreen() {
+
+    hideAllScreens();
+
+    choiceScreen.style.display =
+      "block";
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  function showProductScreen() {
+
+    hideAllScreens();
+
+    productScreen.style.display =
+      "block";
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  function showServiceScreen() {
+
+    hideAllScreens();
+
+    serviceScreen.style.display =
+      "block";
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  function showBusinessScreen() {
+
+    hideAllScreens();
+
+    businessScreen.style.display =
+      "block";
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  /* =====================================================
+     MESSAGES
+     ===================================================== */
+
+  function showMessage(
+    element,
+    text,
+    type
+  ) {
+
+    element.textContent =
+      text;
+
+    element.className =
+      "message " + type;
+
+    element.style.display =
+      "block";
+
+  }
+
+
+  /* =====================================================
+     RESET MESSAGE
+     ===================================================== */
+
+  function clearMessages() {
+
+    document
+      .querySelectorAll(".message")
+      .forEach(
+        function(message) {
+
+          message.style.display =
+            "none";
+
+        }
+      );
+
+  }
+
+
+  /* =====================================================
+     BOUTONS CHOIX
+     ===================================================== */
+
+  document
+    .getElementById("chooseProduct")
+    .addEventListener(
+      "click",
+      function() {
+
+        clearMessages();
+
+        showProductScreen();
+
+      }
+    );
+
+
+  document
+    .getElementById("chooseService")
+    .addEventListener(
+      "click",
+      function() {
+
+        clearMessages();
+
+        showServiceScreen();
+
+      }
+    );
+
+
+  document
+    .getElementById("chooseBusiness")
+    .addEventListener(
+      "click",
+      function() {
+
+        clearMessages();
+
+        showBusinessScreen();
+
+      }
+    );
+
+
+  /* =====================================================
+     RETOUR
+     ===================================================== */
+
+  document
+    .querySelectorAll("[data-back]")
+    .forEach(
+      function(button) {
+
+        button.addEventListener(
+          "click",
+          function() {
+
+            clearMessages();
+
+            showChoiceScreen();
+
+          }
+        );
+
+      }
+    );
+
+
+  headerBack.addEventListener(
+    "click",
+    function() {
+
+      const activeProduct =
+        productScreen.style.display === "block";
+
+      const activeService =
+        serviceScreen.style.display === "block";
+
+      const activeBusiness =
+        businessScreen.style.display === "block";
+
+
+      if (
+        activeProduct ||
+        activeService ||
+        activeBusiness
+      ) {
+
+        showChoiceScreen();
+
+      } else {
+
+        window.location.href =
+          "/";
+
+      }
+
+    }
+  );
+
+
+  /* =====================================================
+     PRODUIT
+     ===================================================== */
+
+  document
+    .getElementById("productForm")
+    .addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const message =
+          document.getElementById(
+            "productMessage"
+          );
+
+        const submit =
+          document.getElementById(
+            "productSubmit"
+          );
+
+
+        clearMessages();
+
+
+        if (!currentUser) {
+
+          showMessage(
+            message,
+            "Connecte-toi avant de publier.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        const title =
+          document
+            .getElementById("productTitle")
+            .value
+            .trim();
+
+
+        const description =
+          document
+            .getElementById("productDescription")
+            .value
+            .trim();
+
+
+        const price =
+          document
+            .getElementById("productPrice")
+            .value;
+
+
+        const currency =
+          document
+            .getElementById("productCurrency")
+            .value;
+
+
+        const category =
+          document
+            .getElementById("productCategory")
+            .value
+            .trim();
+
+
+        const quantity =
+          document
+            .getElementById("productQuantity")
+            .value;
+
+
+        const city =
+          document
+            .getElementById("productCity")
+            .value
+            .trim();
+
+
+        const country =
+          document
+            .getElementById("productCountry")
+            .value
+            .trim();
+
+
+        const whatsapp =
+          document
+            .getElementById("productWhatsapp")
+            .value
+            .trim();
+
+
+        const image =
+          document
+            .getElementById("productImage")
+            .value
+            .trim();
+
+
+        submit.disabled =
+          true;
+
+        submit.textContent =
+          "Publication...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              API_BASE_URL +
+              "/api/products",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+
+                    title:
+                      title,
+
+                    name:
+                      title,
+
+                    description:
+                      description,
+
+                    price:
+                      Number(price),
+
+                    currency:
+                      currency,
+
+                    category:
+                      category,
+
+                    quantity:
+                      Number(quantity),
+
+                    location:
+                      city,
+
+                    city:
+                      city,
+
+                    country:
+                      country,
+
+                    whatsapp:
+                      whatsapp,
+
+                    contact:
+                      whatsapp,
+
+                    image:
+                      image,
+
+                    image_url:
+                      image,
+
+                    seller_id:
+                      currentUser.id,
+
+                    user_id:
+                      currentUser.id
+
+                  })
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              data.error ||
+              "Impossible de publier le produit."
+            );
+
+          }
+
+
+          showMessage(
+            message,
+            "Produit publié avec succès.",
+            "success"
+          );
+
+
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "/products.html";
+
+            },
+            1200
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "Erreur produit:",
+            error
+          );
+
+
+          showMessage(
+            message,
+            error.message ||
+            "Une erreur est survenue.",
+            "error"
+          );
+
+
+          submit.disabled =
+            false;
+
+          submit.textContent =
+            "🛒 Publier le produit";
+
+        }
+
+      }
+    );
+
+
+  /* =====================================================
+     SERVICE
+     ===================================================== */
+
+  document
+    .getElementById("serviceForm")
+    .addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const message =
+          document.getElementById(
+            "serviceMessage"
+          );
+
+        const submit =
+          document.getElementById(
+            "serviceSubmit"
+          );
+
+
+        clearMessages();
+
+
+        if (!currentUser) {
+
+          showMessage(
+            message,
+            "Connecte-toi avant de publier.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        const title =
+          document
+            .getElementById("serviceTitle")
+            .value
+            .trim();
+
+
+        const description =
+          document
+            .getElementById("serviceDescription")
+            .value
+            .trim();
+
+
+        const price =
+          document
+            .getElementById("servicePrice")
+            .value;
+
+
+        const currency =
+          document
+            .getElementById("serviceCurrency")
+            .value;
+
+
+        const category =
+          document
+            .getElementById("serviceCategory")
+            .value
+            .trim();
+
+
+        const city =
+          document
+            .getElementById("serviceCity")
+            .value
+            .trim();
+
+
+        const country =
+          document
+            .getElementById("serviceCountry")
+            .value
+            .trim();
+
+
+        const whatsapp =
+          document
+            .getElementById("serviceWhatsapp")
+            .value
+            .trim();
+
+
+        const image =
+          document
+            .getElementById("serviceImage")
+            .value
+            .trim();
+
+
+        submit.disabled =
+          true;
+
+        submit.textContent =
+          "Publication...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              API_BASE_URL +
+              "/api/services",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+
+                    title:
+                      title,
+
+                    name:
+                      title,
+
+                    description:
+                      description,
+
+                    price:
+                      Number(price),
+
+                    currency:
+                      currency,
+
+                    category:
+                      category,
+
+                    location:
+                      city,
+
+                    city:
+                      city,
+
+                    country:
+                      country,
+
+                    whatsapp:
+                      whatsapp,
+
+                    contact:
+                      whatsapp,
+
+                    image:
+                      image,
+
+                    image_url:
+                      image,
+
+                    provider_id:
+                      currentUser.id,
+
+                    user_id:
+                      currentUser.id
+
+                  })
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              data.error ||
+              "Impossible de publier le service."
+            );
+
+          }
+
+
+          showMessage(
+            message,
+            "Service publié avec succès.",
+            "success"
+          );
+
+
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "/services.html";
+
+            },
+            1200
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "Erreur service:",
+            error
+          );
+
+
+          showMessage(
+            message,
+            error.message ||
+            "Une erreur est survenue.",
+            "error"
+          );
+
+
+          submit.disabled =
+            false;
+
+          submit.textContent =
+            "🛠️ Publier le service";
+
+        }
+
+      }
+    );
+
+
+  /* =====================================================
+     ENTREPRISE
+     ===================================================== */
+
+  document
+    .getElementById("businessForm")
+    .addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const message =
+          document.getElementById(
+            "businessMessage"
+          );
+
+        const submit =
+          document.getElementById(
+            "businessSubmit"
+          );
+
+
+        clearMessages();
+
+
+        if (!currentUser) {
+
+          showMessage(
+            message,
+            "Connecte-toi avant de créer une entreprise.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        const name =
+          document
+            .getElementById("businessName")
+            .value
+            .trim();
+
+
+        const category =
+          document
+            .getElementById("businessCategory")
+            .value
+            .trim();
+
+
+        const description =
+          document
+            .getElementById("businessDescription")
+            .value
+            .trim();
+
+
+        const phone =
+          document
+            .getElementById("businessPhone")
+            .value
+            .trim();
+
+
+        const whatsapp =
+          document
+            .getElementById("businessWhatsapp")
+            .value
+            .trim();
+
+
+        const country =
+          document
+            .getElementById("businessCountry")
+            .value
+            .trim();
+
+
+        const city =
+          document
+            .getElementById("businessCity")
+            .value
+            .trim();
+
+
+        const address =
+          document
+            .getElementById("businessAddress")
+            .value
+            .trim();
+
+
+        const image =
+          document
+            .getElementById("businessImage")
+            .value
+            .trim();
+
+
+        submit.disabled =
+          true;
+
+        submit.textContent =
+          "Création...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              API_BASE_URL +
+              "/api/businesses",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+
+                    name:
+                      name,
+
+                    business_name:
+                      name,
+
+                    category:
+                      category,
+
+                    description:
+                      description,
+
+                    phone:
+                      phone,
+
+                    telephone:
+                      phone,
+
+                    whatsapp:
+                      whatsapp,
+
+                    country:
+                      country,
+
+                    city:
+                      city,
+
+                    location:
+                      city,
+
+                    address:
+                      address,
+
+                    image:
+                      image,
+
+                    image_url:
+                      image,
+
+                    owner_id:
+                      currentUser.id,
+
+                    user_id:
+                      currentUser.id
+
+                  })
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              data.error ||
+              "Impossible de créer l'entreprise."
+            );
+
+          }
+
+
+          showMessage(
+            message,
+            "Entreprise créée avec succès.",
+            "success"
+          );
+
+
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "/businesses.html";
+
+            },
+            1200
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "Erreur entreprise:",
+            error
+          );
+
+
+          showMessage(
+            message,
+            error.message ||
+            "Une erreur est survenue.",
+            "error"
+          );
+
+
+          submit.disabled =
+            false;
+
+          submit.textContent =
+            "🏢 Créer l'entreprise";
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+     INITIALISATION
+     ===================================================== */
+
+  const API_BASE_URL = window.location.origin;
+
+  const currentUser = JSON.parse(
+    localStorage.getItem("helpy_user") || "null"
+  );
+
+  const choiceScreen = document.getElementById("choiceScreen");
+  const productScreen = document.getElementById("productScreen");
+  const serviceScreen = document.getElementById("serviceScreen");
+  const businessScreen = document.getElementById("businessScreen");
+  const loginRequired = document.getElementById("loginRequired");
+
+  const headerBack = document.getElementById("headerBack");
+
+  const choiceProduct = document.getElementById("choiceProduct");
+  const choiceService = document.getElementById("choiceService");
+  const choiceBusiness = document.getElementById("choiceBusiness");
+
+  const backProduct = document.getElementById("backProduct");
+  const backService = document.getElementById("backService");
+  const backBusiness = document.getElementById("backBusiness");
+
+  /* =====================================================
+     VÉRIFICATION DE LA CONNEXION
+     ===================================================== */
+
+  function checkLogin() {
+    if (!currentUser || !currentUser.id) {
+      if (choiceScreen) choiceScreen.style.display = "none";
+      if (productScreen) productScreen.style.display = "none";
+      if (serviceScreen) serviceScreen.style.display = "none";
+      if (businessScreen) businessScreen.style.display = "none";
+
+      if (loginRequired) {
+        loginRequired.style.display = "block";
+      }
+
+      if (headerBack) {
+        headerBack.style.display = "none";
+      }
+
+      return false;
+    }
+
+    if (loginRequired) {
+      loginRequired.style.display = "none";
+    }
+
+    return true;
+  }
+
+  /* =====================================================
+     AFFICHAGE DES ÉCRANS
+     ===================================================== */
+
+  function hideAllScreens() {
+    if (choiceScreen) choiceScreen.style.display = "none";
+    if (productScreen) productScreen.style.display = "none";
+    if (serviceScreen) serviceScreen.style.display = "none";
+    if (businessScreen) businessScreen.style.display = "none";
+  }
+
+  function showChoiceScreen() {
+    hideAllScreens();
+
+    if (choiceScreen) {
+      choiceScreen.style.display = "block";
+    }
+
+    if (headerBack) {
+      headerBack.style.display = "none";
+    }
+  }
+
+  function showProductScreen() {
+    if (!checkLogin()) return;
+
+    hideAllScreens();
+
+    if (productScreen) {
+      productScreen.style.display = "block";
+    }
+
+    if (headerBack) {
+      headerBack.style.display = "flex";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function showServiceScreen() {
+    if (!checkLogin()) return;
+
+    hideAllScreens();
+
+    if (serviceScreen) {
+      serviceScreen.style.display = "block";
+    }
+
+    if (headerBack) {
+      headerBack.style.display = "flex";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function showBusinessScreen() {
+    if (!checkLogin()) return;
+
+    hideAllScreens();
+
+    if (businessScreen) {
+      businessScreen.style.display = "block";
+    }
+
+    if (headerBack) {
+      headerBack.style.display = "flex";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  /* =====================================================
+     BOUTONS DE CHOIX
+     ===================================================== */
+
+  if (choiceProduct) {
+    choiceProduct.addEventListener("click", function () {
+      showProductScreen();
+    });
+  }
+
+  if (choiceService) {
+    choiceService.addEventListener("click", function () {
+      showServiceScreen();
+    });
+  }
+
+  if (choiceBusiness) {
+    choiceBusiness.addEventListener("click", function () {
+      showBusinessScreen();
+    });
+  }
+
+  /* =====================================================
+     RETOUR
+     ===================================================== */
+
+  if (headerBack) {
+    headerBack.addEventListener("click", function () {
+      showChoiceScreen();
+    });
+  }
+
+  if (backProduct) {
+    backProduct.addEventListener("click", function () {
+      showChoiceScreen();
+    });
+  }
+
+  if (backService) {
+    backService.addEventListener("click", function () {
+      showChoiceScreen();
+    });
+  }
+
+  if (backBusiness) {
+    backBusiness.addEventListener("click", function () {
+      showChoiceScreen();
+    });
+  }
+
+  /* =====================================================
+     PUBLICATION D'UN PRODUIT
+     ===================================================== */
+
+  const productForm = document.getElementById("productForm");
+
+  if (productForm) {
+    productForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!checkLogin()) {
+        window.location.href = "/login.html?redirect=/publish.html";
+        return;
+      }
+
+      const submitButton =
+        productForm.querySelector('button[type="submit"]');
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Publication...";
+      }
+
+      const title =
+        document.getElementById("productTitle")?.value.trim() || "";
+
+      const description =
+        document.getElementById("productDescription")?.value.trim() || "";
+
+      const price =
+        document.getElementById("productPrice")?.value || "0";
+
+      const currency =
+        document.getElementById("productCurrency")?.value || "USD";
+
+      const category =
+        document.getElementById("productCategory")?.value.trim() || "";
+
+      const quantity =
+        document.getElementById("productQuantity")?.value || "1";
+
+      const city =
+        document.getElementById("productCity")?.value.trim() || "";
+
+      const country =
+        document.getElementById("productCountry")?.value.trim() || "";
+
+      const contact =
+        document.getElementById("productContact")?.value.trim() || "";
+
+      const image =
+        document.getElementById("productImage")?.value.trim() || "";
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/products`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              title: title,
+              name: title,
+              description: description,
+              price: Number(price),
+              currency: currency,
+              category: category,
+              quantity: Number(quantity),
+              city: city,
+              country: country,
+              location: city,
+              contact: contact,
+              whatsapp: contact,
+              image: image,
+              image_url: image,
+              seller_id: currentUser.id,
+              user_id: currentUser.id
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            data.error ||
+            "Impossible de publier le produit."
+          );
+        }
+
+        alert(
+          data.message ||
+          "Produit publié avec succès !"
+        );
+
+        window.location.href = "/products.html";
+
+      } catch (error) {
+        console.error("Erreur produit :", error);
+
+        alert(
+          error.message ||
+          "Une erreur est survenue pendant la publication."
+        );
+
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Publier l'annonce";
+        }
+      }
+    });
+  }
+
+  /* =====================================================
+     PUBLICATION D'UN SERVICE
+     ===================================================== */
+
+  const serviceForm = document.getElementById("serviceForm");
+
+  if (serviceForm) {
+    serviceForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!checkLogin()) {
+        window.location.href = "/login.html?redirect=/publish.html";
+        return;
+      }
+
+      const submitButton =
+        serviceForm.querySelector('button[type="submit"]');
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Publication...";
+      }
+
+      const title =
+        document.getElementById("serviceTitle")?.value.trim() || "";
+
+      const description =
+        document.getElementById("serviceDescription")?.value.trim() || "";
+
+      const price =
+        document.getElementById("servicePrice")?.value || "0";
+
+      const currency =
+        document.getElementById("serviceCurrency")?.value || "USD";
+
+      const category =
+        document.getElementById("serviceCategory")?.value.trim() || "";
+
+      const city =
+        document.getElementById("serviceCity")?.value.trim() || "";
+
+      const country =
+        document.getElementById("serviceCountry")?.value.trim() || "";
+
+      const contact =
+        document.getElementById("serviceContact")?.value.trim() || "";
+
+      const image =
+        document.getElementById("serviceImage")?.value.trim() || "";
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/services`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              title: title,
+              name: title,
+              description: description,
+              price: Number(price),
+              currency: currency,
+              category: category,
+              city: city,
+              country: country,
+              location: city,
+              contact: contact,
+              whatsapp: contact,
+              image: image,
+              image_url: image,
+              provider_id: currentUser.id,
+              user_id: currentUser.id
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            data.error ||
+            "Impossible de publier le service."
+          );
+        }
+
+        alert(
+          data.message ||
+          "Service publié avec succès !"
+        );
+
+        window.location.href = "/services.html";
+
+      } catch (error) {
+        console.error("Erreur service :", error);
+
+        alert(
+          error.message ||
+          "Une erreur est survenue pendant la publication."
+        );
+
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Publier le service";
+        }
+      }
+    });
+  }
+
+  /* =====================================================
+     CRÉATION D'UNE ENTREPRISE
+     ===================================================== */
+
+  const businessForm =
+    document.getElementById("businessForm");
+
+  if (businessForm) {
+    businessForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (!checkLogin()) {
+        window.location.href =
+          "/login.html?redirect=/publish.html";
+        return;
+      }
+
+      const submitButton =
+        businessForm.querySelector('button[type="submit"]');
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Création...";
+      }
+
+      const name =
+        document.getElementById("businessName")?.value.trim() || "";
+
+      const category =
+        document.getElementById("businessCategory")?.value.trim() || "";
+
+      const description =
+        document.getElementById("businessDescription")?.value.trim() || "";
+
+      const phone =
+        document.getElementById("businessPhone")?.value.trim() || "";
+
+      const whatsapp =
+        document.getElementById("businessWhatsapp")?.value.trim() || "";
+
+      const country =
+        document.getElementById("businessCountry")?.value.trim() || "";
+
+      const city =
+        document.getElementById("businessCity")?.value.trim() || "";
+
+      const address =
+        document.getElementById("businessAddress")?.value.trim() || "";
+
+      const image =
+        document.getElementById("businessImage")?.value.trim() || "";
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/businesses`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name: name,
+              business_name: name,
+              category: category,
+              description: description,
+              phone: phone,
+              telephone: phone,
+              whatsapp: whatsapp,
+              country: country,
+              city: city,
+              location: city,
+              address: address,
+              image: image,
+              image_url: image,
+              owner_id: currentUser.id,
+              user_id: currentUser.id
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            data.error ||
+            "Impossible de créer l'entreprise."
+          );
+        }
+
+        alert(
+          data.message ||
+          "Entreprise créée avec succès !"
+        );
+
+        window.location.href = "/businesses.html";
+
+      } catch (error) {
+        console.error("Erreur entreprise :", error);
+
+        alert(
+          error.message ||
+          "Une erreur est survenue pendant la création."
+        );
+
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Créer l'entreprise";
+        }
+      }
+    });
+  }
+
+  /* =====================================================
+     INITIALISATION DE LA PAGE
+     ===================================================== */
+
+  if (checkLogin()) {
+    showChoiceScreen();
+  }
+
+  /* =====================================================
+     NAVIGATION BASSE
+     ===================================================== */
+
+  const navHome =
+    document.getElementById("navHome");
+
+  const navSearch =
+    document.getElementById("navSearch");
+
+  const navPublish =
+    document.getElementById("navPublish");
+
+  const navMessages =
+    document.getElementById("navMessages");
+
+  const navProfile =
+    document.getElementById("navProfile");
+
+  if (navHome) {
+    navHome.addEventListener("click", function () {
+      window.location.href = "/";
+    });
+  }
+
+  if (navSearch) {
+    navSearch.addEventListener("click", function () {
+      window.location.href = "/search.html";
+    });
+  }
+
+  if (navPublish) {
+    navPublish.addEventListener("click", function () {
+      window.location.href = "/publish.html";
+    });
+  }
+
+  if (navMessages) {
+    navMessages.addEventListener("click", function () {
+      window.location.href = "/messages.html";
+    });
+  }
+
+  if (navProfile) {
+    navProfile.addEventListener("click", function () {
+      window.location.href = "/profile.html";
+    });
+  }
+
+</script>
+
+</body>
+</html>
+
+         
