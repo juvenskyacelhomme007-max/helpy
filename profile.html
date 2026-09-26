@@ -264,6 +264,33 @@
 
   <div id="errorBox" class="error-box"></div>
 
+<div
+  id="loginBox"
+  class="card"
+  style="display:none; text-align:center;"
+>
+  <div style="font-size:45px; margin-bottom:10px;">
+    🔐
+  </div>
+
+  <h2 style="margin:0 0 8px;">
+    Connecte-toi à ton compte
+  </h2>
+
+  <p style="color:#777; line-height:1.5;">
+    Connecte-toi pour accéder à ton profil HELPY,
+    tes produits, tes services et tes entreprises.
+  </p>
+
+  <a
+    href="/login.html"
+    class="button primary"
+    style="margin-top:15px;"
+  >
+    🔑 Se connecter
+  </a>
+</div>
+
 
   <!-- PROFIL -->
   <div class="card">
@@ -1058,28 +1085,27 @@
 
     if (!user) {
 
-      userName.textContent =
-        "Utilisateur HELPY";
+  userName.textContent =
+    "Utilisateur HELPY";
 
-      userEmail.textContent =
-        "Compte non identifié";
+  userEmail.textContent =
+    "Compte non identifié";
 
+  showInitial("Utilisateur");
 
-      showInitial(
-        "Utilisateur"
-      );
+  errorBox.style.display =
+    "block";
 
+  errorBox.textContent =
+    "Aucun compte HELPY enregistré sur cet appareil.";
 
-      errorBox.style.display =
-        "block";
+  document.getElementById(
+    "loginBox"
+  ).style.display =
+    "block";
 
-      errorBox.textContent =
-        "Aucun compte HELPY enregistré sur cet appareil. Connecte-toi d'abord.";
-
-      return;
-
-    }
-
+  return;
+}
 
     /*
       IMPORTANT :
