@@ -40,6 +40,7 @@
       text-decoration: none;
       color: #555;
       font-size: 15px;
+      font-weight: 600;
     }
 
     .logo {
@@ -58,7 +59,7 @@
       background: #fff;
       border-radius: 18px;
       padding: 24px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
       margin-bottom: 18px;
     }
 
@@ -71,6 +72,7 @@
       color: #777;
       margin-bottom: 25px;
       line-height: 1.5;
+      font-size: 14px;
     }
 
     .message {
@@ -79,6 +81,7 @@
       margin-bottom: 20px;
       display: none;
       font-size: 14px;
+      line-height: 1.4;
     }
 
     .error {
@@ -90,6 +93,10 @@
       background: #e8f8ed;
       color: #147a35;
     }
+
+    /* ==============================
+       PHOTO
+       ============================== */
 
     .profile-photo-area {
       text-align: center;
@@ -119,6 +126,14 @@
       display: block;
     }
 
+    .photo-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .photo-button {
       display: inline-block;
       background: #5846e8;
@@ -127,6 +142,20 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
+      border: none;
+      font-size: 14px;
+    }
+
+    .remove-photo {
+      display: none;
+      background: #fff;
+      color: #d33;
+      border: 1px solid #ddd;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
     }
 
     #photoInput {
@@ -136,8 +165,12 @@
     .photo-info {
       color: #888;
       font-size: 12px;
-      margin-top: 8px;
+      margin-top: 9px;
     }
+
+    /* ==============================
+       FORMULAIRE
+       ============================== */
 
     label {
       display: block;
@@ -155,6 +188,7 @@
       font-size: 15px;
       outline: none;
       font-family: inherit;
+      background: #fff;
     }
 
     input:focus,
@@ -190,6 +224,10 @@
       cursor: not-allowed;
     }
 
+    /* ==============================
+       DECONNEXION
+       ============================== */
+
     .logout {
       width: 100%;
       background: #fff;
@@ -199,6 +237,36 @@
       border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* ==============================
+       PAS CONNECTÉ
+       ============================== */
+
+    .login-card {
+      text-align: center;
+      padding: 35px 20px;
+    }
+
+    .login-card h2 {
+      margin: 0 0 10px;
+    }
+
+    .login-card p {
+      color: #777;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .login-link {
+      display: inline-block;
+      background: #5846e8;
+      color: white;
+      text-decoration: none;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-weight: 700;
     }
 
     footer {
@@ -209,6 +277,7 @@
     }
 
     @media (max-width: 600px) {
+
       main {
         margin-top: 15px;
       }
@@ -216,9 +285,24 @@
       .card {
         padding: 19px;
       }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .photo-actions {
+        flex-direction: column;
+      }
+
+      .photo-button,
+      .remove-photo {
+        width: 100%;
+        max-width: 250px;
+      }
     }
   </style>
 </head>
+
 
 <body>
 
@@ -244,7 +328,43 @@
 
 <main>
 
-  <div class="card">
+  <!-- ==========================================
+       UTILISATEUR NON CONNECTÉ
+       ========================================== -->
+
+  <div
+    id="loginCard"
+    class="card login-card"
+    style="display:none;"
+  >
+
+    <h2>
+      Connexion requise
+    </h2>
+
+    <p>
+      Connecte-toi à ton compte HELPY pour modifier ton profil.
+    </p>
+
+    <a
+      href="/login.html?redirect=/edit-profile.html"
+      class="login-link"
+    >
+      🔑 Se connecter
+    </a>
+
+  </div>
+
+
+  <!-- ==========================================
+       PROFIL
+       ========================================== -->
+
+  <div
+    id="profileCard"
+    class="card"
+    style="display:none;"
+  >
 
     <h1>
       Modifier mon profil
@@ -255,11 +375,12 @@
     </div>
 
 
+    <!-- MESSAGES -->
+
     <div
       id="errorMessage"
       class="message error"
     ></div>
-
 
     <div
       id="successMessage"
@@ -267,9 +388,9 @@
     ></div>
 
 
-    <!-- ==============================
+    <!-- ========================================
          PHOTO DE PROFIL
-         ============================== -->
+         ======================================== -->
 
     <div class="profile-photo-area">
 
@@ -281,12 +402,24 @@
       </div>
 
 
-      <label
-        for="photoInput"
-        class="photo-button"
-      >
-        📷 Ajouter une photo
-      </label>
+      <div class="photo-actions">
+
+        <label
+          for="photoInput"
+          class="photo-button"
+        >
+          📷 Ajouter une photo
+        </label>
+
+        <button
+          type="button"
+          id="removePhoto"
+          class="remove-photo"
+        >
+          🗑️ Supprimer
+        </button>
+
+      </div>
 
 
       <input
@@ -303,9 +436,9 @@
     </div>
 
 
-    <!-- ==============================
+    <!-- ========================================
          FORMULAIRE
-         ============================== -->
+         ======================================== -->
 
     <form id="profileForm">
 
@@ -340,6 +473,17 @@
       <input
         type="tel"
         id="phone"
+        placeholder="+509..."
+      >
+
+
+      <label for="whatsapp">
+        WhatsApp
+      </label>
+
+      <input
+        type="tel"
+        id="whatsapp"
         placeholder="+509..."
       >
 
@@ -381,7 +525,7 @@
         class="save-button"
         id="saveButton"
       >
-        Enregistrer les modifications
+        💾 Enregistrer les modifications
       </button>
 
     </form>
@@ -389,7 +533,15 @@
   </div>
 
 
-  <div class="card">
+  <!-- ==========================================
+       DÉCONNEXION
+       ========================================== -->
+
+  <div
+    id="logoutCard"
+    class="card"
+    style="display:none;"
+  >
 
     <button
       class="logout"
@@ -412,16 +564,33 @@
 
   /* =====================================================
      HELPY - MODIFIER PROFIL
-     VERSION PHOTO LOCALE
+     VERSION FINALE
+     
+     PHOTO :
+     - Stockage local uniquement
+     - Pas de PostgreSQL
+     - Pas de server.js pour la photo
+     - La photo disparaît à la déconnexion
      ===================================================== */
 
+
   let currentUser = null;
+
   let selectedPhoto = null;
 
 
   /* =====================================================
      ELEMENTS
      ===================================================== */
+
+  const loginCard =
+    document.getElementById("loginCard");
+
+  const profileCard =
+    document.getElementById("profileCard");
+
+  const logoutCard =
+    document.getElementById("logoutCard");
 
   const errorMessage =
     document.getElementById("errorMessage");
@@ -435,6 +604,9 @@
   const photoInput =
     document.getElementById("photoInput");
 
+  const removePhoto =
+    document.getElementById("removePhoto");
+
   const fullNameInput =
     document.getElementById("fullName");
 
@@ -443,6 +615,9 @@
 
   const phoneInput =
     document.getElementById("phone");
+
+  const whatsappInput =
+    document.getElementById("whatsapp");
 
   const countryInput =
     document.getElementById("country");
@@ -458,6 +633,9 @@
 
   const saveButton =
     document.getElementById("saveButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
 
 
   /* =====================================================
@@ -493,7 +671,7 @@
 
 
   /* =====================================================
-     UTILISATEUR
+     RÉCUPÉRER UTILISATEUR
      ===================================================== */
 
   function getCurrentUser() {
@@ -501,9 +679,13 @@
     const saved =
       localStorage.getItem("helpy_user");
 
+
     if (!saved) {
+
       return null;
+
     }
+
 
     try {
 
@@ -524,14 +706,17 @@
 
 
   /* =====================================================
-     INITIAL
+     INITIAL DU NOM
      ===================================================== */
 
   function getInitial(name) {
 
     if (!name) {
+
       return "U";
+
     }
+
 
     return name
       .trim()
@@ -542,23 +727,27 @@
 
 
   /* =====================================================
-     AFFICHER PHOTO
+     AFFICHER AVATAR
      ===================================================== */
 
   function updateAvatar(name, photo) {
 
     avatar.innerHTML = "";
 
+
     if (photo) {
 
       const img =
         document.createElement("img");
 
+
       img.src =
         photo;
 
+
       img.alt =
         "Photo de profil";
+
 
       img.onerror =
         function() {
@@ -566,22 +755,36 @@
           avatar.textContent =
             getInitial(name);
 
+          removePhoto.style.display =
+            "none";
+
         };
 
+
       avatar.appendChild(img);
+
+
+      removePhoto.style.display =
+        "inline-block";
+
 
       return;
 
     }
 
+
     avatar.textContent =
       getInitial(name);
+
+
+    removePhoto.style.display =
+      "none";
 
   }
 
 
   /* =====================================================
-     CHARGER PROFIL
+     INITIALISER PROFIL
      ===================================================== */
 
   function initializeProfile() {
@@ -590,18 +793,38 @@
       getCurrentUser();
 
 
+    /*
+     * Aucun utilisateur
+     */
+
     if (!currentUser) {
 
-      showError(
-        "Aucun utilisateur connecté. Connecte-toi d'abord."
-      );
+      loginCard.style.display =
+        "block";
 
-      profileForm.style.display =
+      profileCard.style.display =
+        "none";
+
+      logoutCard.style.display =
         "none";
 
       return;
 
     }
+
+
+    /*
+     * Utilisateur connecté
+     */
+
+    loginCard.style.display =
+      "none";
+
+    profileCard.style.display =
+      "block";
+
+    logoutCard.style.display =
+      "block";
 
 
     const name =
@@ -620,6 +843,10 @@
     const phone =
       currentUser.phone ||
       currentUser.telephone ||
+      "";
+
+
+    const whatsapp =
       currentUser.whatsapp ||
       "";
 
@@ -642,10 +869,19 @@
       "";
 
 
-    const photo =
-      currentUser.profile_photo ||
-      "";
+    /*
+     * Photo déjà enregistrée
+     * dans la session locale.
+     */
 
+    selectedPhoto =
+      currentUser.profile_photo ||
+      null;
+
+
+    /*
+     * Remplir formulaire
+     */
 
     fullNameInput.value =
       name;
@@ -655,6 +891,9 @@
 
     phoneInput.value =
       phone;
+
+    whatsappInput.value =
+      whatsapp;
 
     countryInput.value =
       country;
@@ -666,9 +905,13 @@
       description;
 
 
+    /*
+     * Afficher avatar
+     */
+
     updateAvatar(
       name,
-      photo
+      selectedPhoto
     );
 
   }
@@ -687,35 +930,65 @@
 
 
       if (!file) {
+
         return;
+
       }
 
 
-      if (!file.type.startsWith("image/")) {
+      /*
+       * Vérifier type
+       */
+
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ];
+
+
+      if (
+        !allowedTypes.includes(
+          file.type
+        )
+      ) {
 
         showError(
-          "Veuillez sélectionner une image."
+          "Format non accepté. Utilise JPG, PNG ou WEBP."
         );
 
-        this.value = "";
+        this.value =
+          "";
 
         return;
 
       }
 
 
-      if (file.size > 5 * 1024 * 1024) {
+      /*
+       * Vérifier taille
+       */
+
+      if (
+        file.size >
+        5 * 1024 * 1024
+      ) {
 
         showError(
           "La photo est trop grande. Maximum : 5 MB."
         );
 
-        this.value = "";
+        this.value =
+          "";
 
         return;
 
       }
 
+
+      /*
+       * Lire photo
+       */
 
       const reader =
         new FileReader();
@@ -736,7 +1009,7 @@
 
 
           showSuccess(
-            "Photo sélectionnée. Appuie sur « Enregistrer les modifications » pour la conserver."
+            "Photo sélectionnée. Appuie sur « Enregistrer les modifications »."
           );
 
         };
@@ -753,6 +1026,37 @@
 
 
       reader.readAsDataURL(file);
+
+    }
+  );
+
+
+  /* =====================================================
+     SUPPRIMER PHOTO
+     ===================================================== */
+
+  removePhoto.addEventListener(
+    "click",
+    function() {
+
+      selectedPhoto =
+        null;
+
+
+      photoInput.value =
+        "";
+
+
+      updateAvatar(
+        fullNameInput.value ||
+        "Utilisateur",
+        null
+      );
+
+
+      showSuccess(
+        "Photo supprimée. Appuie sur « Enregistrer les modifications » pour confirmer."
+      );
 
     }
   );
@@ -784,6 +1088,10 @@
         fullNameInput.value.trim();
 
 
+      /*
+       * Nom obligatoire
+       */
+
       if (!name) {
 
         showError(
@@ -795,6 +1103,10 @@
       }
 
 
+      /*
+       * Désactiver bouton
+       */
+
       saveButton.disabled =
         true;
 
@@ -803,14 +1115,16 @@
 
 
       /*
-       * Mettre à jour l'utilisateur
+       * Informations
        */
 
       currentUser.name =
         name;
 
+
       currentUser.full_name =
         name;
+
 
       currentUser.fullName =
         name;
@@ -818,6 +1132,10 @@
 
       currentUser.phone =
         phoneInput.value.trim();
+
+
+      currentUser.whatsapp =
+        whatsappInput.value.trim();
 
 
       currentUser.country =
@@ -835,16 +1153,12 @@
       /*
        * PHOTO
        *
-       * Une seule clé :
-       * profile_photo
+       * Elle est enregistrée
+       * uniquement dans localStorage.
        */
 
-      if (selectedPhoto) {
-
-        currentUser.profile_photo =
-          selectedPhoto;
-
-      }
+      currentUser.profile_photo =
+        selectedPhoto;
 
 
       /*
@@ -855,9 +1169,15 @@
 
         localStorage.setItem(
           "helpy_user",
-          JSON.stringify(currentUser)
+          JSON.stringify(
+            currentUser
+          )
         );
 
+
+        /*
+         * ID utilisateur
+         */
 
         if (
           currentUser.id !== undefined &&
@@ -866,26 +1186,39 @@
 
           localStorage.setItem(
             "helpy_user_id",
-            String(currentUser.id)
+            String(
+              currentUser.id
+            )
           );
 
         }
 
 
         /*
-         * Compatibilité
+         * Compatibilité avec
+         * certaines anciennes pages.
          */
 
         localStorage.setItem(
           "currentUser",
-          JSON.stringify(currentUser)
+          JSON.stringify(
+            currentUser
+          )
         );
 
+
+        /*
+         * Message
+         */
 
         showSuccess(
           "Profil enregistré avec succès."
         );
 
+
+        /*
+         * Retour profil
+         */
 
         setTimeout(
           function() {
@@ -907,7 +1240,7 @@
 
 
         showError(
-          "Impossible d'enregistrer les modifications."
+          "Impossible d'enregistrer les modifications. L'image est peut-être trop grande."
         );
 
 
@@ -915,7 +1248,7 @@
           false;
 
         saveButton.textContent =
-          "Enregistrer les modifications";
+          "💾 Enregistrer les modifications";
 
       }
 
@@ -924,56 +1257,71 @@
 
 
   /* =====================================================
-     DECONNEXION
+     DÉCONNEXION
      ===================================================== */
 
-  document
-    .getElementById("logoutButton")
-    .addEventListener(
-      "click",
-      function() {
+  logoutButton.addEventListener(
+    "click",
+    function() {
 
-        const confirmation =
-          confirm(
-            "Voulez-vous vraiment vous déconnecter ?"
-          );
-
-
-        if (!confirmation) {
-          return;
-        }
-
-
-        localStorage.removeItem(
-          "helpy_user"
-        );
-
-        localStorage.removeItem(
-          "helpy_user_id"
-        );
-
-        localStorage.removeItem(
-          "currentUser"
-        );
-
-        localStorage.removeItem(
-          "user"
-        );
-
-        localStorage.removeItem(
-          "helpyUser"
+      const confirmation =
+        confirm(
+          "Voulez-vous vraiment vous déconnecter ?"
         );
 
 
-        window.location.href =
-          "/login.html";
+      if (!confirmation) {
+
+        return;
 
       }
-    );
+
+
+      /*
+       * Supprimer session locale
+       *
+       * Cela supprime également
+       * la photo locale.
+       */
+
+      localStorage.removeItem(
+        "helpy_user"
+      );
+
+
+      localStorage.removeItem(
+        "helpy_user_id"
+      );
+
+
+      localStorage.removeItem(
+        "currentUser"
+      );
+
+
+      localStorage.removeItem(
+        "user"
+      );
+
+
+      localStorage.removeItem(
+        "helpyUser"
+      );
+
+
+      /*
+       * Retour vers la connexion
+       */
+
+      window.location.href =
+        "/login.html";
+
+    }
+  );
 
 
   /* =====================================================
-     START
+     DÉMARRAGE
      ===================================================== */
 
   initializeProfile();
