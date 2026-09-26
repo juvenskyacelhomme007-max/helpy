@@ -177,6 +177,30 @@ async function initializeDatabase() {
       ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     `);
 
+await client.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS phone VARCHAR(50)
+`);
+
+await client.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS country VARCHAR(120)
+`);
+
+await client.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS city VARCHAR(120)
+`);
+
+await client.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS description TEXT
+`);
+
+await client.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS profile_photo TEXT
+`);
 
     // ==================================================
     // PRODUCTS
