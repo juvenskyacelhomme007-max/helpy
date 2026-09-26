@@ -1,395 +1,881 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Se connecter - HELPY</title>  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mon profil - HELPY</title>
+
+  <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
     }
 
     body {
-      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
       background: #f5f6fa;
+      color: #202124;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 15px 20px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      color: #5846e8;
+      font-size: 25px;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: -1px;
+    }
+
+    .back {
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .container {
       width: 100%;
-      max-width: 500px;
-      background: white;
-      border-radius: 28px;
-      padding: 35px 28px;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+      max-width: 700px;
+      margin: 25px auto;
+      padding: 0 16px 40px;
     }
 
-    .logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 35px;
+    .profile-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 25px 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.06);
     }
 
-    .logo-icon {
-      width: 64px;
-      height: 64px;
-      background: #071a2d;
-      color: white;
-      border-radius: 18px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 34px;
-      font-weight: bold;
-      position: relative;
+    .profile-top {
+      text-align: center;
+      margin-bottom: 25px;
     }
 
-    .logo-icon::after {
-      content: "";
-      width: 15px;
-      height: 15px;
-      background: #ffb51b;
+    .avatar {
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      position: absolute;
-      top: 9px;
-      right: 8px;
-    }
-
-    .logo-text {
+      background: #5846e8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
       font-size: 34px;
-      font-weight: 800;
-      color: #101828;
+      font-weight: 700;
+      object-fit: cover;
+      overflow: hidden;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 34px;
-      color: #101828;
-      margin-bottom: 12px;
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    .subtitle {
-      text-align: center;
-      color: #667085;
+    .profile-top h1 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .profile-top p {
+      color: #777;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .section-title {
       font-size: 17px;
-      margin-bottom: 28px;
+      margin: 25px 0 14px;
+      font-weight: 700;
     }
 
-    .message {
-      display: none;
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 20px;
+    .info {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .info-row {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+
+    .value {
       font-size: 15px;
-      text-align: center;
+      font-weight: 600;
+      word-break: break-word;
     }
 
-    .error {
-      display: block;
-      background: #fff0f0;
-      color: #c62828;
+    .actions {
+      display: grid;
+      gap: 11px;
+      margin-top: 25px;
     }
 
-    .success {
-      display: block;
-      background: #ecfdf3;
-      color: #027a48;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      color: #101828;
-      margin: 18px 0 8px;
-    }
-
-    input {
+    .btn {
       width: 100%;
-      height: 58px;
-      border: 1px solid #d0d5dd;
-      border-radius: 15px;
-      padding: 0 18px;
-      font-size: 17px;
-      outline: none;
-      background: white;
-    }
-
-    input:focus {
-      border-color: #5846e8;
-      box-shadow: 0 0 0 3px rgba(88,70,232,0.12);
-    }
-
-    button {
-      width: 100%;
-      height: 58px;
-      margin-top: 28px;
+      padding: 14px;
       border: none;
-      border-radius: 15px;
-      background: #ffb51b;
-      color: #111;
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    .bottom {
-      text-align: center;
-      margin-top: 24px;
-      color: #667085;
-      font-size: 16px;
-    }
-
-    .bottom a {
-      color: #175cd3;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: 700;
+      cursor: pointer;
       text-decoration: none;
-    }
-  </style></head><body>  <div class="container"><div class="logo">
-  <div class="logo-icon">H</div>
-  <div class="logo-text">HELPY</div>
-</div>
-
-<h1>Bienvenue sur HELPY</h1>
-
-<p class="subtitle">
-  Connecte-toi à ton compte pour continuer.
-</p>
-
-<div id="message" class="message"></div>
-
-<form id="loginForm">
-
-  <label for="email">E-mail</label>
-
-  <input
-    type="email"
-    id="email"
-    placeholder="exemple@email.com"
-    autocomplete="email"
-    required
-  >
-
-  <label for="password">Mot de passe</label>
-
-  <input
-    type="password"
-    id="password"
-    placeholder="Ton mot de passe"
-    autocomplete="current-password"
-    required
-  >
-
-  <button type="submit" id="loginButton">
-    Se connecter
-  </button>
-
-</form>
-
-<div class="bottom">
-  Pas encore de compte ?
-  <a href="/register.html">Créer un compte</a>
-</div>
-
-  </div>  <script>
-
-    // ==================================================
-    // HELPY — CONNEXION
-    // Backend : Railway + PostgreSQL
-    // ==================================================
-
-    const API_BASE_URL = window.location.origin;
-
-    const form =
-      document.getElementById("loginForm");
-
-    const message =
-      document.getElementById("message");
-
-    const button =
-      document.getElementById("loginButton");
-
-
-    function showMessage(text, type) {
-
-      message.textContent = text;
-
-      message.className =
-        "message " + type;
-
+      text-align: center;
+      display: block;
     }
 
+    .btn-primary {
+      background: #5846e8;
+      color: white;
+    }
 
-    form.addEventListener(
-      "submit",
-      async function(event) {
+    .btn-secondary {
+      background: #f0efff;
+      color: #5846e8;
+    }
 
-        event.preventDefault();
+    .btn-danger {
+      background: #fff0f0;
+      color: #d93025;
+    }
 
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
+    .stat {
+      background: #f8f8fc;
+      border-radius: 14px;
+      padding: 16px 8px;
+      text-align: center;
+    }
 
-        const password =
-          document
-            .getElementById("password")
-            .value;
+    .stat strong {
+      display: block;
+      font-size: 21px;
+      color: #5846e8;
+      margin-bottom: 5px;
+    }
 
+    .stat span {
+      color: #777;
+      font-size: 11px;
+    }
 
-        message.className =
-          "message";
+    footer {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      padding: 20px;
+    }
 
-        message.textContent =
-          "";
+    @media (max-width: 480px) {
+      .profile-card {
+        padding: 20px 15px;
+      }
 
+      .stats {
+        gap: 7px;
+      }
+    }
+  </style>
+</head>
 
-        if (!email || !password) {
+<body>
 
-          showMessage(
-            "Veuillez remplir tous les champs.",
-            "error"
-          );
+<header>
 
-          return;
-        }
+  <a href="/" class="logo">
+    HELPY
+  </a>
 
+  <a href="/" class="back">
+    ← Accueil
+  </a>
 
-        button.disabled = true;
-
-        button.textContent =
-          "Connexion...";
-
-
-        try {
-
-          // IMPORTANT :
-          // Le serveur HELPY utilise /api/login
-          const response =
-            await fetch(
-              API_BASE_URL + "/api/login",
-              {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body: JSON.stringify({
-                  email: email,
-                  password: password
-                })
-              }
-            );
-
-
-          let data = {};
-
-          try {
-
-            data =
-              await response.json();
-
-          } catch (jsonError) {
-
-            data = {};
-
-          }
+</header>
 
 
-          if (!response.ok) {
+<main class="container">
 
-            throw new Error(
-              data.message ||
-              "E-mail ou mot de passe incorrect."
-            );
+  <div class="profile-card">
 
-          }
+    <div class="profile-top">
 
+      <div class="avatar" id="avatar">
+        H
+      </div>
 
-          // Le backend HELPY retourne directement
-          // l'utilisateur connecté.
-          if (data.user) {
+      <h1 id="userName">
+        Utilisateur HELPY
+      </h1>
 
-            localStorage.setItem(
-              "helpy_user",
-              JSON.stringify(data.user)
-            );
+      <p id="userEmail">
+        Chargement...
+      </p>
 
-          }
-
-
-          // Garder l'id séparément pour les pages
-          // qui en ont besoin.
-          if (
-            data.user &&
-            data.user.id
-          ) {
-
-            localStorage.setItem(
-              "helpy_user_id",
-              String(data.user.id)
-            );
-
-          }
+    </div>
 
 
-          showMessage(
-            "Connexion réussie !",
-            "success"
-          );
+    <div class="stats">
+
+      <div class="stat">
+        <strong id="productCount">0</strong>
+        <span>Produits</span>
+      </div>
+
+      <div class="stat">
+        <strong id="serviceCount">0</strong>
+        <span>Services</span>
+      </div>
+
+      <div class="stat">
+        <strong id="businessCount">0</strong>
+        <span>Entreprises</span>
+      </div>
+
+    </div>
 
 
-          setTimeout(
-            function() {
-
-              window.location.href =
-                "/";
-
-            },
-            700
-          );
+    <h2 class="section-title">
+      Informations personnelles
+    </h2>
 
 
-        } catch (error) {
+    <div class="info">
 
-          console.error(
-            "HELPY login error:",
-            error
-          );
+      <div class="info-row">
+        <span class="label">
+          Nom complet
+        </span>
 
-
-          showMessage(
-            error.message ||
-            "Impossible de se connecter.",
-            "error"
-          );
+        <span class="value" id="fullName">
+          Non renseigné
+        </span>
+      </div>
 
 
-        } finally {
+      <div class="info-row">
+        <span class="label">
+          E-mail
+        </span>
 
-          button.disabled =
-            false;
+        <span class="value" id="email">
+          Non renseigné
+        </span>
+      </div>
 
-          button.textContent =
-            "Se connecter";
 
-        }
+      <div class="info-row">
+        <span class="label">
+          Téléphone / WhatsApp
+        </span>
+
+        <span class="value" id="phone">
+          Non renseigné
+        </span>
+      </div>
+
+
+      <div class="info-row">
+        <span class="label">
+          Pays
+        </span>
+
+        <span class="value" id="country">
+          Non renseigné
+        </span>
+      </div>
+
+
+      <div class="info-row">
+        <span class="label">
+          Ville
+        </span>
+
+        <span class="value" id="city">
+          Non renseigné
+        </span>
+      </div>
+
+
+      <div class="info-row">
+        <span class="label">
+          À propos de moi
+        </span>
+
+        <span class="value" id="description">
+          Non renseigné
+        </span>
+      </div>
+
+    </div>
+
+
+    <div class="actions">
+
+      <a
+        href="/edit-profile.html"
+        class="btn btn-primary"
+      >
+        ✏️ Modifier mon profil
+      </a>
+
+
+      <a
+        href="/products.html"
+        class="btn btn-secondary"
+      >
+        🛍️ Mes produits
+      </a>
+
+
+      <a
+        href="/services.html"
+        class="btn btn-secondary"
+      >
+        🛠️ Mes services
+      </a>
+
+
+      <a
+        href="/businesses.html"
+        class="btn btn-secondary"
+      >
+        🏢 Mes entreprises
+      </a>
+
+
+      <a
+        href="/orders.html"
+        class="btn btn-secondary"
+      >
+        📦 Mes commandes
+      </a>
+
+
+      <button
+        class="btn btn-danger"
+        onclick="logout()"
+      >
+        🚪 Se déconnecter
+      </button>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<footer>
+  © 2026 HELPY — Acheter • Vendre • Offrir des services • Trouver des services
+</footer>
+
+
+<script>
+
+  /*
+   * =====================================================
+   * HELPY — PROFIL
+   * =====================================================
+   *
+   * IMPORTANT:
+   * login.html sauvegarde l'utilisateur sous:
+   *
+   * localStorage:
+   *   helpy_user
+   *
+   * et l'id sous:
+   *   helpy_user_id
+   *
+   */
+
+
+  const API_BASE_URL =
+    window.location.origin;
+
+
+  /*
+   * -----------------------------------------------------
+   * RÉCUPÉRER L'UTILISATEUR CONNECTÉ
+   * -----------------------------------------------------
+   */
+
+  function getCurrentUser() {
+
+    try {
+
+      const savedUser =
+        localStorage.getItem("helpy_user");
+
+
+      if (!savedUser) {
+        return null;
+      }
+
+
+      return JSON.parse(savedUser);
+
+    } catch (error) {
+
+      console.error(
+        "Erreur lecture helpy_user:",
+        error
+      );
+
+      return null;
+
+    }
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * INITIAL
+   * -----------------------------------------------------
+   */
+
+  function getInitial(name) {
+
+    if (!name) {
+      return "H";
+    }
+
+    return name
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * AFFICHER PHOTO OU INITIAL
+   * -----------------------------------------------------
+   */
+
+  function displayAvatar(user) {
+
+    const avatar =
+      document.getElementById("avatar");
+
+
+    const name =
+      user.name ||
+      user.full_name ||
+      user.fullName ||
+      "HELPY";
+
+
+    const photo =
+      user.profile_photo ||
+      user.profilePhoto ||
+      user.avatar ||
+      user.photo ||
+      user.photo_url ||
+      "";
+
+
+    if (photo) {
+
+      avatar.innerHTML = "";
+
+      const img =
+        document.createElement("img");
+
+      img.src = photo;
+
+      img.alt = "Photo de profil";
+
+      img.onerror = function() {
+
+        avatar.textContent =
+          getInitial(name);
+
+      };
+
+      avatar.appendChild(img);
+
+    } else {
+
+      avatar.textContent =
+        getInitial(name);
+
+    }
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * AFFICHER UTILISATEUR
+   * -----------------------------------------------------
+   */
+
+  function displayUser(user) {
+
+    if (!user) {
+
+      document.getElementById(
+        "userName"
+      ).textContent =
+        "Utilisateur HELPY";
+
+
+      document.getElementById(
+        "userEmail"
+      ).textContent =
+        "Compte non identifié";
+
+
+      return;
+
+    }
+
+
+    const name =
+      user.name ||
+      user.full_name ||
+      user.fullName ||
+      user.nom ||
+      "Utilisateur HELPY";
+
+
+    const email =
+      user.email ||
+      user.email_address ||
+      "Non renseigné";
+
+
+    const phone =
+      user.phone ||
+      user.telephone ||
+      user.whatsapp ||
+      user.whatsapp_number ||
+      "Non renseigné";
+
+
+    const country =
+      user.country ||
+      user.pays ||
+      "Non renseigné";
+
+
+    const city =
+      user.city ||
+      user.ville ||
+      "Non renseigné";
+
+
+    const description =
+      user.description ||
+      user.bio ||
+      "Non renseigné";
+
+
+    document.getElementById(
+      "userName"
+    ).textContent =
+      name;
+
+
+    document.getElementById(
+      "userEmail"
+    ).textContent =
+      email;
+
+
+    document.getElementById(
+      "fullName"
+    ).textContent =
+      name;
+
+
+    document.getElementById(
+      "email"
+    ).textContent =
+      email;
+
+
+    document.getElementById(
+      "phone"
+    ).textContent =
+      phone;
+
+
+    document.getElementById(
+      "country"
+    ).textContent =
+      country;
+
+
+    document.getElementById(
+      "city"
+    ).textContent =
+      city;
+
+
+    document.getElementById(
+      "description"
+    ).textContent =
+      description;
+
+
+    displayAvatar(user);
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * CHARGER STATISTIQUES
+   * -----------------------------------------------------
+   */
+
+  async function loadStats() {
+
+    /*
+     * Produits
+     */
+
+    try {
+
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/products"
+        );
+
+
+      if (response.ok) {
+
+        const data =
+          await response.json();
+
+
+        const products =
+          data.products ||
+          data.produits ||
+          [];
+
+
+        document.getElementById(
+          "productCount"
+        ).textContent =
+          Array.isArray(products)
+            ? products.length
+            : 0;
 
       }
+
+    } catch (error) {
+
+      console.log(
+        "Erreur produits:",
+        error
+      );
+
+    }
+
+
+    /*
+     * Services
+     */
+
+    try {
+
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/services"
+        );
+
+
+      if (response.ok) {
+
+        const data =
+          await response.json();
+
+
+        const services =
+          data.services ||
+          data.servicesList ||
+          [];
+
+
+        document.getElementById(
+          "serviceCount"
+        ).textContent =
+          Array.isArray(services)
+            ? services.length
+            : 0;
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Erreur services:",
+        error
+      );
+
+    }
+
+
+    /*
+     * Entreprises
+     */
+
+    try {
+
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/businesses"
+        );
+
+
+      if (response.ok) {
+
+        const data =
+          await response.json();
+
+
+        const businesses =
+          data.entreprises ||
+          data.businesses ||
+          [];
+
+
+        document.getElementById(
+          "businessCount"
+        ).textContent =
+          Array.isArray(businesses)
+            ? businesses.length
+            : 0;
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Erreur entreprises:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * DÉCONNEXION
+   * -----------------------------------------------------
+   */
+
+  function logout() {
+
+    const confirmation =
+      confirm(
+        "Voulez-vous vraiment vous déconnecter ?"
+      );
+
+
+    if (!confirmation) {
+      return;
+    }
+
+
+    localStorage.removeItem(
+      "helpy_user"
     );
 
-  </script></body>
+
+    localStorage.removeItem(
+      "helpy_user_id"
+    );
+
+
+    /*
+     * Nettoyage d'anciennes clés éventuelles.
+     */
+
+    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("helpyUser");
+    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("helpyToken");
+
+
+    window.location.href =
+      "/login.html";
+
+  }
+
+
+  /*
+   * -----------------------------------------------------
+   * DÉMARRAGE
+   * -----------------------------------------------------
+   */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+      const user =
+        getCurrentUser();
+
+
+      displayUser(user);
+
+
+      loadStats();
+
+    }
+  );
+
+</script>
+
+</body>
 </html>
