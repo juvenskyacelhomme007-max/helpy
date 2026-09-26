@@ -3,107 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Mon profil - HELPY</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: #f5f6fa;
-      color: #202124;
-      min-height: 100vh;
+      color: #222;
     }
 
     header {
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 15px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 15px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 760px;
+      margin: auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      gap: 15px;
+    }
+
+    .back {
+      text-decoration: none;
+      color: #555;
+      font-size: 15px;
+      font-weight: 600;
     }
 
     .logo {
       color: #5846e8;
       font-size: 25px;
-      font-weight: 800;
-      text-decoration: none;
+      font-weight: 900;
       letter-spacing: -1px;
     }
 
-    .back {
-      text-decoration: none;
-      color: #444;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 700px;
+    main {
+      max-width: 760px;
       margin: 25px auto;
-      padding: 0 16px 40px;
+      padding: 0 15px 40px;
     }
 
-    .profile-card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 25px 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
     }
 
     .profile-top {
       text-align: center;
-      margin-bottom: 25px;
     }
 
     .avatar {
-      width: 92px;
-      height: 92px;
+      width: 115px;
+      height: 115px;
       border-radius: 50%;
+      margin: 0 auto 15px;
       background: #5846e8;
-      color: white;
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 14px;
-      font-size: 34px;
-      font-weight: 700;
+      font-size: 45px;
+      font-weight: 800;
+      overflow: hidden;
+      border: 4px solid #eee;
     }
 
-    .profile-top h1 {
-      font-size: 24px;
-      margin-bottom: 6px;
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
-    .profile-top p {
+    .user-name {
+      font-size: 25px;
+      font-weight: 800;
+      margin: 5px 0;
+    }
+
+    .user-email {
       color: #777;
       font-size: 14px;
       word-break: break-word;
     }
 
-    .section-title {
-      font-size: 17px;
-      margin: 25px 0 14px;
-      font-weight: 700;
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 25px;
     }
 
-    .info {
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      overflow: hidden;
+    .stat {
+      background: #f7f7fb;
+      border-radius: 13px;
+      padding: 15px 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 22px;
+      font-weight: 800;
+      color: #5846e8;
+    }
+
+    .stat-label {
+      color: #777;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin: 0 0 18px;
     }
 
     .info-row {
-      padding: 15px;
+      padding: 14px 0;
       border-bottom: 1px solid #eee;
     }
 
@@ -111,108 +143,99 @@
       border-bottom: none;
     }
 
-    .label {
-      display: block;
-      font-size: 12px;
+    .info-label {
       color: #888;
+      font-size: 13px;
       margin-bottom: 5px;
     }
 
-    .value {
+    .info-value {
       font-size: 15px;
       font-weight: 600;
       word-break: break-word;
     }
 
-    .actions {
+    .empty {
+      color: #999;
+      font-weight: normal;
+    }
+
+    .buttons {
       display: grid;
       gap: 11px;
-      margin-top: 25px;
     }
 
-    .btn {
+    .button {
+      display: block;
       width: 100%;
       padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
+      border-radius: 11px;
       text-align: center;
-      display: block;
+      text-decoration: none;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
     }
 
-    .btn-primary {
+    .primary {
       background: #5846e8;
       color: white;
     }
 
-    .btn-secondary {
-      background: #f0efff;
-      color: #5846e8;
+    .secondary {
+      background: #f2f2f7;
+      color: #333;
     }
 
-    .btn-danger {
+    .logout {
       background: #fff0f0;
-      color: #d93025;
+      color: #d62828;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .stat {
-      background: #f8f8fc;
-      border-radius: 14px;
-      padding: 16px 8px;
+    .loading {
       text-align: center;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 21px;
-      color: #5846e8;
-      margin-bottom: 5px;
-    }
-
-    .stat span {
       color: #777;
-      font-size: 11px;
+      padding: 30px 10px;
     }
 
-    .not-connected {
-      text-align: center;
-      padding: 35px 10px;
-    }
-
-    .not-connected h2 {
-      margin-bottom: 10px;
-    }
-
-    .not-connected p {
-      color: #777;
-      margin-bottom: 20px;
+    .error-box {
+      background: #fff0f0;
+      color: #b00020;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 18px;
+      display: none;
       line-height: 1.5;
     }
 
     footer {
       text-align: center;
-      color: #888;
+      color: #999;
       font-size: 12px;
       padding: 20px;
     }
 
-    @media (max-width: 480px) {
-      .profile-card {
-        padding: 20px 15px;
-      }
+    @media (max-width: 600px) {
 
       .stats {
         gap: 7px;
+      }
+
+      .stat {
+        padding: 13px 5px;
+      }
+
+      .stat-number {
+        font-size: 20px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+      }
+
+      .card {
+        padding: 18px;
       }
     }
   </style>
@@ -221,102 +244,94 @@
 <body>
 
 <header>
-  <a href="index.html" class="logo">HELPY</a>
-  <a href="index.html" class="back">← Accueil</a>
+
+  <div class="header-inner">
+
+    <a href="/" class="back">
+      ← Accueil
+    </a>
+
+    <div class="logo">
+      HELPY
+    </div>
+
+  </div>
+
 </header>
 
-<main class="container">
 
-  <div id="profileArea">
+<main>
 
-    <div class="profile-card">
+  <div id="errorBox" class="error-box"></div>
 
-      <div class="profile-top">
-        <div class="avatar" id="avatar">H</div>
 
-        <h1 id="userName">Utilisateur HELPY</h1>
+  <!-- PROFIL -->
+  <div class="card">
 
-        <p id="userEmail">Chargement...</p>
+    <div class="profile-top">
+
+      <div class="avatar" id="avatar">
+        <span id="avatarLetter">?</span>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <strong id="productCount">0</strong>
-          <span>Produits</span>
-        </div>
-
-        <div class="stat">
-          <strong id="serviceCount">0</strong>
-          <span>Services</span>
-        </div>
-
-        <div class="stat">
-          <strong id="businessCount">0</strong>
-          <span>Entreprises</span>
-        </div>
+      <div class="user-name" id="userName">
+        Chargement...
       </div>
 
-      <h2 class="section-title">Informations personnelles</h2>
+      <div class="user-email" id="userEmail">
+        ...
+      </div>
 
-      <div class="info">
+    </div>
 
-        <div class="info-row">
-          <span class="label">Nom complet</span>
-          <span class="value" id="fullName">Non renseigné</span>
+
+    <!-- STATISTIQUES -->
+    <div class="stats">
+
+      <div class="stat">
+
+        <div
+          class="stat-number"
+          id="productsCount"
+        >
+          0
         </div>
 
-        <div class="info-row">
-          <span class="label">E-mail</span>
-          <span class="value" id="email">Non renseigné</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">Téléphone / WhatsApp</span>
-          <span class="value" id="phone">Non renseigné</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">Pays</span>
-          <span class="value" id="country">Non renseigné</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">Ville</span>
-          <span class="value" id="city">Non renseigné</span>
-        </div>
-
-        <div class="info-row">
-          <span class="label">À propos de moi</span>
-          <span class="value" id="description">Non renseigné</span>
+        <div class="stat-label">
+          Produits
         </div>
 
       </div>
 
-      <div class="actions">
 
-        <a href="edit-profile.html" class="btn btn-primary">
-          ✏️ Modifier mon profil
-        </a>
+      <div class="stat">
 
-        <a href="products.html" class="btn btn-secondary">
-          🛍️ Mes produits
-        </a>
+        <div
+          class="stat-number"
+          id="servicesCount"
+        >
+          0
+        </div>
 
-        <a href="services.html" class="btn btn-secondary">
-          🛠️ Mes services
-        </a>
+        <div class="stat-label">
+          Services
+        </div>
 
-        <a href="businesses.html" class="btn btn-secondary">
-          🏢 Mes entreprises
-        </a>
+      </div>
 
-        <a href="orders.html" class="btn btn-secondary">
-          📦 Mes commandes
-        </a>
 
-        <button class="btn btn-danger" onclick="logout()">
-          🚪 Se déconnecter
-        </button>
+      <div class="stat">
+
+        <div
+          class="stat-number"
+          id="businessesCount"
+        >
+          0
+        </div>
+
+        <div class="stat-label">
+          Entreprises
+        </div>
 
       </div>
 
@@ -324,242 +339,806 @@
 
   </div>
 
+
+  <!-- INFORMATIONS -->
+  <div class="card">
+
+    <div class="section-title">
+      Informations personnelles
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        Nom complet
+      </div>
+
+      <div
+        class="info-value"
+        id="fullName"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        E-mail
+      </div>
+
+      <div
+        class="info-value"
+        id="email"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        Téléphone / WhatsApp
+      </div>
+
+      <div
+        class="info-value"
+        id="phone"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        Pays
+      </div>
+
+      <div
+        class="info-value"
+        id="country"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        Ville
+      </div>
+
+      <div
+        class="info-value"
+        id="city"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+
+    <div class="info-row">
+
+      <div class="info-label">
+        À propos de moi
+      </div>
+
+      <div
+        class="info-value"
+        id="description"
+      >
+        Non renseigné
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACTIONS -->
+  <div class="card">
+
+    <div class="buttons">
+
+      <a
+        href="/edit-profile.html"
+        class="button primary"
+      >
+        ✏️ Modifier mon profil
+      </a>
+
+
+      <a
+        href="/products.html"
+        class="button secondary"
+      >
+        🛍️ Mes produits
+      </a>
+
+
+      <a
+        href="/services.html"
+        class="button secondary"
+      >
+        🛠️ Mes services
+      </a>
+
+
+      <a
+        href="/businesses.html"
+        class="button secondary"
+      >
+        🏢 Mes entreprises
+      </a>
+
+
+      <a
+        href="/orders.html"
+        class="button secondary"
+      >
+        📦 Mes commandes
+      </a>
+
+
+      <button
+        class="button logout"
+        id="logoutButton"
+      >
+        🚪 Se déconnecter
+      </button>
+
+    </div>
+
+  </div>
+
 </main>
+
 
 <footer>
   © 2026 HELPY — Acheter • Vendre • Offrir des services • Trouver des services
 </footer>
 
+
 <script>
-  /*
-   * HELPY - PROFIL UTILISATEUR
-   */
+
+  /* =====================================================
+     HELPY - PROFIL
+     ===================================================== */
+
+  const API_BASE_URL = window.location.origin;
+
+
+  /* =====================================================
+     ELEMENTS
+     ===================================================== */
+
+  const userName =
+    document.getElementById("userName");
+
+  const userEmail =
+    document.getElementById("userEmail");
+
+  const fullName =
+    document.getElementById("fullName");
+
+  const email =
+    document.getElementById("email");
+
+  const phone =
+    document.getElementById("phone");
+
+  const country =
+    document.getElementById("country");
+
+  const city =
+    document.getElementById("city");
+
+  const description =
+    document.getElementById("description");
+
+  const avatar =
+    document.getElementById("avatar");
+
+  const errorBox =
+    document.getElementById("errorBox");
+
+
+  /* =====================================================
+     UTILITAIRES
+     ===================================================== */
+
+  function cleanValue(value) {
+
+    if (
+      value === undefined ||
+      value === null ||
+      String(value).trim() === "" ||
+      String(value).trim().toLowerCase() === "undefined" ||
+      String(value).trim().toLowerCase() === "null"
+    ) {
+
+      return "";
+
+    }
+
+    return String(value).trim();
+
+  }
+
+
+  function getUserName(user) {
+
+    return cleanValue(
+      user.name
+    ) ||
+    cleanValue(
+      user.full_name
+    ) ||
+    cleanValue(
+      user.fullName
+    ) ||
+    cleanValue(
+      user.nom
+    ) ||
+    cleanValue(
+      user.username
+    ) ||
+    cleanValue(
+      user.display_name
+    ) ||
+    "Utilisateur HELPY";
+
+  }
+
+
+  function getUserEmail(user) {
+
+    return cleanValue(
+      user.email
+    ) ||
+    cleanValue(
+      user.mail
+    ) ||
+    "";
+
+  }
+
+
+  function getUserPhone(user) {
+
+    return cleanValue(
+      user.phone
+    ) ||
+    cleanValue(
+      user.telephone
+    ) ||
+    cleanValue(
+      user.whatsapp
+    ) ||
+    cleanValue(
+      user.whatsapp_number
+    ) ||
+    "";
+
+  }
+
+
+  function getUserCountry(user) {
+
+    return cleanValue(
+      user.country
+    ) ||
+    cleanValue(
+      user.pays
+    ) ||
+    "";
+
+  }
+
+
+  function getUserCity(user) {
+
+    return cleanValue(
+      user.city
+    ) ||
+    cleanValue(
+      user.ville
+    ) ||
+    "";
+
+  }
+
+
+  function getUserDescription(user) {
+
+    return cleanValue(
+      user.description
+    ) ||
+    cleanValue(
+      user.bio
+    ) ||
+    "";
+
+  }
+
+
+  function getUserPhoto(user) {
+
+    return cleanValue(
+      user.profile_photo
+    ) ||
+    cleanValue(
+      user.profilePhoto
+    ) ||
+    cleanValue(
+      user.avatar
+    ) ||
+    cleanValue(
+      user.photo
+    ) ||
+    cleanValue(
+      user.photo_url
+    ) ||
+    "";
+
+  }
+
+
+  /* =====================================================
+     RECUPERER LE COMPTE
+     ===================================================== */
 
   function getStoredUser() {
-    const possibleKeys = [
-      "user",
-      "currentUser",
+
+    /*
+      IMPORTANT :
+      login.html utilise actuellement
+      localStorage -> helpy_user
+    */
+
+    const keys = [
+
+      "helpy_user",
       "helpyUser",
-      "loggedUser",
-      "userData"
+      "currentUser",
+      "user"
+
     ];
 
-    for (const key of possibleKeys) {
-      try {
-        const value = localStorage.getItem(key);
 
-        if (!value) continue;
+    for (const key of keys) {
 
-        const data = JSON.parse(value);
+      const raw =
+        localStorage.getItem(key);
 
-        if (data && typeof data === "object") {
-          return data;
-        }
-      } catch (error) {
-        console.log("Lecture localStorage:", error);
+      if (!raw) {
+        continue;
       }
+
+
+      try {
+
+        const parsed =
+          JSON.parse(raw);
+
+
+        if (
+          parsed &&
+          typeof parsed === "object"
+        ) {
+
+          /*
+            Vérification supplémentaire :
+            on accepte le compte s'il possède
+            au moins un identifiant utile.
+          */
+
+          if (
+            parsed.id ||
+            parsed.user_id ||
+            parsed.email ||
+            parsed.name ||
+            parsed.full_name
+          ) {
+
+            return parsed;
+
+          }
+
+        }
+
+      } catch (error) {
+
+        console.log(
+          "Impossible de lire",
+          key,
+          error
+        );
+
+      }
+
     }
+
 
     return null;
+
   }
 
-  function getInitial(name) {
-    if (!name) return "H";
 
-    return name
-      .trim()
-      .charAt(0)
-      .toUpperCase();
-  }
+  /* =====================================================
+     AFFICHER LE PROFIL
+     ===================================================== */
 
-  function showUser(user) {
-
-    if (!user) {
-      document.getElementById("userName").textContent = "Utilisateur HELPY";
-      document.getElementById("userEmail").textContent = "Compte non identifié";
-
-      document.getElementById("fullName").textContent = "Non renseigné";
-      document.getElementById("email").textContent = "Non renseigné";
-
-      return;
-    }
+  function displayUser(user) {
 
     const name =
-      user.name ||
-      user.full_name ||
-      user.fullName ||
-      user.nom ||
-      "Utilisateur HELPY";
+      getUserName(user);
 
-    const email =
-      user.email ||
-      user.email_address ||
-      "Non renseigné";
+    const userEmailValue =
+      getUserEmail(user);
 
-    const phone =
-      user.phone ||
-      user.telephone ||
-      user.whatsapp ||
-      user.whatsapp_number ||
-      "Non renseigné";
+    const userPhone =
+      getUserPhone(user);
 
-    const country =
-      user.country ||
-      user.pays ||
-      "Non renseigné";
+    const userCountry =
+      getUserCountry(user);
 
-    const city =
-      user.city ||
-      user.ville ||
-      "Non renseigné";
+    const userCity =
+      getUserCity(user);
 
-    const description =
-      user.description ||
-      user.bio ||
-      "Non renseigné";
+    const userDescription =
+      getUserDescription(user);
 
-    document.getElementById("avatar").textContent =
-      getInitial(name);
+    const userPhoto =
+      getUserPhoto(user);
 
-    document.getElementById("userName").textContent =
+
+    /* NOM */
+
+    userName.textContent =
       name;
 
-    document.getElementById("userEmail").textContent =
-      email;
 
-    document.getElementById("fullName").textContent =
-      name;
+    /* EMAIL */
 
-    document.getElementById("email").textContent =
-      email;
+    userEmail.textContent =
+      userEmailValue ||
+      "E-mail non renseigné";
 
-    document.getElementById("phone").textContent =
-      phone;
 
-    document.getElementById("country").textContent =
-      country;
+    /* INFORMATIONS */
 
-    document.getElementById("city").textContent =
-      city;
+    fullName.textContent =
+      name !== "Utilisateur HELPY"
+        ? name
+        : "Non renseigné";
 
-    document.getElementById("description").textContent =
-      description;
+
+    email.textContent =
+      userEmailValue ||
+      "Non renseigné";
+
+
+    phone.textContent =
+      userPhone ||
+      "Non renseigné";
+
+
+    country.textContent =
+      userCountry ||
+      "Non renseigné";
+
+
+    city.textContent =
+      userCity ||
+      "Non renseigné";
+
+
+    description.textContent =
+      userDescription ||
+      "Non renseigné";
+
+
+    /* PHOTO */
+
+    if (userPhoto) {
+
+      avatar.innerHTML =
+        "";
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        userPhoto;
+
+      img.alt =
+        "Photo de profil";
+
+      img.onerror =
+        function () {
+
+          showInitial(name);
+
+        };
+
+      avatar.appendChild(img);
+
+    } else {
+
+      showInitial(name);
+
+    }
+
   }
 
-  async function loadStats() {
 
-    const API_BASE_URL =
-      window.location.hostname.includes("railway.app")
-        ? window.location.origin
-        : "https://helpy-production-c2f2.up.railway.app";
+  /* =====================================================
+     AVATAR INITIAL
+     ===================================================== */
+
+  function showInitial(name) {
+
+    const firstLetter =
+      (name || "U")
+        .trim()
+        .charAt(0)
+        .toUpperCase() || "U";
+
+
+    avatar.innerHTML =
+      "";
+
+
+    const span =
+      document.createElement("span");
+
+    span.textContent =
+      firstLetter;
+
+    avatar.appendChild(span);
+
+  }
+
+
+  /* =====================================================
+     STATISTIQUES
+     ===================================================== */
+
+  async function loadStatistics(user) {
+
+    /*
+      Les statistiques sont secondaires.
+      Même si une API échoue,
+      le profil reste affiché.
+    */
 
     try {
 
-      const productsResponse =
-        await fetch(API_BASE_URL + "/api/products");
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/products"
+        );
 
-      if (productsResponse.ok) {
 
-        const data = await productsResponse.json();
+      if (response.ok) {
+
+        const data =
+          await response.json();
 
         const products =
           data.products ||
           data.produits ||
-          data.data ||
           [];
 
-        document.getElementById("productCount").textContent =
-          Array.isArray(products) ? products.length : 0;
+        document.getElementById(
+          "productsCount"
+        ).textContent =
+          Array.isArray(products)
+            ? products.length
+            : 0;
+
       }
 
     } catch (error) {
-      console.log("Produits:", error);
+
+      console.log(
+        "Produits non disponibles",
+        error
+      );
+
     }
+
 
     try {
 
-      const servicesResponse =
-        await fetch(API_BASE_URL + "/api/services");
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/services"
+        );
 
-      if (servicesResponse.ok) {
 
-        const data = await servicesResponse.json();
+      if (response.ok) {
+
+        const data =
+          await response.json();
 
         const services =
           data.services ||
           data.servicesList ||
-          data.data ||
           [];
 
-        document.getElementById("serviceCount").textContent =
-          Array.isArray(services) ? services.length : 0;
+        document.getElementById(
+          "servicesCount"
+        ).textContent =
+          Array.isArray(services)
+            ? services.length
+            : 0;
+
       }
 
     } catch (error) {
-      console.log("Services:", error);
+
+      console.log(
+        "Services non disponibles",
+        error
+      );
+
     }
+
 
     try {
 
-      const businessResponse =
-        await fetch(API_BASE_URL + "/api/businesses");
+      const response =
+        await fetch(
+          API_BASE_URL +
+          "/api/businesses"
+        );
 
-      if (businessResponse.ok) {
 
-        const data = await businessResponse.json();
+      if (response.ok) {
+
+        const data =
+          await response.json();
 
         const businesses =
           data.entreprises ||
           data.businesses ||
-          data.data ||
           [];
 
-        document.getElementById("businessCount").textContent =
-          Array.isArray(businesses) ? businesses.length : 0;
+        document.getElementById(
+          "businessesCount"
+        ).textContent =
+          Array.isArray(businesses)
+            ? businesses.length
+            : 0;
+
       }
 
     } catch (error) {
-      console.log("Entreprises:", error);
+
+      console.log(
+        "Entreprises non disponibles",
+        error
+      );
+
     }
+
   }
 
-  function logout() {
 
-    const confirmation =
-      confirm("Voulez-vous vraiment vous déconnecter ?");
+  /* =====================================================
+     CHARGEMENT PRINCIPAL
+     ===================================================== */
 
-    if (!confirmation) {
+  async function loadProfile() {
+
+    const user =
+      getStoredUser();
+
+
+    console.log(
+      "Compte HELPY trouvé :",
+      user
+    );
+
+
+    if (!user) {
+
+      userName.textContent =
+        "Utilisateur HELPY";
+
+      userEmail.textContent =
+        "Compte non identifié";
+
+
+      showInitial(
+        "Utilisateur"
+      );
+
+
+      errorBox.style.display =
+        "block";
+
+      errorBox.textContent =
+        "Aucun compte HELPY enregistré sur cet appareil. Connecte-toi d'abord.";
+
       return;
+
     }
 
-    const keys = [
-      "user",
-      "currentUser",
-      "helpyUser",
-      "loggedUser",
-      "userData",
-      "token",
-      "authToken",
-      "helpyToken"
-    ];
 
-    keys.forEach(function(key) {
-      localStorage.removeItem(key);
-      sessionStorage.removeItem(key);
-    });
+    /*
+      IMPORTANT :
+      On NE SUPPRIME PAS le compte.
+      On l'affiche immédiatement.
+    */
 
-    window.location.href = "login.html";
+    displayUser(user);
+
+
+    await loadStatistics(user);
+
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
 
-    const user = getStoredUser();
+  /* =====================================================
+     DECONNEXION
+     ===================================================== */
 
-    showUser(user);
+  document
+    .getElementById("logoutButton")
+    .addEventListener(
+      "click",
+      function () {
 
-    loadStats();
+        localStorage.removeItem(
+          "helpy_user"
+        );
 
-  });
+        localStorage.removeItem(
+          "helpy_user_id"
+        );
+
+        localStorage.removeItem(
+          "helpyUser"
+        );
+
+        localStorage.removeItem(
+          "currentUser"
+        );
+
+        localStorage.removeItem(
+          "user"
+        );
+
+
+        window.location.href =
+          "/login.html";
+
+      }
+    );
+
+
+  /* =====================================================
+     DEMARRAGE
+     ===================================================== */
+
+  loadProfile();
+
 </script>
 
 </body>
