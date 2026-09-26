@@ -1,3 +1,566 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/config.js"></script><script src="/supabase.js"></script><title>Profil — HELPY</title></head><body><header class="topbar"><div class="inner"><a class="brand" href="/"><span class="logo">H</span><span class="brand-name">HELPY</span></a><button class="outline-btn" onclick="HELPY.signOut()">Déconnexion</button></div></header><main class="container page"><div class="panel"><div id="profile">Chargement…</div></div></main><nav class="bottom-nav"><a href="/"><div>⌂</div><span>Accueil</span></a><a href="/search.html"><div>⌕</div><span>Recherche</span></a><a class="publish-fab" href="/publish.html"><div>＋</div><span>Publier</span></a><a href="/messages.html"><div>💬</div><span>Messages</span></a><a class="active" href="/profile.html"><div>♙</div><span>Profil</span></a></nav><script>
-async function load(){const u=await HELPY.user();if(!u){profile.innerHTML='<div class="empty">Tu n’es pas connecté.<br><a href="/login.html" style="color:var(--blue);font-weight:900">Se connecter</a></div>';return}const db=await HELPY.init();const p=await HELPY.profile(u.id);const {count}=await db.from("listings").select("*",{count:"exact",head:true}).eq("user_id",u.id);profile.innerHTML=`<h1>${HELPY.esc(p?.name||u.email.split("@")[0])}</h1><p class="muted">${HELPY.esc(u.email)}</p><div class="quick" style="grid-template-columns:1fr"><a class="quick-card" href="/publish.html"><span class="quick-icon q-blue">＋</span><span><b>Publier</b><small>Ajouter une annonce ou une entreprise</small></span></a><a class="quick-card" href="/settings.html"><span class="quick-icon q-green">⚙️</span><span><b>Paramètres</b><small>Préférences</small></span></a></div><p class="muted" style="margin-top:18px">${count||0} annonce(s) publiée(s)</p>`}load();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon profil - HELPY</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f6fa;
+      color: #202124;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      color: #5846e8;
+      font-size: 25px;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: -1px;
+    }
+
+    .back {
+      text-decoration: none;
+      color: #444;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      margin: 25px auto;
+      padding: 0 16px 40px;
+    }
+
+    .profile-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 25px 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+    }
+
+    .profile-top {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: #5846e8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    .profile-top h1 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .profile-top p {
+      color: #777;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .section-title {
+      font-size: 17px;
+      margin: 25px 0 14px;
+      font-weight: 700;
+    }
+
+    .info {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .info-row {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 15px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: grid;
+      gap: 11px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+
+    .btn-primary {
+      background: #5846e8;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #f0efff;
+      color: #5846e8;
+    }
+
+    .btn-danger {
+      background: #fff0f0;
+      color: #d93025;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      background: #f8f8fc;
+      border-radius: 14px;
+      padding: 16px 8px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 21px;
+      color: #5846e8;
+      margin-bottom: 5px;
+    }
+
+    .stat span {
+      color: #777;
+      font-size: 11px;
+    }
+
+    .not-connected {
+      text-align: center;
+      padding: 35px 10px;
+    }
+
+    .not-connected h2 {
+      margin-bottom: 10px;
+    }
+
+    .not-connected p {
+      color: #777;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      padding: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .profile-card {
+        padding: 20px 15px;
+      }
+
+      .stats {
+        gap: 7px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo">HELPY</a>
+  <a href="index.html" class="back">← Accueil</a>
+</header>
+
+<main class="container">
+
+  <div id="profileArea">
+
+    <div class="profile-card">
+
+      <div class="profile-top">
+        <div class="avatar" id="avatar">H</div>
+
+        <h1 id="userName">Utilisateur HELPY</h1>
+
+        <p id="userEmail">Chargement...</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <strong id="productCount">0</strong>
+          <span>Produits</span>
+        </div>
+
+        <div class="stat">
+          <strong id="serviceCount">0</strong>
+          <span>Services</span>
+        </div>
+
+        <div class="stat">
+          <strong id="businessCount">0</strong>
+          <span>Entreprises</span>
+        </div>
+      </div>
+
+      <h2 class="section-title">Informations personnelles</h2>
+
+      <div class="info">
+
+        <div class="info-row">
+          <span class="label">Nom complet</span>
+          <span class="value" id="fullName">Non renseigné</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">E-mail</span>
+          <span class="value" id="email">Non renseigné</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Téléphone / WhatsApp</span>
+          <span class="value" id="phone">Non renseigné</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Pays</span>
+          <span class="value" id="country">Non renseigné</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">Ville</span>
+          <span class="value" id="city">Non renseigné</span>
+        </div>
+
+        <div class="info-row">
+          <span class="label">À propos de moi</span>
+          <span class="value" id="description">Non renseigné</span>
+        </div>
+
+      </div>
+
+      <div class="actions">
+
+        <a href="edit-profile.html" class="btn btn-primary">
+          ✏️ Modifier mon profil
+        </a>
+
+        <a href="products.html" class="btn btn-secondary">
+          🛍️ Mes produits
+        </a>
+
+        <a href="services.html" class="btn btn-secondary">
+          🛠️ Mes services
+        </a>
+
+        <a href="businesses.html" class="btn btn-secondary">
+          🏢 Mes entreprises
+        </a>
+
+        <a href="orders.html" class="btn btn-secondary">
+          📦 Mes commandes
+        </a>
+
+        <button class="btn btn-danger" onclick="logout()">
+          🚪 Se déconnecter
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  © 2026 HELPY — Acheter • Vendre • Offrir des services • Trouver des services
+</footer>
+
+<script>
+  /*
+   * HELPY - PROFIL UTILISATEUR
+   */
+
+  function getStoredUser() {
+    const possibleKeys = [
+      "user",
+      "currentUser",
+      "helpyUser",
+      "loggedUser",
+      "userData"
+    ];
+
+    for (const key of possibleKeys) {
+      try {
+        const value = localStorage.getItem(key);
+
+        if (!value) continue;
+
+        const data = JSON.parse(value);
+
+        if (data && typeof data === "object") {
+          return data;
+        }
+      } catch (error) {
+        console.log("Lecture localStorage:", error);
+      }
+    }
+
+    return null;
+  }
+
+  function getInitial(name) {
+    if (!name) return "H";
+
+    return name
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+  }
+
+  function showUser(user) {
+
+    if (!user) {
+      document.getElementById("userName").textContent = "Utilisateur HELPY";
+      document.getElementById("userEmail").textContent = "Compte non identifié";
+
+      document.getElementById("fullName").textContent = "Non renseigné";
+      document.getElementById("email").textContent = "Non renseigné";
+
+      return;
+    }
+
+    const name =
+      user.name ||
+      user.full_name ||
+      user.fullName ||
+      user.nom ||
+      "Utilisateur HELPY";
+
+    const email =
+      user.email ||
+      user.email_address ||
+      "Non renseigné";
+
+    const phone =
+      user.phone ||
+      user.telephone ||
+      user.whatsapp ||
+      user.whatsapp_number ||
+      "Non renseigné";
+
+    const country =
+      user.country ||
+      user.pays ||
+      "Non renseigné";
+
+    const city =
+      user.city ||
+      user.ville ||
+      "Non renseigné";
+
+    const description =
+      user.description ||
+      user.bio ||
+      "Non renseigné";
+
+    document.getElementById("avatar").textContent =
+      getInitial(name);
+
+    document.getElementById("userName").textContent =
+      name;
+
+    document.getElementById("userEmail").textContent =
+      email;
+
+    document.getElementById("fullName").textContent =
+      name;
+
+    document.getElementById("email").textContent =
+      email;
+
+    document.getElementById("phone").textContent =
+      phone;
+
+    document.getElementById("country").textContent =
+      country;
+
+    document.getElementById("city").textContent =
+      city;
+
+    document.getElementById("description").textContent =
+      description;
+  }
+
+  async function loadStats() {
+
+    const API_BASE_URL =
+      window.location.hostname.includes("railway.app")
+        ? window.location.origin
+        : "https://helpy-production-c2f2.up.railway.app";
+
+    try {
+
+      const productsResponse =
+        await fetch(API_BASE_URL + "/api/products");
+
+      if (productsResponse.ok) {
+
+        const data = await productsResponse.json();
+
+        const products =
+          data.products ||
+          data.produits ||
+          data.data ||
+          [];
+
+        document.getElementById("productCount").textContent =
+          Array.isArray(products) ? products.length : 0;
+      }
+
+    } catch (error) {
+      console.log("Produits:", error);
+    }
+
+    try {
+
+      const servicesResponse =
+        await fetch(API_BASE_URL + "/api/services");
+
+      if (servicesResponse.ok) {
+
+        const data = await servicesResponse.json();
+
+        const services =
+          data.services ||
+          data.servicesList ||
+          data.data ||
+          [];
+
+        document.getElementById("serviceCount").textContent =
+          Array.isArray(services) ? services.length : 0;
+      }
+
+    } catch (error) {
+      console.log("Services:", error);
+    }
+
+    try {
+
+      const businessResponse =
+        await fetch(API_BASE_URL + "/api/businesses");
+
+      if (businessResponse.ok) {
+
+        const data = await businessResponse.json();
+
+        const businesses =
+          data.entreprises ||
+          data.businesses ||
+          data.data ||
+          [];
+
+        document.getElementById("businessCount").textContent =
+          Array.isArray(businesses) ? businesses.length : 0;
+      }
+
+    } catch (error) {
+      console.log("Entreprises:", error);
+    }
+  }
+
+  function logout() {
+
+    const confirmation =
+      confirm("Voulez-vous vraiment vous déconnecter ?");
+
+    if (!confirmation) {
+      return;
+    }
+
+    const keys = [
+      "user",
+      "currentUser",
+      "helpyUser",
+      "loggedUser",
+      "userData",
+      "token",
+      "authToken",
+      "helpyToken"
+    ];
+
+    keys.forEach(function(key) {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
+
+    window.location.href = "login.html";
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+
+    const user = getStoredUser();
+
+    showUser(user);
+
+    loadStats();
+
+  });
+</script>
+
+</body>
+</html>
