@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Modifier mon profil - HELPY</title>
 
   <style>
@@ -114,6 +116,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .photo-button {
@@ -220,35 +223,71 @@
 <body>
 
 <header>
+
   <div class="header-content">
-    <a href="/profile.html" class="back">← Mon profil</a>
-    <div class="logo">HELPY</div>
+
+    <a
+      href="/profile.html"
+      class="back"
+    >
+      ← Mon profil
+    </a>
+
+    <div class="logo">
+      HELPY
+    </div>
+
   </div>
+
 </header>
+
 
 <main>
 
   <div class="card">
 
-    <h1>Modifier mon profil</h1>
+    <h1>
+      Modifier mon profil
+    </h1>
 
     <div class="subtitle">
       Mets à jour tes informations personnelles et ta photo de profil.
     </div>
 
-    <div id="errorMessage" class="message error"></div>
-    <div id="successMessage" class="message success"></div>
 
-    <!-- PHOTO -->
+    <div
+      id="errorMessage"
+      class="message error"
+    ></div>
+
+
+    <div
+      id="successMessage"
+      class="message success"
+    ></div>
+
+
+    <!-- ==============================
+         PHOTO DE PROFIL
+         ============================== -->
+
     <div class="profile-photo-area">
 
-      <div class="avatar" id="avatar">
-        <span id="avatarLetter">?</span>
+      <div
+        class="avatar"
+        id="avatar"
+      >
+        U
       </div>
 
-      <label for="photoInput" class="photo-button">
+
+      <label
+        for="photoInput"
+        class="photo-button"
+      >
         📷 Ajouter une photo
       </label>
+
 
       <input
         type="file"
@@ -256,15 +295,20 @@
         accept="image/jpeg,image/png,image/webp"
       >
 
+
       <div class="photo-info">
-        JPG, PNG ou WEBP • Taille recommandée : image carrée
+        JPG, PNG ou WEBP • Maximum 5 MB
       </div>
 
     </div>
 
-    <!-- FORMULAIRE -->
+
+    <!-- ==============================
+         FORMULAIRE
+         ============================== -->
 
     <form id="profileForm">
+
 
       <label for="fullName">
         Nom complet
@@ -277,6 +321,7 @@
         required
       >
 
+
       <label for="email">
         E-mail
       </label>
@@ -286,6 +331,7 @@
         id="email"
         readonly
       >
+
 
       <label for="phone">
         Téléphone
@@ -297,6 +343,7 @@
         placeholder="+509..."
       >
 
+
       <label for="country">
         Pays
       </label>
@@ -306,6 +353,7 @@
         id="country"
         placeholder="Exemple : Haïti"
       >
+
 
       <label for="city">
         Ville
@@ -317,6 +365,7 @@
         placeholder="Exemple : Port-au-Prince"
       >
 
+
       <label for="description">
         À propos de moi
       </label>
@@ -325,6 +374,7 @@
         id="description"
         placeholder="Présente-toi brièvement..."
       ></textarea>
+
 
       <button
         type="submit"
@@ -338,25 +388,32 @@
 
   </div>
 
+
   <div class="card">
-    <button class="logout" id="logoutButton">
+
+    <button
+      class="logout"
+      id="logoutButton"
+    >
       Déconnexion
     </button>
+
   </div>
 
 </main>
+
 
 <footer>
   © 2026 HELPY
 </footer>
 
+
 <script>
 
   /* =====================================================
-     HELPY - MODIFICATION DU PROFIL
+     HELPY - MODIFIER PROFIL
+     VERSION PHOTO LOCALE
      ===================================================== */
-
-  const API_BASE_URL = window.location.origin;
 
   let currentUser = null;
   let selectedPhoto = null;
@@ -366,95 +423,172 @@
      ELEMENTS
      ===================================================== */
 
-  const errorMessage = document.getElementById("errorMessage");
-  const successMessage = document.getElementById("successMessage");
+  const errorMessage =
+    document.getElementById("errorMessage");
 
-  const avatar = document.getElementById("avatar");
-  const avatarLetter = document.getElementById("avatarLetter");
+  const successMessage =
+    document.getElementById("successMessage");
 
-  const photoInput = document.getElementById("photoInput");
+  const avatar =
+    document.getElementById("avatar");
 
-  const fullNameInput = document.getElementById("fullName");
-  const emailInput = document.getElementById("email");
-  const phoneInput = document.getElementById("phone");
-  const countryInput = document.getElementById("country");
-  const cityInput = document.getElementById("city");
-  const descriptionInput = document.getElementById("description");
+  const photoInput =
+    document.getElementById("photoInput");
 
-  const profileForm = document.getElementById("profileForm");
-  const saveButton = document.getElementById("saveButton");
+  const fullNameInput =
+    document.getElementById("fullName");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const phoneInput =
+    document.getElementById("phone");
+
+  const countryInput =
+    document.getElementById("country");
+
+  const cityInput =
+    document.getElementById("city");
+
+  const descriptionInput =
+    document.getElementById("description");
+
+  const profileForm =
+    document.getElementById("profileForm");
+
+  const saveButton =
+    document.getElementById("saveButton");
 
 
   /* =====================================================
-     MESSAGE
+     MESSAGES
      ===================================================== */
 
   function showError(message) {
 
-    errorMessage.textContent = message;
-    errorMessage.style.display = "block";
+    errorMessage.textContent =
+      message;
 
-    successMessage.style.display = "none";
+    errorMessage.style.display =
+      "block";
+
+    successMessage.style.display =
+      "none";
+
   }
 
 
   function showSuccess(message) {
 
-    successMessage.textContent = message;
-    successMessage.style.display = "block";
+    successMessage.textContent =
+      message;
 
-    errorMessage.style.display = "none";
+    successMessage.style.display =
+      "block";
+
+    errorMessage.style.display =
+      "none";
+
   }
 
 
   /* =====================================================
-     RECUPERER UTILISATEUR
+     UTILISATEUR
      ===================================================== */
 
   function getCurrentUser() {
 
-    const possibleKeys = [
-      "helpy_user",
-      "user",
-      "currentUser",
-      "helpyUser"
-    ];
+    const saved =
+      localStorage.getItem("helpy_user");
 
-    for (const key of possibleKeys) {
+    if (!saved) {
+      return null;
+    }
 
-      const saved = localStorage.getItem(key);
+    try {
 
-      if (!saved) continue;
+      return JSON.parse(saved);
 
-      try {
+    } catch (error) {
 
-        const user = JSON.parse(saved);
+      console.error(
+        "Erreur utilisateur:",
+        error
+      );
 
-        if (user && typeof user === "object") {
-
-          return user;
-
-        }
-
-      } catch (error) {
-
-        console.log("Erreur lecture utilisateur:", key);
-
-      }
+      return null;
 
     }
 
-    return null;
   }
 
 
   /* =====================================================
-     INITIALISATION
+     INITIAL
+     ===================================================== */
+
+  function getInitial(name) {
+
+    if (!name) {
+      return "U";
+    }
+
+    return name
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+
+  }
+
+
+  /* =====================================================
+     AFFICHER PHOTO
+     ===================================================== */
+
+  function updateAvatar(name, photo) {
+
+    avatar.innerHTML = "";
+
+    if (photo) {
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        photo;
+
+      img.alt =
+        "Photo de profil";
+
+      img.onerror =
+        function() {
+
+          avatar.textContent =
+            getInitial(name);
+
+        };
+
+      avatar.appendChild(img);
+
+      return;
+
+    }
+
+    avatar.textContent =
+      getInitial(name);
+
+  }
+
+
+  /* =====================================================
+     CHARGER PROFIL
      ===================================================== */
 
   function initializeProfile() {
 
-    currentUser = getCurrentUser();
+    currentUser =
+      getCurrentUser();
+
 
     if (!currentUser) {
 
@@ -462,13 +596,13 @@
         "Aucun utilisateur connecté. Connecte-toi d'abord."
       );
 
-      profileForm.style.display = "none";
+      profileForm.style.display =
+        "none";
 
       return;
 
     }
 
-    console.log("Utilisateur HELPY chargé :", currentUser);
 
     const name =
       currentUser.name ||
@@ -477,371 +611,316 @@
       currentUser.nom ||
       "Utilisateur";
 
+
     const email =
       currentUser.email ||
       "";
+
 
     const phone =
       currentUser.phone ||
       currentUser.telephone ||
       currentUser.whatsapp ||
-      currentUser.whatsapp_number ||
       "";
+
 
     const country =
       currentUser.country ||
       currentUser.pays ||
       "";
 
+
     const city =
       currentUser.city ||
       currentUser.ville ||
       "";
+
 
     const description =
       currentUser.description ||
       currentUser.bio ||
       "";
 
+
     const photo =
       currentUser.profile_photo ||
-      currentUser.profilePhoto ||
-      currentUser.avatar ||
-      currentUser.photo ||
-      currentUser.photo_url ||
       "";
 
 
-    fullNameInput.value = name;
-    emailInput.value = email;
-    phoneInput.value = phone;
-    countryInput.value = country;
-    cityInput.value = city;
-    descriptionInput.value = description;
+    fullNameInput.value =
+      name;
 
+    emailInput.value =
+      email;
 
-    updateAvatar(name, photo);
+    phoneInput.value =
+      phone;
 
-  }
+    countryInput.value =
+      country;
 
+    cityInput.value =
+      city;
 
-  /* =====================================================
-     AVATAR
-     ===================================================== */
+    descriptionInput.value =
+      description;
 
-  function updateAvatar(name, photo) {
 
-    if (photo) {
-
-      avatar.innerHTML =
-        `<img src="${photo}" alt="Photo de profil">`;
-
-      return;
-
-    }
-
-    const firstLetter =
-      (name || "U").trim().charAt(0).toUpperCase();
-
-    avatar.innerHTML =
-      `<span id="avatarLetter">${firstLetter}</span>`;
-  }
-
-
-  /* =====================================================
-     CHOIX PHOTO
-     ===================================================== */
-
-  photoInput.addEventListener("change", function () {
-
-    const file = this.files[0];
-
-    if (!file) return;
-
-
-    if (!file.type.startsWith("image/")) {
-
-      showError("Veuillez sélectionner une image.");
-
-      this.value = "";
-
-      return;
-    }
-
-
-    if (file.size > 5 * 1024 * 1024) {
-
-      showError(
-        "La photo est trop grande. Maximum : 5 MB."
-      );
-
-      this.value = "";
-
-      return;
-    }
-
-
-    const reader = new FileReader();
-
-
-    reader.onload = function (event) {
-
-      selectedPhoto = event.target.result;
-
-      avatar.innerHTML =
-        `<img src="${selectedPhoto}" alt="Nouvelle photo de profil">`;
-
-      showSuccess("Photo sélectionnée.");
-
-    };
-
-
-    reader.readAsDataURL(file);
-
-  });
-
-
-  /* =====================================================
-     ENREGISTRER
-     ===================================================== */
-
-  profileForm.addEventListener("submit", async function (event) {
-
-    event.preventDefault();
-
-
-    if (!currentUser) {
-
-      showError(
-        "Aucun utilisateur connecté. Connecte-toi d'abord."
-      );
-
-      return;
-    }
-
-
-    const fullName =
-      fullNameInput.value.trim();
-
-    const phone =
-      phoneInput.value.trim();
-
-    const country =
-      countryInput.value.trim();
-
-    const city =
-      cityInput.value.trim();
-
-    const description =
-      descriptionInput.value.trim();
-
-
-    if (!fullName) {
-
-      showError(
-        "Veuillez entrer votre nom complet."
-      );
-
-      return;
-    }
-
-
-    saveButton.disabled = true;
-
-    saveButton.textContent =
-      "Enregistrement...";
-
-
-    /*
-      On met d'abord à jour localement.
-      Cela garantit que le profil reste visible
-      même si l'ancien backend ne possède pas encore
-      l'endpoint de modification.
-    */
-
-    currentUser.name = fullName;
-    currentUser.full_name = fullName;
-    currentUser.fullName = fullName;
-
-    currentUser.phone = phone;
-    currentUser.telephone = phone;
-
-    currentUser.country = country;
-    currentUser.pays = country;
-
-    currentUser.city = city;
-    currentUser.ville = city;
-
-    currentUser.description = description;
-    currentUser.bio = description;
-
-
-    if (selectedPhoto) {
-
-      currentUser.profile_photo = selectedPhoto;
-      currentUser.profilePhoto = selectedPhoto;
-      currentUser.avatar = selectedPhoto;
-
-    }
-
-
-    /* Sauvegarde locale */
-
-    localStorage.setItem(
-      "helpy_user",
-      JSON.stringify(currentUser)
+    updateAvatar(
+      name,
+      photo
     );
 
-
-    /*
-      On conserve également l'ancien identifiant.
-    */
-
-    if (currentUser.id) {
-
-      localStorage.setItem(
-        "helpy_user_id",
-        String(currentUser.id)
-      );
-
-    }
+  }
 
 
-    /*
-      Tentative de synchronisation avec le serveur.
-    */
+  /* =====================================================
+     CHOISIR PHOTO
+     ===================================================== */
 
-    let serverUpdated = false;
+  photoInput.addEventListener(
+    "change",
+    function() {
 
-
-    if (currentUser.id) {
-
-      const userId =
-        encodeURIComponent(currentUser.id);
-
-
-      const payload = {
-
-        name: fullName,
-        full_name: fullName,
-        phone: phone,
-        country: country,
-        city: city,
-        description: description
-
-      };
+      const file =
+        this.files[0];
 
 
-      if (selectedPhoto) {
+      if (!file) {
+        return;
+      }
 
-        payload.profile_photo = selectedPhoto;
+
+      if (!file.type.startsWith("image/")) {
+
+        showError(
+          "Veuillez sélectionner une image."
+        );
+
+        this.value = "";
+
+        return;
 
       }
 
 
-      const endpoints = [
+      if (file.size > 5 * 1024 * 1024) {
 
-        `/api/users/${userId}`,
+        showError(
+          "La photo est trop grande. Maximum : 5 MB."
+        );
 
-        `/api/profile/${userId}`,
+        this.value = "";
 
-        `/api/users/profile/${userId}`
+        return;
 
-      ];
-
-
-      for (const endpoint of endpoints) {
-
-        try {
-
-          const response =
-            await fetch(
-              API_BASE_URL + endpoint,
-              {
-                method: "PUT",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body: JSON.stringify(payload)
-              }
-            );
+      }
 
 
-          if (response.ok) {
+      const reader =
+        new FileReader();
 
-            serverUpdated = true;
 
-            try {
+      reader.onload =
+        function(event) {
 
-              const data =
-                await response.json();
+          selectedPhoto =
+            event.target.result;
 
-              if (data.user) {
 
-                currentUser = {
-                  ...currentUser,
-                  ...data.user
-                };
+          updateAvatar(
+            fullNameInput.value ||
+            "Utilisateur",
+            selectedPhoto
+          );
 
-                localStorage.setItem(
-                  "helpy_user",
-                  JSON.stringify(currentUser)
-                );
 
-              }
+          showSuccess(
+            "Photo sélectionnée. Appuie sur « Enregistrer les modifications » pour la conserver."
+          );
 
-            } catch (e) {}
+        };
 
-            break;
 
-          }
+      reader.onerror =
+        function() {
 
-        } catch (error) {
+          showError(
+            "Impossible de lire cette photo."
+          );
 
-          console.log(
-            "Endpoint non disponible:",
-            endpoint
+        };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+
+  /* =====================================================
+     ENREGISTRER PROFIL
+     ===================================================== */
+
+  profileForm.addEventListener(
+    "submit",
+    function(event) {
+
+      event.preventDefault();
+
+
+      if (!currentUser) {
+
+        showError(
+          "Aucun utilisateur connecté."
+        );
+
+        return;
+
+      }
+
+
+      const name =
+        fullNameInput.value.trim();
+
+
+      if (!name) {
+
+        showError(
+          "Veuillez entrer votre nom complet."
+        );
+
+        return;
+
+      }
+
+
+      saveButton.disabled =
+        true;
+
+      saveButton.textContent =
+        "Enregistrement...";
+
+
+      /*
+       * Mettre à jour l'utilisateur
+       */
+
+      currentUser.name =
+        name;
+
+      currentUser.full_name =
+        name;
+
+      currentUser.fullName =
+        name;
+
+
+      currentUser.phone =
+        phoneInput.value.trim();
+
+
+      currentUser.country =
+        countryInput.value.trim();
+
+
+      currentUser.city =
+        cityInput.value.trim();
+
+
+      currentUser.description =
+        descriptionInput.value.trim();
+
+
+      /*
+       * PHOTO
+       *
+       * Une seule clé :
+       * profile_photo
+       */
+
+      if (selectedPhoto) {
+
+        currentUser.profile_photo =
+          selectedPhoto;
+
+      }
+
+
+      /*
+       * Sauvegarde locale
+       */
+
+      try {
+
+        localStorage.setItem(
+          "helpy_user",
+          JSON.stringify(currentUser)
+        );
+
+
+        if (
+          currentUser.id !== undefined &&
+          currentUser.id !== null
+        ) {
+
+          localStorage.setItem(
+            "helpy_user_id",
+            String(currentUser.id)
           );
 
         }
 
+
+        /*
+         * Compatibilité
+         */
+
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify(currentUser)
+        );
+
+
+        showSuccess(
+          "Profil enregistré avec succès."
+        );
+
+
+        setTimeout(
+          function() {
+
+            window.location.href =
+              "/profile.html";
+
+          },
+          900
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur sauvegarde:",
+          error
+        );
+
+
+        showError(
+          "Impossible d'enregistrer les modifications."
+        );
+
+
+        saveButton.disabled =
+          false;
+
+        saveButton.textContent =
+          "Enregistrer les modifications";
+
       }
 
     }
-
-
-    saveButton.disabled = false;
-
-    saveButton.textContent =
-      "Enregistrer les modifications";
-
-
-    if (serverUpdated) {
-
-      showSuccess(
-        "Profil mis à jour avec succès."
-      );
-
-    } else {
-
-      showSuccess(
-        "Profil enregistré avec succès sur cet appareil."
-      );
-
-    }
-
-
-    setTimeout(function () {
-
-      window.location.href =
-        "/profile.html";
-
-    }, 1200);
-
-  });
+  );
 
 
   /* =====================================================
@@ -850,19 +929,47 @@
 
   document
     .getElementById("logoutButton")
-    .addEventListener("click", function () {
+    .addEventListener(
+      "click",
+      function() {
 
-      localStorage.removeItem("helpy_user");
-      localStorage.removeItem("helpy_user_id");
+        const confirmation =
+          confirm(
+            "Voulez-vous vraiment vous déconnecter ?"
+          );
 
-      localStorage.removeItem("user");
-      localStorage.removeItem("currentUser");
-      localStorage.removeItem("helpyUser");
 
-      window.location.href =
-        "/login.html";
+        if (!confirmation) {
+          return;
+        }
 
-    });
+
+        localStorage.removeItem(
+          "helpy_user"
+        );
+
+        localStorage.removeItem(
+          "helpy_user_id"
+        );
+
+        localStorage.removeItem(
+          "currentUser"
+        );
+
+        localStorage.removeItem(
+          "user"
+        );
+
+        localStorage.removeItem(
+          "helpyUser"
+        );
+
+
+        window.location.href =
+          "/login.html";
+
+      }
+    );
 
 
   /* =====================================================
