@@ -101,7 +101,17 @@ function publicUser(user) {
     id: user.id,
     name: user.name,
     email: user.email,
+
+    phone: user.phone || null,
     whatsapp: user.whatsapp || null,
+
+    country: user.country || null,
+    city: user.city || null,
+
+    description: user.description || null,
+
+    profile_photo: user.profile_photo || null,
+
     role: user.role || "user",
     status: user.status || "active",
     verified: Boolean(user.verified),
@@ -1462,7 +1472,7 @@ app.get(
 
 
 // ======================================================
-// MODIFIER PROFIL
+// MODIFIER PROFIL COMPLET
 // ======================================================
 
 app.put(
@@ -1474,56 +1484,130 @@ app.put(
       const id =
         Number(req.params.id);
 
-      const name =
-        clean(
-          req.body.name,
-          150
-        );
-
-      const whatsapp =
-        clean(
-          req.body.whatsapp,
-          50
-        );
-
-
       if (
         !id ||
         Number.isNaN(id)
       ) {
 
         return res.status(400).json({
+
           statut: "erreur",
+
           message:
             "Utilisateur invalide."
+
         });
+
       }
+
+
+      const name =
+        clean(
+          req.body.name,
+          150
+        );
+
+
+      const phone =
+        clean(
+          req.body.phone ||
+          req.body.telephone,
+          50
+        );
+
+
+      const whatsapp =
+        clean(
+          req.body.whatsapp ||
+          req.body.whatsapp_number ||
+          phone,
+          50
+        );
+
+
+      const country =
+        clean(
+          req.body.country ||
+          req.body.pays,
+          120
+        );
+
+
+      const city =
+        clean(
+          req.body.city ||
+          req.body.ville,
+          120
+        );
+
+
+      const description =
+        clean(
+          req.body.description ||
+          req.body.bio,
+          5000
+        );
+
+
+      const profilePhoto =
+        clean(
+          req.body.profile_photo ||
+          req.body.profilePhoto ||
+          req.body.avatar ||
+          "",
+          9000000
+        );
 
 
       const result =
         await pool.query(
           `
           UPDATE users
+
           SET
             name = COALESCE(
               NULLIF($1, ''),
               name
             ),
-            whatsapp = $2
-          WHERE id = $3
+
+            phone = $2,
+
+            whatsapp = $3,
+
+            country = $4,
+
+            city = $5,
+
+            description = $6,
+
+            profile_photo = $7
+
+          WHERE id = $8
+
           RETURNING
             id,
             name,
             email,
+            phone,
             whatsapp,
+            country,
+            city,
+            description,
+            profile_photo,
             role,
             status,
             verified,
             created_at
           `,
+
           [
             name,
+            phone,
             whatsapp,
+            country,
+            city,
+            description,
+            profilePhoto,
             id
           ]
         );
@@ -1534,11 +1618,19 @@ app.put(
       ) {
 
         return res.status(404).json({
+
           statut: "erreur",
+
           message:
             "Utilisateur introuvable."
+
         });
+
       }
+
+
+      const user =
+        result.rows[0];
 
 
       return res.json({
@@ -1546,23 +1638,33 @@ app.put(
         statut: "ok",
 
         message:
-          "Profil mis à jour.",
+          "Profil mis à jour avec succès.",
 
         user:
-          publicUser(
-            result.rows[0]
-          )
+          publicUser(user)
 
       });
 
 
     } catch (error) {
 
-      return sendServerError(
-        res,
+      console.error(
+        "Erreur modification profil :",
         error
       );
+
+
+      return res.status(500).json({
+
+        statut: "erreur",
+
+        message:
+          "Impossible de modifier le profil."
+
+      });
+
     }
+
   }
 );
 
