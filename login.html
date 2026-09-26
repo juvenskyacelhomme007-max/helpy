@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!DOCTYPE html><html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Se connecter - HELPY</title>
-
-  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Se connecter - HELPY</title>  <style>
     * {
       box-sizing: border-box;
       margin: 0;
@@ -159,173 +154,242 @@
       font-weight: 700;
       text-decoration: none;
     }
-  </style>
-</head>
+  </style></head><body>  <div class="container"><div class="logo">
+  <div class="logo-icon">H</div>
+  <div class="logo-text">HELPY</div>
+</div>
 
-<body>
+<h1>Bienvenue sur HELPY</h1>
 
-  <div class="container">
+<p class="subtitle">
+  Connecte-toi à ton compte pour continuer.
+</p>
 
-    <div class="logo">
-      <div class="logo-icon">H</div>
-      <div class="logo-text">HELPY</div>
-    </div>
+<div id="message" class="message"></div>
 
-    <h1>Bienvenue sur HELPY</h1>
+<form id="loginForm">
 
-    <p class="subtitle">
-      Connecte-toi à ton compte pour continuer.
-    </p>
+  <label for="email">E-mail</label>
 
-    <div id="message" class="message"></div>
+  <input
+    type="email"
+    id="email"
+    placeholder="exemple@email.com"
+    autocomplete="email"
+    required
+  >
 
-    <form id="loginForm">
+  <label for="password">Mot de passe</label>
 
-      <label for="email">E-mail</label>
+  <input
+    type="password"
+    id="password"
+    placeholder="Ton mot de passe"
+    autocomplete="current-password"
+    required
+  >
 
-      <input
-        type="email"
-        id="email"
-        placeholder="exemple@email.com"
-        autocomplete="email"
-        required
-      >
+  <button type="submit" id="loginButton">
+    Se connecter
+  </button>
 
-      <label for="password">Mot de passe</label>
+</form>
 
-      <input
-        type="password"
-        id="password"
-        placeholder="Ton mot de passe"
-        autocomplete="current-password"
-        required
-      >
+<div class="bottom">
+  Pas encore de compte ?
+  <a href="/register.html">Créer un compte</a>
+</div>
 
-      <button type="submit" id="loginButton">
-        Se connecter
-      </button>
+  </div>  <script>
 
-    </form>
-
-    <div class="bottom">
-      Pas encore de compte ?
-      <a href="register.html">Créer un compte</a>
-    </div>
-
-  </div>
-
-  <script>
-
-    /*
-      HELPY
-      Connexion directe au backend Railway
-      Aucun Supabase
-    */
+    // ==================================================
+    // HELPY — CONNEXION
+    // Backend : Railway + PostgreSQL
+    // ==================================================
 
     const API_BASE_URL = window.location.origin;
 
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-    const button = document.getElementById("loginButton");
+    const form =
+      document.getElementById("loginForm");
+
+    const message =
+      document.getElementById("message");
+
+    const button =
+      document.getElementById("loginButton");
+
 
     function showMessage(text, type) {
+
       message.textContent = text;
-      message.className = "message " + type;
+
+      message.className =
+        "message " + type;
+
     }
 
-    form.addEventListener("submit", async function(event) {
 
-      event.preventDefault();
+    form.addEventListener(
+      "submit",
+      async function(event) {
 
-      const email =
-        document.getElementById("email").value.trim();
+        event.preventDefault();
 
-      const password =
-        document.getElementById("password").value;
 
-      message.className = "message";
-      message.textContent = "";
+        const email =
+          document
+            .getElementById("email")
+            .value
+            .trim();
 
-      if (!email || !password) {
-        showMessage(
-          "Veuillez remplir tous les champs.",
-          "error"
-        );
-        return;
-      }
+        const password =
+          document
+            .getElementById("password")
+            .value;
 
-      button.disabled = true;
-      button.textContent = "Connexion...";
 
-      try {
+        message.className =
+          "message";
 
-        const response = await fetch(
-          API_BASE_URL + "/api/auth/login",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              email: email,
-              password: password
-            })
+        message.textContent =
+          "";
+
+
+        if (!email || !password) {
+
+          showMessage(
+            "Veuillez remplir tous les champs.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+          "Connexion...";
+
+
+        try {
+
+          // IMPORTANT :
+          // Le serveur HELPY utilise /api/login
+          const response =
+            await fetch(
+              API_BASE_URL + "/api/login",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                  email: email,
+                  password: password
+                })
+              }
+            );
+
+
+          let data = {};
+
+          try {
+
+            data =
+              await response.json();
+
+          } catch (jsonError) {
+
+            data = {};
+
           }
-        );
 
-        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-            data.error ||
-            "E-mail ou mot de passe incorrect."
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              "E-mail ou mot de passe incorrect."
+            );
+
+          }
+
+
+          // Le backend HELPY retourne directement
+          // l'utilisateur connecté.
+          if (data.user) {
+
+            localStorage.setItem(
+              "helpy_user",
+              JSON.stringify(data.user)
+            );
+
+          }
+
+
+          // Garder l'id séparément pour les pages
+          // qui en ont besoin.
+          if (
+            data.user &&
+            data.user.id
+          ) {
+
+            localStorage.setItem(
+              "helpy_user_id",
+              String(data.user.id)
+            );
+
+          }
+
+
+          showMessage(
+            "Connexion réussie !",
+            "success"
           );
-        }
 
-        if (data.token) {
-          localStorage.setItem(
-            "helpy_token",
-            data.token
+
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "/";
+
+            },
+            700
           );
-        }
 
-        if (data.user) {
-          localStorage.setItem(
-            "helpy_user",
-            JSON.stringify(data.user)
+
+        } catch (error) {
+
+          console.error(
+            "HELPY login error:",
+            error
           );
+
+
+          showMessage(
+            error.message ||
+            "Impossible de se connecter.",
+            "error"
+          );
+
+
+        } finally {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "Se connecter";
+
         }
-
-        showMessage(
-          "Connexion réussie !",
-          "success"
-        );
-
-        setTimeout(function() {
-          window.location.href = "index.html";
-        }, 1000);
-
-      } catch (error) {
-
-        console.error("HELPY login error:", error);
-
-        showMessage(
-          error.message ||
-          "Impossible de se connecter.",
-          "error"
-        );
-
-      } finally {
-
-        button.disabled = false;
-        button.textContent = "Se connecter";
 
       }
+    );
 
-    });
-
-  </script>
-
-</body>
+  </script></body>
 </html>
