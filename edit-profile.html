@@ -3,155 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Modifier mon profil - HELPY</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      font-family: Arial, sans-serif;
       background: #f5f6fa;
-      color: #202124;
-      min-height: 100vh;
+      color: #222;
     }
 
     header {
       background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 15px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      border-bottom: 1px solid #e5e5e5;
+      padding: 16px 18px;
       position: sticky;
       top: 0;
       z-index: 10;
     }
 
-    .logo {
-      color: #5846e8;
-      font-size: 25px;
-      font-weight: 800;
-      text-decoration: none;
+    .header-content {
+      max-width: 700px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
     .back {
-      color: #444;
       text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
+      color: #555;
+      font-size: 15px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 650px;
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: #5846e8;
+    }
+
+    main {
+      max-width: 700px;
       margin: 25px auto;
       padding: 0 16px 40px;
     }
 
     .card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 25px 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
     }
 
     h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
+      font-size: 25px;
     }
 
     .subtitle {
       color: #777;
-      font-size: 14px;
       margin-bottom: 25px;
       line-height: 1.5;
     }
 
-    /* PHOTO */
+    .message {
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 14px;
+    }
 
-    .photo-section {
+    .error {
+      background: #ffe9e9;
+      color: #b00020;
+    }
+
+    .success {
+      background: #e8f8ed;
+      color: #147a35;
+    }
+
+    .profile-photo-area {
       text-align: center;
       margin-bottom: 28px;
     }
 
-    .photo-wrapper {
-      position: relative;
-      width: 120px;
-      height: 120px;
+    .avatar {
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
       margin: 0 auto 14px;
+      background: #5846e8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      overflow: hidden;
+      border: 4px solid #eee;
     }
 
-    #profilePreview {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+    .avatar img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      background: #5846e8;
-      border: 4px solid #ffffff;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     }
 
     .photo-button {
       display: inline-block;
       background: #5846e8;
-      color: #ffffff;
+      color: white;
       padding: 11px 18px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 10px;
       cursor: pointer;
-    }
-
-    .photo-button:hover {
-      opacity: 0.9;
+      font-weight: 600;
     }
 
     #photoInput {
       display: none;
     }
 
-    .photo-help {
+    .photo-info {
       color: #888;
       font-size: 12px;
-      margin-top: 9px;
-    }
-
-    /* FORM */
-
-    .form-group {
-      margin-bottom: 18px;
+      margin-top: 8px;
     }
 
     label {
       display: block;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 7px;
+      margin: 17px 0 7px;
+      font-weight: 600;
+      font-size: 14px;
     }
 
     input,
-    textarea,
-    select {
+    textarea {
       width: 100%;
-      border: 1px solid #dcdfe5;
-      border-radius: 12px;
       padding: 13px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
       font-size: 15px;
       outline: none;
-      background: #ffffff;
-      color: #202124;
+      font-family: inherit;
     }
 
     input:focus,
-    textarea:focus,
-    select:focus {
+    textarea:focus {
       border-color: #5846e8;
-      box-shadow: 0 0 0 3px rgba(88,70,232,0.10);
+    }
+
+    input[readonly] {
+      background: #f3f3f3;
+      color: #777;
     }
 
     textarea {
@@ -159,68 +169,50 @@
       resize: vertical;
     }
 
-    input[readonly] {
-      background: #f3f4f6;
-      color: #777;
-    }
-
-    .buttons {
-      display: grid;
-      gap: 11px;
+    .save-button {
+      width: 100%;
+      border: none;
+      background: #5846e8;
+      color: white;
+      padding: 15px;
+      border-radius: 11px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
       margin-top: 25px;
     }
 
-    button {
+    .save-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .logout {
       width: 100%;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .save {
-      background: #5846e8;
-      color: white;
-    }
-
-    .cancel {
-      background: #f0efff;
-      color: #5846e8;
-    }
-
-    .message {
-      display: none;
+      background: #fff;
+      border: 1px solid #ddd;
+      color: #d33;
       padding: 13px;
-      border-radius: 12px;
-      margin-bottom: 18px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .success {
-      display: block;
-      background: #eaf8ef;
-      color: #187a3d;
-    }
-
-    .error {
-      display: block;
-      background: #fff0f0;
-      color: #c62828;
-    }
-
-    .loading {
-      opacity: 0.65;
-      pointer-events: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     footer {
       text-align: center;
-      color: #888;
+      color: #999;
       font-size: 12px;
       padding: 20px;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin-top: 15px;
+      }
+
+      .card {
+        padding: 19px;
+      }
     }
   </style>
 </head>
@@ -228,37 +220,30 @@
 <body>
 
 <header>
-  <a href="index.html" class="logo">HELPY</a>
-
-  <a href="profile.html" class="back">
-    ← Mon profil
-  </a>
+  <div class="header-content">
+    <a href="/profile.html" class="back">← Mon profil</a>
+    <div class="logo">HELPY</div>
+  </div>
 </header>
 
-<main class="container">
+<main>
 
   <div class="card">
 
     <h1>Modifier mon profil</h1>
 
-    <p class="subtitle">
+    <div class="subtitle">
       Mets à jour tes informations personnelles et ta photo de profil.
-    </p>
+    </div>
 
-    <div id="message" class="message"></div>
+    <div id="errorMessage" class="message error"></div>
+    <div id="successMessage" class="message success"></div>
 
     <!-- PHOTO -->
+    <div class="profile-photo-area">
 
-    <div class="photo-section">
-
-      <div class="photo-wrapper">
-
-        <img
-          id="profilePreview"
-          src=""
-          alt="Photo de profil"
-        >
-
+      <div class="avatar" id="avatar">
+        <span id="avatarLetter">?</span>
       </div>
 
       <label for="photoInput" class="photo-button">
@@ -268,130 +253,95 @@
       <input
         type="file"
         id="photoInput"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
       >
 
-      <p class="photo-help">
+      <div class="photo-info">
         JPG, PNG ou WEBP • Taille recommandée : image carrée
-      </p>
+      </div>
 
     </div>
 
-    <!-- FORM -->
+    <!-- FORMULAIRE -->
 
     <form id="profileForm">
 
-      <div class="form-group">
+      <label for="fullName">
+        Nom complet
+      </label>
 
-        <label for="fullName">
-          Nom complet
-        </label>
+      <input
+        type="text"
+        id="fullName"
+        placeholder="Ton nom complet"
+        required
+      >
 
-        <input
-          type="text"
-          id="fullName"
-          placeholder="Ton nom complet"
-          maxlength="100"
-          required
-        >
+      <label for="email">
+        E-mail
+      </label>
 
-      </div>
+      <input
+        type="email"
+        id="email"
+        readonly
+      >
 
-      <div class="form-group">
+      <label for="phone">
+        Téléphone
+      </label>
 
-        <label for="email">
-          E-mail
-        </label>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="+509..."
+      >
 
-        <input
-          type="email"
-          id="email"
-          readonly
-        >
+      <label for="country">
+        Pays
+      </label>
 
-      </div>
+      <input
+        type="text"
+        id="country"
+        placeholder="Exemple : Haïti"
+      >
 
-      <div class="form-group">
+      <label for="city">
+        Ville
+      </label>
 
-        <label for="phone">
-          Téléphone / WhatsApp
-        </label>
+      <input
+        type="text"
+        id="city"
+        placeholder="Exemple : Port-au-Prince"
+      >
 
-        <input
-          type="tel"
-          id="phone"
-          placeholder="+509..."
-          maxlength="30"
-        >
+      <label for="description">
+        À propos de moi
+      </label>
 
-      </div>
+      <textarea
+        id="description"
+        placeholder="Présente-toi brièvement..."
+      ></textarea>
 
-      <div class="form-group">
-
-        <label for="country">
-          Pays
-        </label>
-
-        <input
-          type="text"
-          id="country"
-          placeholder="Ton pays"
-          maxlength="80"
-        >
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="city">
-          Ville
-        </label>
-
-        <input
-          type="text"
-          id="city"
-          placeholder="Ta ville"
-          maxlength="100"
-        >
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="description">
-          À propos de moi
-        </label>
-
-        <textarea
-          id="description"
-          maxlength="500"
-          placeholder="Présente-toi en quelques mots..."
-        ></textarea>
-
-      </div>
-
-      <div class="buttons">
-
-        <button
-          type="submit"
-          class="save"
-          id="saveButton"
-        >
-          💾 Enregistrer les modifications
-        </button>
-
-        <button
-          type="button"
-          class="cancel"
-          onclick="window.location.href='profile.html'"
-        >
-          Annuler
-        </button>
-
-      </div>
+      <button
+        type="submit"
+        class="save-button"
+        id="saveButton"
+      >
+        Enregistrer les modifications
+      </button>
 
     </form>
 
+  </div>
+
+  <div class="card">
+    <button class="logout" id="logoutButton">
+      Déconnexion
+    </button>
   </div>
 
 </main>
@@ -400,63 +350,95 @@
   © 2026 HELPY
 </footer>
 
-
 <script>
 
-  /*
-   * =====================================================
-   * HELPY — MODIFICATION DU PROFIL
-   * =====================================================
-   */
+  /* =====================================================
+     HELPY - MODIFICATION DU PROFIL
+     ===================================================== */
 
-  const API_BASE_URL =
-    window.location.hostname.includes("railway.app")
-      ? window.location.origin
-      : "https://helpy-production-c2f2.up.railway.app";
-
+  const API_BASE_URL = window.location.origin;
 
   let currentUser = null;
   let selectedPhoto = null;
 
 
-  /*
-   * -----------------------------------------------------
-   * UTILISATEUR LOCAL
-   * -----------------------------------------------------
-   */
+  /* =====================================================
+     ELEMENTS
+     ===================================================== */
 
-  function getStoredUser() {
+  const errorMessage = document.getElementById("errorMessage");
+  const successMessage = document.getElementById("successMessage");
 
-    const keys = [
+  const avatar = document.getElementById("avatar");
+  const avatarLetter = document.getElementById("avatarLetter");
+
+  const photoInput = document.getElementById("photoInput");
+
+  const fullNameInput = document.getElementById("fullName");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phone");
+  const countryInput = document.getElementById("country");
+  const cityInput = document.getElementById("city");
+  const descriptionInput = document.getElementById("description");
+
+  const profileForm = document.getElementById("profileForm");
+  const saveButton = document.getElementById("saveButton");
+
+
+  /* =====================================================
+     MESSAGE
+     ===================================================== */
+
+  function showError(message) {
+
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
+
+    successMessage.style.display = "none";
+  }
+
+
+  function showSuccess(message) {
+
+    successMessage.textContent = message;
+    successMessage.style.display = "block";
+
+    errorMessage.style.display = "none";
+  }
+
+
+  /* =====================================================
+     RECUPERER UTILISATEUR
+     ===================================================== */
+
+  function getCurrentUser() {
+
+    const possibleKeys = [
+      "helpy_user",
       "user",
       "currentUser",
-      "helpyUser",
-      "loggedUser",
-      "userData"
+      "helpyUser"
     ];
 
-    for (const key of keys) {
+    for (const key of possibleKeys) {
+
+      const saved = localStorage.getItem(key);
+
+      if (!saved) continue;
 
       try {
 
-        const value = localStorage.getItem(key);
+        const user = JSON.parse(saved);
 
-        if (!value) {
-          continue;
-        }
+        if (user && typeof user === "object") {
 
-        const data = JSON.parse(value);
+          return user;
 
-        if (data && typeof data === "object") {
-          return data;
         }
 
       } catch (error) {
 
-        console.log(
-          "Erreur lecture utilisateur:",
-          error
-        );
+        console.log("Erreur lecture utilisateur:", key);
 
       }
 
@@ -466,132 +448,37 @@
   }
 
 
-  /*
-   * -----------------------------------------------------
-   * SAUVEGARDE UTILISATEUR LOCAL
-   * -----------------------------------------------------
-   */
+  /* =====================================================
+     INITIALISATION
+     ===================================================== */
 
-  function saveStoredUser(user) {
+  function initializeProfile() {
 
-    const keys = [
-      "user",
-      "currentUser",
-      "helpyUser",
-      "loggedUser",
-      "userData"
-    ];
-
-    let saved = false;
-
-    for (const key of keys) {
-
-      if (localStorage.getItem(key)) {
-
-        localStorage.setItem(
-          key,
-          JSON.stringify(user)
-        );
-
-        saved = true;
-
-        break;
-      }
-
-    }
-
-    if (!saved) {
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
-
-    }
-  }
-
-
-  /*
-   * -----------------------------------------------------
-   * INITIALISER LA PHOTO
-   * -----------------------------------------------------
-   */
-
-  function setDefaultPhoto(name) {
-
-    const initial =
-      name && name.trim()
-        ? name.trim().charAt(0).toUpperCase()
-        : "H";
-
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg"
-           width="200"
-           height="200"
-           viewBox="0 0 200 200">
-
-        <rect
-          width="200"
-          height="200"
-          rx="100"
-          fill="#5846e8"
-        />
-
-        <text
-          x="100"
-          y="120"
-          text-anchor="middle"
-          font-size="82"
-          font-family="Arial"
-          font-weight="bold"
-          fill="white"
-        >
-          ${initial}
-        </text>
-
-      </svg>
-    `;
-
-    document.getElementById("profilePreview").src =
-      "data:image/svg+xml;charset=UTF-8," +
-      encodeURIComponent(svg);
-  }
-
-
-  /*
-   * -----------------------------------------------------
-   * CHARGER LES DONNÉES
-   * -----------------------------------------------------
-   */
-
-  function loadProfile() {
-
-    currentUser = getStoredUser();
+    currentUser = getCurrentUser();
 
     if (!currentUser) {
 
-      showMessage(
-        "Aucun utilisateur connecté. Connecte-toi d'abord.",
-        "error"
+      showError(
+        "Aucun utilisateur connecté. Connecte-toi d'abord."
       );
 
-      document.getElementById("profileForm").style.display =
-        "none";
+      profileForm.style.display = "none";
 
       return;
+
     }
 
+    console.log("Utilisateur HELPY chargé :", currentUser);
 
     const name =
       currentUser.name ||
       currentUser.full_name ||
       currentUser.fullName ||
       currentUser.nom ||
-      "";
+      "Utilisateur";
 
     const email =
       currentUser.email ||
-      currentUser.email_address ||
       "";
 
     const phone =
@@ -616,26 +503,6 @@
       currentUser.bio ||
       "";
 
-
-    document.getElementById("fullName").value =
-      name;
-
-    document.getElementById("email").value =
-      email;
-
-    document.getElementById("phone").value =
-      phone;
-
-    document.getElementById("country").value =
-      country;
-
-    document.getElementById("city").value =
-      city;
-
-    document.getElementById("description").value =
-      description;
-
-
     const photo =
       currentUser.profile_photo ||
       currentUser.profilePhoto ||
@@ -645,382 +512,364 @@
       "";
 
 
-    if (photo) {
+    fullNameInput.value = name;
+    emailInput.value = email;
+    phoneInput.value = phone;
+    countryInput.value = country;
+    cityInput.value = city;
+    descriptionInput.value = description;
 
-      document.getElementById("profilePreview").src =
-        photo;
 
-    } else {
-
-      setDefaultPhoto(name);
-
-    }
+    updateAvatar(name, photo);
 
   }
 
 
-  /*
-   * -----------------------------------------------------
-   * CHOISIR UNE PHOTO
-   * -----------------------------------------------------
-   */
+  /* =====================================================
+     AVATAR
+     ===================================================== */
 
-  document
-    .getElementById("photoInput")
-    .addEventListener("change", function(event) {
+  function updateAvatar(name, photo) {
 
-      const file =
-        event.target.files[0];
+    if (photo) {
 
-      if (!file) {
-        return;
-      }
+      avatar.innerHTML =
+        `<img src="${photo}" alt="Photo de profil">`;
 
+      return;
 
-      if (!file.type.startsWith("image/")) {
+    }
 
-        showMessage(
-          "Veuillez sélectionner une image.",
-          "error"
-        );
+    const firstLetter =
+      (name || "U").trim().charAt(0).toUpperCase();
 
-        return;
-      }
+    avatar.innerHTML =
+      `<span id="avatarLetter">${firstLetter}</span>`;
+  }
 
 
-      const maxSize =
-        5 * 1024 * 1024;
+  /* =====================================================
+     CHOIX PHOTO
+     ===================================================== */
+
+  photoInput.addEventListener("change", function () {
+
+    const file = this.files[0];
+
+    if (!file) return;
 
 
-      if (file.size > maxSize) {
+    if (!file.type.startsWith("image/")) {
 
-        showMessage(
-          "La photo ne doit pas dépasser 5 Mo.",
-          "error"
-        );
+      showError("Veuillez sélectionner une image.");
 
-        event.target.value = "";
+      this.value = "";
 
-        return;
-      }
+      return;
+    }
 
 
-      const reader =
-        new FileReader();
+    if (file.size > 5 * 1024 * 1024) {
+
+      showError(
+        "La photo est trop grande. Maximum : 5 MB."
+      );
+
+      this.value = "";
+
+      return;
+    }
 
 
-      reader.onload = function(e) {
+    const reader = new FileReader();
 
-        selectedPhoto =
-          e.target.result;
 
-        document.getElementById(
-          "profilePreview"
-        ).src = selectedPhoto;
+    reader.onload = function (event) {
+
+      selectedPhoto = event.target.result;
+
+      avatar.innerHTML =
+        `<img src="${selectedPhoto}" alt="Nouvelle photo de profil">`;
+
+      showSuccess("Photo sélectionnée.");
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+  });
+
+
+  /* =====================================================
+     ENREGISTRER
+     ===================================================== */
+
+  profileForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+
+    if (!currentUser) {
+
+      showError(
+        "Aucun utilisateur connecté. Connecte-toi d'abord."
+      );
+
+      return;
+    }
+
+
+    const fullName =
+      fullNameInput.value.trim();
+
+    const phone =
+      phoneInput.value.trim();
+
+    const country =
+      countryInput.value.trim();
+
+    const city =
+      cityInput.value.trim();
+
+    const description =
+      descriptionInput.value.trim();
+
+
+    if (!fullName) {
+
+      showError(
+        "Veuillez entrer votre nom complet."
+      );
+
+      return;
+    }
+
+
+    saveButton.disabled = true;
+
+    saveButton.textContent =
+      "Enregistrement...";
+
+
+    /*
+      On met d'abord à jour localement.
+      Cela garantit que le profil reste visible
+      même si l'ancien backend ne possède pas encore
+      l'endpoint de modification.
+    */
+
+    currentUser.name = fullName;
+    currentUser.full_name = fullName;
+    currentUser.fullName = fullName;
+
+    currentUser.phone = phone;
+    currentUser.telephone = phone;
+
+    currentUser.country = country;
+    currentUser.pays = country;
+
+    currentUser.city = city;
+    currentUser.ville = city;
+
+    currentUser.description = description;
+    currentUser.bio = description;
+
+
+    if (selectedPhoto) {
+
+      currentUser.profile_photo = selectedPhoto;
+      currentUser.profilePhoto = selectedPhoto;
+      currentUser.avatar = selectedPhoto;
+
+    }
+
+
+    /* Sauvegarde locale */
+
+    localStorage.setItem(
+      "helpy_user",
+      JSON.stringify(currentUser)
+    );
+
+
+    /*
+      On conserve également l'ancien identifiant.
+    */
+
+    if (currentUser.id) {
+
+      localStorage.setItem(
+        "helpy_user_id",
+        String(currentUser.id)
+      );
+
+    }
+
+
+    /*
+      Tentative de synchronisation avec le serveur.
+    */
+
+    let serverUpdated = false;
+
+
+    if (currentUser.id) {
+
+      const userId =
+        encodeURIComponent(currentUser.id);
+
+
+      const payload = {
+
+        name: fullName,
+        full_name: fullName,
+        phone: phone,
+        country: country,
+        city: city,
+        description: description
 
       };
 
 
-      reader.readAsDataURL(file);
-
-    });
-
-
-  /*
-   * -----------------------------------------------------
-   * MESSAGE
-   * -----------------------------------------------------
-   */
-
-  function showMessage(text, type) {
-
-    const message =
-      document.getElementById("message");
-
-    message.textContent = text;
-
-    message.className =
-      "message " + type;
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-
-  }
-
-
-  /*
-   * -----------------------------------------------------
-   * ENREGISTRER
-   * -----------------------------------------------------
-   */
-
-  document
-    .getElementById("profileForm")
-    .addEventListener("submit", async function(event) {
-
-      event.preventDefault();
-
-
-      if (!currentUser) {
-
-        showMessage(
-          "Utilisateur non connecté.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const name =
-        document.getElementById("fullName").value.trim();
-
-      const phone =
-        document.getElementById("phone").value.trim();
-
-      const country =
-        document.getElementById("country").value.trim();
-
-      const city =
-        document.getElementById("city").value.trim();
-
-      const description =
-        document.getElementById("description").value.trim();
-
-
-      if (!name) {
-
-        showMessage(
-          "Le nom complet est obligatoire.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const saveButton =
-        document.getElementById("saveButton");
-
-
-      saveButton.textContent =
-        "Enregistrement...";
-
-      document
-        .getElementById("profileForm")
-        .classList.add("loading");
-
-
-      /*
-       * Mise à jour locale immédiate.
-       */
-
-      currentUser.name =
-        name;
-
-      currentUser.full_name =
-        name;
-
-      currentUser.phone =
-        phone;
-
-      currentUser.telephone =
-        phone;
-
-      currentUser.whatsapp =
-        phone;
-
-      currentUser.country =
-        country;
-
-      currentUser.pays =
-        country;
-
-      currentUser.city =
-        city;
-
-      currentUser.ville =
-        city;
-
-      currentUser.description =
-        description;
-
-
       if (selectedPhoto) {
 
-        currentUser.profile_photo =
-          selectedPhoto;
-
-        currentUser.profilePhoto =
-          selectedPhoto;
-
-        currentUser.avatar =
-          selectedPhoto;
+        payload.profile_photo = selectedPhoto;
 
       }
 
 
-      /*
-       * Sauvegarde locale.
-       */
+      const endpoints = [
 
-      saveStoredUser(currentUser);
+        `/api/users/${userId}`,
 
+        `/api/profile/${userId}`,
 
-      /*
-       * Tentative de sauvegarde backend.
-       *
-       * On essaie plusieurs routes possibles.
-       * Si elles n'existent pas encore, les données
-       * locales restent sauvegardées.
-       */
+        `/api/users/profile/${userId}`
 
-      let backendSaved = false;
+      ];
 
 
-      const userId =
-        currentUser.id ||
-        currentUser.user_id ||
-        currentUser.userId;
+      for (const endpoint of endpoints) {
 
+        try {
 
-      if (userId) {
+          const response =
+            await fetch(
+              API_BASE_URL + endpoint,
+              {
+                method: "PUT",
 
-        const payload = {
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
 
-          id: userId,
-
-          name: name,
-
-          full_name: name,
-
-          phone: phone,
-
-          whatsapp: phone,
-
-          country: country,
-
-          city: city,
-
-          description: description,
-
-          profile_photo:
-            currentUser.profile_photo || null
-
-        };
-
-
-        const endpoints = [
-
-          "/api/users/" + userId,
-
-          "/api/profile/" + userId,
-
-          "/api/users/profile/" + userId
-
-        ];
-
-
-        for (const endpoint of endpoints) {
-
-          try {
-
-            const response =
-              await fetch(
-                API_BASE_URL + endpoint,
-                {
-                  method: "PUT",
-
-                  headers: {
-                    "Content-Type":
-                      "application/json"
-                  },
-
-                  body:
-                    JSON.stringify(payload)
-                }
-              );
-
-
-            if (response.ok) {
-
-              backendSaved = true;
-
-              break;
-
-            }
-
-          } catch (error) {
-
-            console.log(
-              "Backend:",
-              endpoint,
-              error
+                body: JSON.stringify(payload)
+              }
             );
 
+
+          if (response.ok) {
+
+            serverUpdated = true;
+
+            try {
+
+              const data =
+                await response.json();
+
+              if (data.user) {
+
+                currentUser = {
+                  ...currentUser,
+                  ...data.user
+                };
+
+                localStorage.setItem(
+                  "helpy_user",
+                  JSON.stringify(currentUser)
+                );
+
+              }
+
+            } catch (e) {}
+
+            break;
+
           }
+
+        } catch (error) {
+
+          console.log(
+            "Endpoint non disponible:",
+            endpoint
+          );
 
         }
 
       }
 
-
-      /*
-       * FIN
-       */
-
-      document
-        .getElementById("profileForm")
-        .classList.remove("loading");
+    }
 
 
-      saveButton.textContent =
-        "💾 Enregistrer les modifications";
+    saveButton.disabled = false;
+
+    saveButton.textContent =
+      "Enregistrer les modifications";
 
 
-      if (backendSaved) {
+    if (serverUpdated) {
 
-        showMessage(
-          "Votre profil a été enregistré avec succès.",
-          "success"
-        );
+      showSuccess(
+        "Profil mis à jour avec succès."
+      );
 
-      } else {
+    } else {
 
-        showMessage(
-          "Les informations ont été enregistrées sur cet appareil. La synchronisation serveur sera activée avec l’API profil HELPY.",
-          "success"
-        );
+      showSuccess(
+        "Profil enregistré avec succès sur cet appareil."
+      );
 
-      }
+    }
 
 
-      setTimeout(function() {
+    setTimeout(function () {
 
-        window.location.href =
-          "profile.html";
+      window.location.href =
+        "/profile.html";
 
-      }, 1500);
+    }, 1200);
+
+  });
+
+
+  /* =====================================================
+     DECONNEXION
+     ===================================================== */
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener("click", function () {
+
+      localStorage.removeItem("helpy_user");
+      localStorage.removeItem("helpy_user_id");
+
+      localStorage.removeItem("user");
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("helpyUser");
+
+      window.location.href =
+        "/login.html";
 
     });
 
 
-  /*
-   * -----------------------------------------------------
-   * DÉMARRAGE
-   * -----------------------------------------------------
-   */
+  /* =====================================================
+     START
+     ===================================================== */
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-      loadProfile();
-
-    }
-  );
+  initializeProfile();
 
 </script>
 
