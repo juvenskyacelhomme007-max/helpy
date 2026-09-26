@@ -182,6 +182,7 @@
     <form id="registerForm">
 
       <label for="name">Nom complet</label>
+
       <input
         type="text"
         id="name"
@@ -191,6 +192,7 @@
       >
 
       <label for="email">E-mail</label>
+
       <input
         type="email"
         id="email"
@@ -200,6 +202,7 @@
       >
 
       <label for="password">Mot de passe</label>
+
       <input
         type="password"
         id="password"
@@ -209,7 +212,10 @@
         required
       >
 
-      <label for="confirmPassword">Confirmer le mot de passe</label>
+      <label for="confirmPassword">
+        Confirmer le mot de passe
+      </label>
+
       <input
         type="password"
         id="confirmPassword"
@@ -219,7 +225,10 @@
         required
       >
 
-      <button type="submit" id="registerButton">
+      <button
+        type="submit"
+        id="registerButton"
+      >
         Créer mon compte
       </button>
 
@@ -227,131 +236,276 @@
 
     <div class="bottom">
       Déjà inscrit ?
-      <a href="login.html">Se connecter</a>
+      <a href="/login.html">
+        Se connecter
+      </a>
     </div>
 
   </div>
 
   <script>
-    /*
-      HELPY
-      Connexion directe au backend Railway
-      Aucun Supabase
-    */
 
-    const API_BASE_URL = window.location.origin;
+    // ==================================================
+    // HELPY — INSCRIPTION
+    // Backend Railway + PostgreSQL
+    // ==================================================
 
-    const form = document.getElementById("registerForm");
-    const message = document.getElementById("message");
-    const button = document.getElementById("registerButton");
+    const API_BASE_URL =
+      window.location.origin;
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className = "message " + type;
+
+    const form =
+      document.getElementById(
+        "registerForm"
+      );
+
+
+    const message =
+      document.getElementById(
+        "message"
+      );
+
+
+    const button =
+      document.getElementById(
+        "registerButton"
+      );
+
+
+    function showMessage(
+      text,
+      type
+    ) {
+
+      message.textContent =
+        text;
+
+      message.className =
+        "message " + type;
+
     }
 
-    form.addEventListener("submit", async function(event) {
 
-      event.preventDefault();
+    form.addEventListener(
+      "submit",
+      async function(event) {
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmPassword =
-        document.getElementById("confirmPassword").value;
+        event.preventDefault();
 
-      message.className = "message";
-      message.textContent = "";
 
-      if (!name || !email || !password || !confirmPassword) {
-        showMessage("Veuillez remplir tous les champs.", "error");
-        return;
-      }
+        const name =
+          document
+            .getElementById("name")
+            .value
+            .trim();
 
-      if (password.length < 6) {
-        showMessage(
-          "Le mot de passe doit contenir au moins 6 caractères.",
-          "error"
-        );
-        return;
-      }
 
-      if (password !== confirmPassword) {
-        showMessage(
-          "Les mots de passe ne correspondent pas.",
-          "error"
-        );
-        return;
-      }
+        const email =
+          document
+            .getElementById("email")
+            .value
+            .trim();
 
-      button.disabled = true;
-      button.textContent = "Création du compte...";
 
-      try {
+        const password =
+          document
+            .getElementById("password")
+            .value;
 
-        const response = await fetch(
-          API_BASE_URL + "/api/auth/register",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              name: name,
-              email: email,
-              password: password
-            })
+
+        const confirmPassword =
+          document
+            .getElementById(
+              "confirmPassword"
+            )
+            .value;
+
+
+        message.className =
+          "message";
+
+        message.textContent =
+          "";
+
+
+        if (
+          !name ||
+          !email ||
+          !password ||
+          !confirmPassword
+        ) {
+
+          showMessage(
+            "Veuillez remplir tous les champs.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (
+          password.length < 6
+        ) {
+
+          showMessage(
+            "Le mot de passe doit contenir au moins 6 caractères.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (
+          password !==
+          confirmPassword
+        ) {
+
+          showMessage(
+            "Les mots de passe ne correspondent pas.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        button.disabled =
+          true;
+
+        button.textContent =
+          "Création du compte...";
+
+
+        try {
+
+          // IMPORTANT :
+          // Le backend HELPY utilise /api/register
+          const response =
+            await fetch(
+              API_BASE_URL +
+              "/api/register",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: password
+                  })
+              }
+            );
+
+
+          let data = {};
+
+          try {
+
+            data =
+              await response.json();
+
+          } catch (jsonError) {
+
+            data = {};
+
           }
-        );
 
-        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-            data.error ||
-            "Impossible de créer le compte."
+          if (
+            !response.ok
+          ) {
+
+            throw new Error(
+              data.message ||
+              data.error ||
+              "Impossible de créer le compte."
+            );
+
+          }
+
+
+          // Sauvegarder l'utilisateur
+          // retourné par HELPY.
+          if (
+            data.user
+          ) {
+
+            localStorage.setItem(
+              "helpy_user",
+              JSON.stringify(
+                data.user
+              )
+            );
+
+
+            if (
+              data.user.id
+            ) {
+
+              localStorage.setItem(
+                "helpy_user_id",
+                String(
+                  data.user.id
+                )
+              );
+
+            }
+
+          }
+
+
+          showMessage(
+            "Compte créé avec succès !",
+            "success"
           );
-        }
 
-        if (data.token) {
-          localStorage.setItem("helpy_token", data.token);
-        }
 
-        if (data.user) {
-          localStorage.setItem(
-            "helpy_user",
-            JSON.stringify(data.user)
+          setTimeout(
+            function() {
+
+              window.location.href =
+                "/";
+
+            },
+            1000
           );
+
+
+        } catch (error) {
+
+          console.error(
+            "HELPY register error:",
+            error
+          );
+
+
+          showMessage(
+            error.message ||
+            "Une erreur est survenue.",
+            "error"
+          );
+
+
+        } finally {
+
+          button.disabled =
+            false;
+
+          button.textContent =
+            "Créer mon compte";
+
         }
-
-        showMessage(
-          "Compte créé avec succès !",
-          "success"
-        );
-
-        setTimeout(function() {
-          window.location.href = "index.html";
-        }, 1200);
-
-      } catch (error) {
-
-        console.error("HELPY register error:", error);
-
-        showMessage(
-          error.message ||
-          "Une erreur est survenue. Vérifie ta connexion.",
-          "error"
-        );
-
-      } finally {
-
-        button.disabled = false;
-        button.textContent = "Créer mon compte";
 
       }
+    );
 
-    });
   </script>
 
 </body>
