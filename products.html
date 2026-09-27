@@ -1,1 +1,2208 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Produits — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><h1>Produits</h1><div id="grid" class="grid">Chargement...</div></main><script>(async()=>{const r=await apiFetch('/api/products');grid.innerHTML=(r.produits||[]).map(x=>`<article class="card"><h3>${x.title||x.name}</h3><p>${x.description||''}</p><p class="price">${x.price} ${x.currency||'USD'}</p><a class="btn" href="listing-details.html?id=${x.id}&type=product">Voir détails</a></article>`).join('')||'<p>Aucun produit pour le moment.</p>'})()</script></body></html>
+<!doctype html>
+<html lang="fr">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Produits — HELPY</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <style>
+
+    /* =====================================================
+       PRODUCTS PAGE
+       ===================================================== */
+
+    .products-page {
+      padding-bottom: 40px;
+    }
+
+
+    /* =====================================================
+       PAGE HEADER
+       ===================================================== */
+
+    .products-header {
+      padding: 25px 0 15px;
+    }
+
+    .products-header h1 {
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    .products-header p {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+
+    /* =====================================================
+       SEARCH
+       ===================================================== */
+
+    .products-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 14px;
+
+      padding: 6px;
+
+      margin-bottom: 12px;
+    }
+
+    .products-search span {
+      padding-left: 9px;
+      font-size: 18px;
+    }
+
+    .products-search input {
+      border: 0;
+      box-shadow: none;
+      padding: 10px 6px;
+    }
+
+    .products-search input:focus {
+      box-shadow: none;
+    }
+
+    .products-search button {
+      width: 45px;
+      height: 43px;
+
+      border: 0;
+      border-radius: 11px;
+
+      background: var(--primary);
+      color: white;
+
+      cursor: pointer;
+    }
+
+
+    /* =====================================================
+       FILTER BUTTON
+       ===================================================== */
+
+    .filter-toggle {
+      width: 100%;
+
+      min-height: 45px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 12px;
+
+      background: white;
+
+      color: var(--text);
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      margin-bottom: 10px;
+    }
+
+
+    /* =====================================================
+       FILTER PANEL
+       ===================================================== */
+
+    .filters {
+      display: none;
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      padding: 15px;
+
+      margin-bottom: 15px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .filters.open {
+      display: block;
+    }
+
+    .filter-group {
+      margin-bottom: 14px;
+    }
+
+    .filter-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .filter-group label {
+      margin-bottom: 6px;
+    }
+
+    .price-row {
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 8px;
+    }
+
+    .filter-actions {
+      display: flex;
+
+      gap: 8px;
+
+      margin-top: 15px;
+    }
+
+    .filter-actions button {
+      flex: 1;
+    }
+
+
+    /* =====================================================
+       RESULTS BAR
+       ===================================================== */
+
+    .results-bar {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 10px;
+
+      margin: 15px 0;
+    }
+
+    .results-count {
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    .sort-select {
+      width: auto;
+
+      min-width: 145px;
+
+      padding: 9px 10px;
+
+      font-size: 12px;
+    }
+
+
+    /* =====================================================
+       PRODUCT GRID
+       ===================================================== */
+
+    .products-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 12px;
+    }
+
+
+    /* =====================================================
+       PRODUCT CARD
+       ===================================================== */
+
+    .product-item {
+      position: relative;
+
+      overflow: hidden;
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      box-shadow:
+        0 3px 12px
+        rgba(20, 20, 30, 0.04);
+
+      transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .product-item:hover {
+      transform: translateY(-3px);
+
+      box-shadow: var(--shadow);
+    }
+
+
+    .product-item-image {
+      position: relative;
+
+      width: 100%;
+
+      aspect-ratio: 1 / 1;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f1f0f6,
+          #fafafd
+        );
+
+      overflow: hidden;
+    }
+
+    .product-item-image img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+    }
+
+    .product-placeholder {
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 42px;
+    }
+
+
+    /* =====================================================
+       FAVORITE
+       ===================================================== */
+
+    .favorite-button {
+      position: absolute;
+
+      top: 9px;
+      right: 9px;
+
+      width: 36px;
+      height: 36px;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      background:
+        rgba(255, 255, 255, .94);
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 20px;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, .08);
+
+      z-index: 2;
+    }
+
+    .favorite-button.active {
+      color: #e13d58;
+    }
+
+
+    /* =====================================================
+       CONDITION BADGE
+       ===================================================== */
+
+    .condition-badge {
+      position: absolute;
+
+      left: 9px;
+      top: 9px;
+
+      padding: 5px 8px;
+
+      border-radius: 7px;
+
+      background:
+        rgba(23, 23, 28, .78);
+
+      color: white;
+
+      font-size: 9px;
+
+      font-weight: 700;
+    }
+
+
+    /* =====================================================
+       PRODUCT INFO
+       ===================================================== */
+
+    .product-item-info {
+      padding: 11px;
+    }
+
+    .product-item-info h3 {
+      font-size: 14px;
+
+      line-height: 1.3;
+
+      margin-bottom: 6px;
+
+      display: -webkit-box;
+
+      -webkit-line-clamp: 2;
+
+      -webkit-box-orient: vertical;
+
+      overflow: hidden;
+    }
+
+    .product-price {
+      color: var(--primary);
+
+      font-size: 15px;
+
+      font-weight: 800;
+    }
+
+    .product-meta {
+      margin-top: 5px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 2px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+    }
+
+
+    /* =====================================================
+       DETAILS BUTTON
+       ===================================================== */
+
+    .details-button {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      min-height: 38px;
+
+      margin-top: 10px;
+
+      border-radius: 10px;
+
+      background: var(--primary-soft);
+
+      color: var(--primary);
+
+      font-size: 12px;
+
+      font-weight: 800;
+    }
+
+    .details-button:hover {
+      background: var(--primary);
+
+      color: white;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+       ===================================================== */
+
+    .empty-products {
+      grid-column: 1 / -1;
+
+      padding: 45px 20px;
+
+      text-align: center;
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+    }
+
+    .empty-products .empty-icon {
+      font-size: 45px;
+
+      margin-bottom: 10px;
+    }
+
+    .empty-products h3 {
+      font-size: 18px;
+    }
+
+    .empty-products p {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       LOADING
+       ===================================================== */
+
+    .products-loading {
+      grid-column: 1 / -1;
+
+      padding: 45px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+    }
+
+
+    /* =====================================================
+       DESKTOP
+       ===================================================== */
+
+    @media (min-width: 600px) {
+
+      .products-grid {
+        grid-template-columns:
+          repeat(3, minmax(0, 1fr));
+      }
+
+      .filters-grid {
+        display: grid;
+
+        grid-template-columns:
+          repeat(2, 1fr);
+
+        gap: 12px;
+      }
+
+    }
+
+
+    @media (min-width: 900px) {
+
+      .products-grid {
+        grid-template-columns:
+          repeat(4, minmax(0, 1fr));
+      }
+
+      .filter-toggle {
+        display: none;
+      }
+
+      .filters {
+        display: block;
+      }
+
+      .filters-grid {
+        grid-template-columns:
+          repeat(4, 1fr);
+      }
+
+    }
+
+
+    @media (min-width: 1200px) {
+
+      .products-grid {
+        grid-template-columns:
+          repeat(5, minmax(0, 1fr));
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="header">
+
+    <nav class="nav">
+
+      <a
+        class="logo"
+        href="index.html"
+      >
+        HELPY
+      </a>
+
+
+      <div class="navlinks">
+
+        <a
+          href="products.html"
+          style="color:var(--primary)"
+        >
+          Produits
+        </a>
+
+        <a href="services.html">
+          Services
+        </a>
+
+        <a href="businesses.html">
+          Entreprises
+        </a>
+
+        <a href="search.html">
+          Recherche
+        </a>
+
+      </div>
+
+
+      <a
+        class="btn light"
+        href="login.html"
+      >
+        Connexion
+      </a>
+
+    </nav>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main class="products-page">
+
+
+    <div class="container">
+
+
+      <!-- HEADER -->
+
+      <section class="products-header">
+
+        <h1>
+          Produits
+        </h1>
+
+        <p>
+          Découvrez des produits proposés par
+          des vendeurs du monde entier.
+        </p>
+
+      </section>
+
+
+      <!-- SEARCH -->
+
+      <form
+        id="products-search-form"
+        class="products-search"
+      >
+
+        <span>
+          🔎
+        </span>
+
+        <input
+          id="products-search"
+          type="search"
+          placeholder="Rechercher un produit..."
+          autocomplete="off"
+        >
+
+        <button
+          type="submit"
+          aria-label="Rechercher"
+        >
+          🔎
+        </button>
+
+      </form>
+
+
+      <!-- FILTER BUTTON -->
+
+      <button
+        id="filter-toggle"
+        class="filter-toggle"
+        type="button"
+      >
+        ⚙️ Filtres
+      </button>
+
+
+      <!-- FILTERS -->
+
+      <section
+        id="filters"
+        class="filters"
+      >
+
+        <div class="filters-grid">
+
+
+          <!-- CATEGORY -->
+
+          <div class="filter-group">
+
+            <label for="category-filter">
+              Catégorie
+            </label>
+
+            <select id="category-filter">
+
+              <option value="">
+                Toutes les catégories
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- COUNTRY -->
+
+          <div class="filter-group">
+
+            <label for="country-filter">
+              Pays
+            </label>
+
+            <select id="country-filter">
+
+              <option value="">
+                Tous les pays
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- CITY -->
+
+          <div class="filter-group">
+
+            <label for="city-filter">
+              Ville / zone
+            </label>
+
+            <select id="city-filter">
+
+              <option value="">
+                Toutes les villes
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- CONDITION -->
+
+          <div class="filter-group">
+
+            <label for="condition-filter">
+              État
+            </label>
+
+            <select id="condition-filter">
+
+              <option value="">
+                Tous les états
+              </option>
+
+              <option value="Neuf">
+                Neuf
+              </option>
+
+              <option value="Occasion">
+                Occasion
+              </option>
+
+              <option value="Reconditionné">
+                Reconditionné
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- PRICE -->
+
+          <div class="filter-group">
+
+            <label>
+              Prix
+            </label>
+
+            <div class="price-row">
+
+              <input
+                id="min-price"
+                type="number"
+                min="0"
+                placeholder="Min"
+              >
+
+              <input
+                id="max-price"
+                type="number"
+                min="0"
+                placeholder="Max"
+              >
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="filter-actions">
+
+          <button
+            id="apply-filters"
+            class="btn"
+            type="button"
+          >
+            Appliquer
+          </button>
+
+          <button
+            id="reset-filters"
+            class="btn light"
+            type="button"
+          >
+            Réinitialiser
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- RESULTS BAR -->
+
+      <div class="results-bar">
+
+        <span
+          id="results-count"
+          class="results-count"
+        >
+          Chargement...
+        </span>
+
+
+        <select
+          id="sort-products"
+          class="sort-select"
+        >
+
+          <option value="recent">
+            Plus récents
+          </option>
+
+          <option value="price-low">
+            Prix croissant
+          </option>
+
+          <option value="price-high">
+            Prix décroissant
+          </option>
+
+          <option value="name">
+            Nom A-Z
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PRODUCTS -->
+
+      <section
+        id="products-grid"
+        class="products-grid"
+      >
+
+        <div class="products-loading">
+          ⏳ Chargement des produits...
+        </div>
+
+      </section>
+
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================
+       MOBILE NAVIGATION
+       ===================================================== -->
+
+  <nav class="bottom-nav">
+
+    <a href="index.html">
+
+      <span>
+        ⌂
+      </span>
+
+      <small>
+        Accueil
+      </small>
+
+    </a>
+
+
+    <a
+      href="search.html"
+      class="active"
+    >
+
+      <span>
+        🔎
+      </span>
+
+      <small>
+        Recherche
+      </small>
+
+    </a>
+
+
+    <a
+      href="publish.html"
+      class="publish-nav"
+    >
+
+      <span>
+        ＋
+      </span>
+
+      <small>
+        Publier
+      </small>
+
+    </a>
+
+
+    <a href="favorites.html">
+
+      <span>
+        ♡
+      </span>
+
+      <small>
+        Favoris
+      </small>
+
+    </a>
+
+
+    <a href="profile.html">
+
+      <span>
+        👤
+      </span>
+
+      <small>
+        Profil
+      </small>
+
+    </a>
+
+  </nav>
+
+
+  <!-- =====================================================
+       APP JS
+       ===================================================== -->
+
+  <script src="app.js"></script>
+
+
+  <!-- =====================================================
+       PRODUCTS LOGIC
+       ===================================================== -->
+
+  <script>
+
+    /*
+     * =====================================================
+     * HELPY PRODUCTS
+     * =====================================================
+     */
+
+
+    let allProducts = [];
+
+    let filteredProducts = [];
+
+
+    /* =====================================================
+       DOM
+       ===================================================== */
+
+    const grid =
+      document.getElementById(
+        "products-grid"
+      );
+
+
+    const searchInput =
+      document.getElementById(
+        "products-search"
+      );
+
+
+    const searchForm =
+      document.getElementById(
+        "products-search-form"
+      );
+
+
+    const categoryFilter =
+      document.getElementById(
+        "category-filter"
+      );
+
+
+    const countryFilter =
+      document.getElementById(
+        "country-filter"
+      );
+
+
+    const cityFilter =
+      document.getElementById(
+        "city-filter"
+      );
+
+
+    const conditionFilter =
+      document.getElementById(
+        "condition-filter"
+      );
+
+
+    const minPrice =
+      document.getElementById(
+        "min-price"
+      );
+
+
+    const maxPrice =
+      document.getElementById(
+        "max-price"
+      );
+
+
+    const sortProducts =
+      document.getElementById(
+        "sort-products"
+      );
+
+
+    const resultsCount =
+      document.getElementById(
+        "results-count"
+      );
+
+
+    const filters =
+      document.getElementById(
+        "filters"
+      );
+
+
+    const filterToggle =
+      document.getElementById(
+        "filter-toggle"
+      );
+
+
+    /* =====================================================
+       FAVORITES
+       ===================================================== */
+
+    function getFavorites() {
+
+      try {
+
+        return JSON.parse(
+          localStorage.getItem(
+            "helpy_favorites"
+          ) || "[]"
+        );
+
+      } catch {
+
+        return [];
+
+      }
+
+    }
+
+
+    function saveFavorites(
+      favorites
+    ) {
+
+      localStorage.setItem(
+        "helpy_favorites",
+        JSON.stringify(favorites)
+      );
+
+    }
+
+
+    function isFavorite(id) {
+
+      return getFavorites()
+        .map(String)
+        .includes(
+          String(id)
+        );
+
+    }
+
+
+    function toggleFavorite(
+      id,
+      button
+    ) {
+
+      let favorites =
+        getFavorites();
+
+
+      const idString =
+        String(id);
+
+
+      const index =
+        favorites
+          .map(String)
+          .indexOf(idString);
+
+
+      if (index === -1) {
+
+        favorites.push(id);
+
+        button.classList.add(
+          "active"
+        );
+
+        button.innerHTML =
+          "♥";
+
+      } else {
+
+        favorites.splice(
+          index,
+          1
+        );
+
+        button.classList.remove(
+          "active"
+        );
+
+        button.innerHTML =
+          "♡";
+
+      }
+
+
+      saveFavorites(
+        favorites
+      );
+
+    }
+
+
+    /* =====================================================
+       NORMALIZE PRODUCT
+       ===================================================== */
+
+    function normalizeProduct(
+      product
+    ) {
+
+      return {
+
+        ...product,
+
+        title:
+          product.title ||
+          product.name ||
+          "Produit sans nom",
+
+        description:
+          product.description ||
+          "",
+
+        category:
+          product.category ||
+          "Autre",
+
+        country:
+          product.country ||
+          "",
+
+        city:
+          product.city ||
+          product.location ||
+          "",
+
+        condition:
+          product.condition ||
+          "",
+
+        price:
+          Number(product.price) || 0,
+
+        currency:
+          product.currency ||
+          "",
+
+        quantity:
+          product.quantity ??
+          1,
+
+        created_at:
+          product.created_at ||
+          product.createdAt ||
+          ""
+
+      };
+
+    }
+
+
+    /* =====================================================
+       LOAD PRODUCTS
+       ===================================================== */
+
+    async function loadProducts() {
+
+      grid.innerHTML = `
+        <div class="products-loading">
+          ⏳ Chargement des produits...
+        </div>
+      `;
+
+
+      try {
+
+        const response =
+          await HELPY.apiFetch(
+            "/api/products"
+          );
+
+
+        if (
+          response.error
+        ) {
+
+          throw new Error(
+            response.message ||
+            "Erreur serveur"
+          );
+
+    }
+
+    const products =
+      response.produits ||
+      response.products ||
+      [];
+
+    allProducts =
+      products.map(
+        normalizeProduct
+      );
+
+    filteredProducts =
+      [...allProducts];
+
+    populateFilters();
+
+    applyURLSearch();
+
+    applyFilters();
+
+  } catch (error) {
+
+    console.error(
+      "Products error:",
+      error
+    );
+
+    grid.innerHTML = `
+
+      <div class="empty-products">
+
+        <div class="empty-icon">
+          ⚠️
+        </div>
+
+        <h3>
+          Impossible de charger les produits
+        </h3>
+
+        <p>
+          Vérifiez votre connexion puis
+          réessayez.
+        </p>
+
+        <br>
+
+        <button
+          class="btn"
+          onclick="loadProducts()"
+        >
+          Réessayer
+        </button>
+
+      </div>
+
+    `;
+
+    resultsCount.textContent =
+      "Erreur de chargement";
+
+  }
+
+}
+
+
+/* =====================================================
+   UNIQUE FILTER VALUES
+   ===================================================== */
+
+function uniqueValues(
+  field
+) {
+
+  return [
+    ...new Set(
+
+      allProducts
+
+        .map(
+          product =>
+            String(
+              product[field] || ""
+            ).trim()
+        )
+
+        .filter(Boolean)
+
+    )
+  ]
+
+  .sort(
+    (a, b) =>
+      a.localeCompare(
+        b,
+        undefined,
+        {
+          sensitivity: "base"
+        }
+      )
+  );
+
+}
+
+
+/* =====================================================
+   POPULATE FILTERS
+   ===================================================== */
+
+function populateFilters() {
+
+  fillSelect(
+    categoryFilter,
+    uniqueValues(
+      "category"
+    ),
+    "Toutes les catégories"
+  );
+
+  fillSelect(
+    countryFilter,
+    uniqueValues(
+      "country"
+    ),
+    "Tous les pays"
+  );
+
+  fillSelect(
+    cityFilter,
+    uniqueValues(
+      "city"
+    ),
+    "Toutes les villes"
+  );
+
+}
+
+
+function fillSelect(
+  select,
+  values,
+  defaultText
+) {
+
+  select.innerHTML =
+    `<option value="">
+      ${defaultText}
+    </option>`;
+
+  values.forEach(
+    value => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        value;
+
+      option.textContent =
+        value;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   URL SEARCH
+   ===================================================== */
+
+function applyURLSearch() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const query =
+    params.get("q");
+
+  if (query) {
+
+    searchInput.value =
+      query;
+
+  }
+
+}
+
+
+/* =====================================================
+   FILTER PRODUCTS
+   ===================================================== */
+
+function applyFilters() {
+
+  const query =
+    searchInput.value
+      .trim()
+      .toLowerCase();
+
+  const category =
+    categoryFilter.value
+      .toLowerCase();
+
+  const country =
+    countryFilter.value
+      .toLowerCase();
+
+  const city =
+    cityFilter.value
+      .toLowerCase();
+
+  const condition =
+    conditionFilter.value
+      .toLowerCase();
+
+  const min =
+    Number(
+      minPrice.value
+    );
+
+  const max =
+    Number(
+      maxPrice.value
+    );
+
+
+  filteredProducts =
+    allProducts.filter(
+      product => {
+
+        const searchable = [
+
+          product.title,
+
+          product.description,
+
+          product.category,
+
+          product.country,
+
+          product.city,
+
+          product.condition,
+
+          product.name
+
+        ]
+
+        .join(" ")
+
+        .toLowerCase();
+
+
+        if (
+          query &&
+          !searchable.includes(
+            query
+          )
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          category &&
+          product.category
+            .toLowerCase() !==
+          category
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          country &&
+          product.country
+            .toLowerCase() !==
+          country
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          city &&
+          product.city
+            .toLowerCase() !==
+          city
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          condition &&
+          product.condition
+            .toLowerCase() !==
+          condition
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          minPrice.value !== "" &&
+          product.price < min
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          maxPrice.value !== "" &&
+          product.price > max
+        ) {
+
+          return false;
+
+        }
+
+
+        return true;
+
+      }
+    );
+
+
+  sortCurrentProducts();
+
+}
+
+
+/* =====================================================
+   SORT PRODUCTS
+   ===================================================== */
+
+function sortCurrentProducts() {
+
+  const sort =
+    sortProducts.value;
+
+
+  if (
+    sort === "price-low"
+  ) {
+
+    filteredProducts.sort(
+      (a, b) =>
+        a.price - b.price
+    );
+
+  }
+
+  else if (
+    sort === "price-high"
+  ) {
+
+    filteredProducts.sort(
+      (a, b) =>
+        b.price - a.price
+    );
+
+  }
+
+  else if (
+    sort === "name"
+  ) {
+
+    filteredProducts.sort(
+      (a, b) =>
+        a.title.localeCompare(
+          b.title,
+          undefined,
+          {
+            sensitivity: "base"
+          }
+        )
+    );
+
+  }
+
+  else {
+
+    filteredProducts.sort(
+      (a, b) => {
+
+        const dateA =
+          new Date(
+            a.created_at || 0
+          ).getTime();
+
+        const dateB =
+          new Date(
+            b.created_at || 0
+          ).getTime();
+
+        return dateB - dateA;
+
+      }
+    );
+
+  }
+
+
+  renderProducts();
+
+}
+
+
+/* =====================================================
+   RENDER PRODUCTS
+   ===================================================== */
+
+function renderProducts() {
+
+  resultsCount.textContent =
+    `${filteredProducts.length} produit${
+      filteredProducts.length > 1
+        ? "s"
+        : ""
+    }`;
+
+
+  if (
+    !filteredProducts.length
+  ) {
+
+    grid.innerHTML = `
+
+      <div class="empty-products">
+
+        <div class="empty-icon">
+          🔍
+        </div>
+
+        <h3>
+          Aucun produit trouvé
+        </h3>
+
+        <p>
+          Essayez une autre recherche
+          ou modifiez vos filtres.
+        </p>
+
+        <br>
+
+        <button
+          class="btn light"
+          onclick="resetFilters()"
+        >
+          Réinitialiser
+        </button>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  grid.innerHTML =
+    filteredProducts
+      .map(
+        renderProductCard
+      )
+      .join("");
+
+
+  setupFavoriteButtons();
+
+}
+
+
+/* =====================================================
+   PRODUCT CARD
+   ===================================================== */
+
+function renderProductCard(
+  product
+) {
+
+  const favorite =
+    isFavorite(
+      product.id
+    );
+
+
+  const image =
+    getProductImage(
+      product
+    );
+
+
+  const condition =
+    product.condition;
+
+
+  return `
+
+    <article
+      class="product-item"
+    >
+
+      <div
+        class="product-item-image"
+      >
+
+        ${
+          image
+
+          ?
+
+          `
+            <img
+              src="${escapeHTML(image)}"
+              alt="${escapeHTML(product.title)}"
+              loading="lazy"
+              onerror="
+                this.style.display='none';
+                this.nextElementSibling.style.display='flex';
+              "
+            >
+
+            <div
+              class="product-placeholder"
+              style="display:none"
+            >
+              🛍️
+            </div>
+          `
+
+          :
+
+          `
+            <div
+              class="product-placeholder"
+            >
+              🛍️
+            </div>
+          `
+        }
+
+
+        ${
+          condition
+
+          ?
+
+          `
+            <span
+              class="condition-badge"
+            >
+              ${escapeHTML(condition)}
+            </span>
+          `
+
+          :
+
+          ""
+        }
+
+
+        <button
+          type="button"
+          class="
+            favorite-button
+            ${favorite ? "active" : ""}
+          "
+          data-favorite-id="${escapeHTML(product.id)}"
+          aria-label="Ajouter aux favoris"
+        >
+          ${favorite ? "♥" : "♡"}
+        </button>
+
+      </div>
+
+
+      <div
+        class="product-item-info"
+      >
+
+        <h3>
+          ${escapeHTML(product.title)}
+        </h3>
+
+
+        <div
+          class="product-price"
+        >
+          ${escapeHTML(
+            HELPY.formatPrice(
+              product.price,
+              product.currency
+            )
+          )}
+        </div>
+
+
+        <div
+          class="product-meta"
+        >
+
+          ${
+            product.category
+              ?
+              `<span>
+                🏷️ ${escapeHTML(product.category)}
+              </span>`
+              :
+              ""
+          }
+
+
+          ${
+            product.country ||
+            product.city
+
+              ?
+
+              `<span>
+                📍
+                ${escapeHTML(
+                  [
+                    product.city,
+                    product.country
+                  ]
+                  .filter(Boolean)
+                  .join(", ")
+                )}
+              </span>`
+
+              :
+
+              ""
+          }
+
+
+          ${
+            product.quantity !==
+            undefined
+
+              ?
+
+              `<span>
+                📦 Quantité :
+                ${escapeHTML(
+                  product.quantity
+                )}
+              </span>`
+
+              :
+
+              ""
+          }
+
+        </div>
+
+
+        <a
+          class="details-button"
+          href="
+            product-details.html?id=${encodeURIComponent(
+              product.id
+            )}
+          "
+        >
+          Voir les détails
+        </a>
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =====================================================
+   PRODUCT IMAGE
+   ===================================================== */
+
+function getProductImage(
+  product
+) {
+
+  if (
+    product.image &&
+    typeof product.image === "string"
+  ) {
+
+    return product.image;
+
+  }
+
+
+  if (
+    product.image_url &&
+    typeof product.image_url === "string"
+  ) {
+
+    return product.image_url;
+
+  }
+
+
+  if (
+    Array.isArray(
+      product.images
+    ) &&
+    product.images.length
+  ) {
+
+    const image =
+      product.images[0];
+
+
+    if (
+      typeof image === "string"
+    ) {
+
+      return image;
+
+    }
+
+
+    if (
+      image &&
+      image.url
+    ) {
+
+      return image.url;
+
+    }
+
+  }
+
+
+  return "";
+
+}
+
+
+/* =====================================================
+   FAVORITE BUTTONS
+   ===================================================== */
+
+function setupFavoriteButtons() {
+
+  document
+    .querySelectorAll(
+      "[data-favorite-id]"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          function(event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            const id =
+              button.dataset.favoriteId;
+
+
+            toggleFavorite(
+              id,
+              button
+            );
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   RESET FILTERS
+   ===================================================== */
+
+function resetFilters() {
+
+  searchInput.value = "";
+
+  categoryFilter.value = "";
+
+  countryFilter.value = "";
+
+  cityFilter.value = "";
+
+  conditionFilter.value = "";
+
+  minPrice.value = "";
+
+  maxPrice.value = "";
+
+  sortProducts.value =
+    "recent";
+
+
+  applyFilters();
+
+}
+
+
+/* =====================================================
+   EVENTS
+   ===================================================== */
+
+searchForm.addEventListener(
+  "submit",
+  function(event) {
+
+    event.preventDefault();
+
+    applyFilters();
+
+  }
+);
+
+
+searchInput.addEventListener(
+  "input",
+  function() {
+
+    applyFilters();
+
+  }
+);
+
+
+sortProducts.addEventListener(
+  "change",
+  function() {
+
+    sortCurrentProducts();
+
+  }
+);
+
+
+document
+  .getElementById(
+    "apply-filters"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      applyFilters();
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "reset-filters"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      resetFilters();
+
+    }
+  );
+
+
+filterToggle.addEventListener(
+  "click",
+  function() {
+
+    filters.classList.toggle(
+      "open"
+    );
+
+
+    filterToggle.textContent =
+      filters.classList.contains(
+        "open"
+      )
+
+      ?
+
+      "✕ Fermer les filtres"
+
+      :
+
+      "⚙️ Filtres";
+
+  }
+);
+
+
+/* =====================================================
+   START
+   ===================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    loadProducts();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
+
+
+       
