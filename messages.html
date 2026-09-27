@@ -1,1 +1,2114 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>messages — HELPY</title><link rel="stylesheet" href="style.css"></head><body><main class="container"><div class="card"><h1>messages</h1><p class="muted">Cette section est prête dans l'interface HELPY et sera alimentée par les données du compte.</p><a class="btn" href="index.html">Retour à l'accueil</a></div></main></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <meta name="theme-color" content="#5b45e6">
+
+  <title>Messages - HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .messages-page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 12px 95px;
+    }
+
+    .messages-header-card {
+      background: linear-gradient(135deg, #5b45e6, #7966ed);
+      color: #fff;
+      border-radius: 22px;
+      padding: 22px 18px;
+      margin-bottom: 15px;
+    }
+
+    .messages-header-card h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .messages-header-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: .92;
+    }
+
+    .messages-layout {
+      display: grid;
+      gap: 12px;
+    }
+
+    .conversations-panel,
+    .chat-panel {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 6px 25px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+
+    .panel-title {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .conversation-search {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .conversation-search input {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .conversation-search input:focus {
+      border-color: #5b45e6;
+    }
+
+    .conversation-list {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .conversation {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fff;
+      padding: 13px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .conversation:hover {
+      background: #faf9ff;
+    }
+
+    .conversation.active {
+      background: #f1efff;
+    }
+
+    .conversation-avatar {
+      width: 45px;
+      height: 45px;
+      flex: 0 0 45px;
+      border-radius: 50%;
+      background: #eeeaff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      overflow: hidden;
+    }
+
+    .conversation-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .conversation-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .conversation-name-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .conversation-name {
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .conversation-time {
+      color: #999;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .conversation-preview {
+      margin-top: 4px;
+      color: #777;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .unread-badge {
+      display: inline-flex;
+      min-width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      background: #5b45e6;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      margin-left: 5px;
+    }
+
+    .empty-conversations {
+      padding: 40px 20px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+    }
+
+    .chat-top {
+      min-height: 66px;
+      border-bottom: 1px solid #eee;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-to-conversations {
+      display: none;
+      border: 0;
+      background: transparent;
+      font-size: 23px;
+      cursor: pointer;
+    }
+
+    .chat-avatar {
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      border-radius: 50%;
+      background: #eeeaff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      overflow: hidden;
+    }
+
+    .chat-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-user-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chat-user-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .chat-user-status {
+      color: #777;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .chat-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .chat-action {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: #f4f2ff;
+      color: #5b45e6;
+      cursor: pointer;
+    }
+
+    .messages-list {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #fafafa;
+      min-height: 420px;
+      max-height: 520px;
+    }
+
+    .chat-empty {
+      height: 100%;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .message-row.mine {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 78%;
+      border-radius: 17px;
+      padding: 10px 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+
+    .message-row.mine .message-bubble {
+      background: #5b45e6;
+      color: #fff;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message-row.theirs .message-bubble {
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-text {
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message-time {
+      margin-top: 4px;
+      font-size: 9px;
+      opacity: .65;
+      text-align: right;
+    }
+
+    .message-form {
+      border-top: 1px solid #eee;
+      padding: 10px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: #fff;
+    }
+
+    .message-form textarea {
+      flex: 1;
+      min-width: 0;
+      max-height: 110px;
+      min-height: 43px;
+      resize: none;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 11px 12px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .message-form textarea:focus {
+      border-color: #5b45e6;
+    }
+
+    .send-button {
+      width: 45px;
+      height: 45px;
+      flex: 0 0 45px;
+      border: 0;
+      border-radius: 50%;
+      background: #5b45e6;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .send-button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .login-message {
+      background: #fff;
+      border-radius: 20px;
+      padding: 45px 20px;
+      text-align: center;
+      box-shadow: 0 6px 25px rgba(0,0,0,.05);
+    }
+
+    .login-message h2 {
+      margin: 0 0 8px;
+    }
+
+    .login-message p {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .login-message a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #5b45e6;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    @media (min-width: 800px) {
+      .messages-page {
+        padding-top: 30px;
+      }
+
+      .messages-layout {
+        grid-template-columns: 330px 1fr;
+        align-items: stretch;
+      }
+
+      .conversations-panel {
+        min-height: 600px;
+      }
+    }
+
+    @media (max-width: 799px) {
+      .chat-panel.mobile-hidden {
+        display: none;
+      }
+
+      .conversations-panel.mobile-hidden {
+        display: none;
+      }
+
+      .back-to-conversations {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="index.html" class="logo">
+      HELPY
+    </a>
+
+    <nav class="nav-links">
+      <a href="products.html">Produits</a>
+      <a href="services.html">Services</a>
+      <a href="businesses.html">Entreprises</a>
+      <a href="search.html">Recherche</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="profile.html" class="profile-link">
+        👤
+      </a>
+    </div>
+
+  </div>
+</header>
+
+
+<main class="messages-page">
+
+  <section class="messages-header-card">
+    <h1>Mes messages 💬</h1>
+
+    <p>
+      Communiquez facilement avec les vendeurs,
+      prestataires et entreprises sur HELPY.
+    </p>
+  </section>
+
+
+  <div id="loginMessage" style="display:none;">
+
+    <div class="login-message">
+
+      <h2>
+        Connectez-vous à HELPY
+      </h2>
+
+      <p>
+        Vous devez être connecté pour accéder
+        à vos conversations.
+      </p>
+
+      <a href="login.html?redirect=messages.html">
+        Se connecter
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="messagesLayout"
+    class="messages-layout"
+  >
+
+    <!-- CONVERSATIONS -->
+
+    <section
+      id="conversationsPanel"
+      class="conversations-panel"
+    >
+
+      <div class="panel-title">
+        Conversations
+      </div>
+
+      <div class="conversation-search">
+
+        <input
+          type="search"
+          id="conversationSearch"
+          placeholder="Rechercher une conversation..."
+        >
+
+      </div>
+
+      <div
+        id="conversationList"
+        class="conversation-list"
+      >
+
+        <div class="empty-conversations">
+          Chargement des conversations...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CHAT -->
+
+    <section
+      id="chatPanel"
+      class="chat-panel mobile-hidden"
+    >
+
+      <div
+        id="chatTop"
+        class="chat-top"
+      >
+
+        <button
+          type="button"
+          id="backButton"
+          class="back-to-conversations"
+        >
+          ←
+        </button>
+
+        <div
+          id="chatAvatar"
+          class="chat-avatar"
+        >
+          💬
+        </div>
+
+        <div class="chat-user-info">
+
+          <div
+            id="chatUserName"
+            class="chat-user-name"
+          >
+            Messages
+          </div>
+
+          <div
+            id="chatUserStatus"
+            class="chat-user-status"
+          >
+            Sélectionnez une conversation
+          </div>
+
+        </div>
+
+        <div class="chat-actions">
+
+          <button
+            type="button"
+            class="chat-action"
+            id="callButton"
+            title="Appeler"
+            style="display:none;"
+          >
+            ☎
+          </button>
+
+          <button
+            type="button"
+            class="chat-action"
+            id="whatsappButton"
+            title="WhatsApp"
+            style="display:none;"
+          >
+            WA
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="messagesList"
+        class="messages-list"
+      >
+
+        <div class="chat-empty">
+          <div>
+            <div style="font-size:40px;margin-bottom:10px;">
+              💬
+            </div>
+
+            Sélectionnez une conversation
+            pour commencer.
+          </div>
+        </div>
+
+      </div>
+
+
+      <form
+        id="messageForm"
+        class="message-form"
+        style="display:none;"
+      >
+
+        <textarea
+          id="messageInput"
+          rows="1"
+          maxlength="2000"
+          placeholder="Écrire un message..."
+        ></textarea>
+
+        <button
+          type="submit"
+          class="send-button"
+          id="sendButton"
+          aria-label="Envoyer"
+        >
+          ➤
+        </button>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    <small>Accueil</small>
+  </a>
+
+  <a href="search.html">
+    <span>⌕</span>
+    <small>Recherche</small>
+  </a>
+
+  <a href="publish.html">
+    <span>＋</span>
+    <small>Publier</small>
+  </a>
+
+  <a href="favorites.html">
+    <span>♡</span>
+    <small>Favoris</small>
+  </a>
+
+  <a href="profile.html">
+    <span>👤</span>
+    <small>Profil</small>
+  </a>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+<script>
+
+let currentUserId = null;
+let conversations = [];
+let currentConversation = null;
+let allMessages = [];
+
+
+/* ==================================================
+   OUTILS
+================================================== */
+
+function safe(value) {
+
+  if (typeof escapeHTML === "function") {
+    return escapeHTML(value || "");
+  }
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function getUserId() {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.currentUserId === "function"
+  ) {
+    return HELPY.currentUserId();
+  }
+
+  return (
+    localStorage.getItem("helpy_user_id") ||
+    localStorage.getItem("user_id") ||
+    ""
+  );
+
+}
+
+
+function getCurrentUser() {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.currentUser === "function"
+  ) {
+    return HELPY.currentUser();
+  }
+
+  try {
+
+    const data =
+      localStorage.getItem("helpy_user") ||
+      localStorage.getItem("user");
+
+    return data
+      ? JSON.parse(data)
+      : null;
+
+  } catch (error) {
+
+    return null;
+
+  }
+
+}
+
+
+function getUserName(user) {
+
+  return (
+    user?.name ||
+    user?.full_name ||
+    user?.username ||
+    "Utilisateur"
+  );
+
+}
+
+
+function getInitials(name) {
+
+  const value =
+    String(name || "U")
+      .trim();
+
+  if (!value) {
+    return "U";
+  }
+
+  const parts =
+    value.split(/\s+/);
+
+  if (parts.length >= 2) {
+
+    return (
+      parts[0].charAt(0) +
+      parts[1].charAt(0)
+    ).toUpperCase();
+
+  }
+
+  return value
+    .charAt(0)
+    .toUpperCase();
+
+}
+
+
+function getPersonName(conversation) {
+
+  return (
+    conversation.other_user_name ||
+    conversation.user_name ||
+    conversation.name ||
+    conversation.username ||
+    conversation.recipient_name ||
+    "Utilisateur"
+  );
+
+}
+
+
+function getPersonImage(conversation) {
+
+  return (
+    conversation.other_user_photo ||
+    conversation.user_photo ||
+    conversation.photo ||
+    conversation.avatar ||
+    ""
+  );
+
+}
+
+
+function getPersonPhone(conversation) {
+
+  return (
+    conversation.other_user_phone ||
+    conversation.user_phone ||
+    conversation.phone ||
+    ""
+  );
+
+}
+
+
+function getPersonWhatsapp(conversation) {
+
+  return (
+    conversation.other_user_whatsapp ||
+    conversation.user_whatsapp ||
+    conversation.whatsapp ||
+    ""
+  );
+
+}
+
+
+function getConversationId(conversation) {
+
+  return (
+    conversation.conversation_id ||
+    conversation.thread_id ||
+    conversation.id
+  );
+
+}
+
+
+function formatTime(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  try {
+
+    const date =
+      new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return date.toLocaleTimeString(
+      "fr-FR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function apiRequest(
+  endpoint,
+  method = "GET",
+  data = null
+) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.apiFetch === "function"
+  ) {
+
+    return HELPY.apiFetch(
+      endpoint,
+      method,
+      data
+    );
+
+  }
+
+
+  const options = {
+
+    method,
+
+    headers: {
+      "Content-Type": "application/json",
+      "x-user-id": currentUserId
+    }
+
+  };
+
+
+  if (data !== null) {
+    options.body =
+      JSON.stringify(data);
+  }
+
+
+  const response =
+    await fetch(
+      endpoint,
+      options
+    );
+
+
+  return response.json();
+
+}
+
+
+/* ==================================================
+   CONVERSATIONS
+================================================== */
+
+async function loadConversations() {
+
+  const container =
+    document.getElementById(
+      "conversationList"
+    );
+
+
+  container.innerHTML = `
+    <div class="empty-conversations">
+      Chargement des conversations...
+    </div>
+  `;
+
+
+  try {
+
+    /*
+     * Le backend pourra renvoyer:
+     * conversations,
+     * conversations list,
+     * messages,
+     * data.
+     */
+
+    const response =
+      await apiRequest(
+        "/api/messages"
+      );
+
+
+    if (response.error) {
+      throw new Error(
+        response.error
+      );
+    }
+
+
+    let list =
+      response.conversations ||
+      response.conversation ||
+      response.data ||
+      response.messages ||
+      response;
+
+
+    if (!Array.isArray(list)) {
+      list = [];
+    }
+
+
+    /*
+     * Si l'API renvoie des messages individuels,
+     * on les regroupe par conversation.
+     */
+
+    if (
+      list.length &&
+      (
+        list[0].conversation_id ||
+        list[0].thread_id
+      )
+    ) {
+
+      list =
+        groupMessagesIntoConversations(
+          list
+        );
+
+    }
+
+
+    conversations = list;
+
+
+    renderConversations();
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    /*
+     * Le backend actuel peut ne pas encore
+     * posséder la route GET /api/messages.
+     * Dans ce cas, l'interface reste utilisable
+     * et indique qu'il n'y a pas encore de conversation.
+     */
+
+    conversations = [];
+
+    container.innerHTML = `
+      <div class="empty-conversations">
+        <div style="font-size:32px;margin-bottom:8px;">
+          💬
+        </div>
+
+        Aucune conversation pour le moment.
+      </div>
+    `;
+
+  }
+
+}
+
+
+function groupMessagesIntoConversations(
+  messages
+) {
+
+  const groups = {};
+
+  messages.forEach(function(message) {
+
+    const id =
+      message.conversation_id ||
+      message.thread_id ||
+      (
+        [
+          message.sender_id,
+          message.receiver_id
+        ]
+        .sort()
+        .join("-")
+      );
+
+
+    if (!groups[id]) {
+
+      groups[id] = {
+
+        id: id,
+
+        conversation_id: id,
+
+        other_user_id:
+          String(message.sender_id) ===
+          String(currentUserId)
+            ? message.receiver_id
+            : message.sender_id,
+
+        other_user_name:
+          message.sender_name ||
+          message.receiver_name ||
+          "Utilisateur",
+
+        last_message:
+          message.content ||
+          message.message ||
+          "",
+
+        last_message_at:
+          message.created_at ||
+          message.sent_at ||
+          null,
+
+        unread_count:
+          0
+
+      };
+
+    }
+
+
+    if (
+      message.created_at &&
+      (
+        !groups[id].last_message_at ||
+        new Date(message.created_at) >
+        new Date(groups[id].last_message_at)
+      )
+    ) {
+
+      groups[id].last_message =
+        message.content ||
+        message.message ||
+        "";
+
+      groups[id].last_message_at =
+        message.created_at;
+
+    }
+
+  });
+
+
+  return Object.values(groups);
+
+}
+
+
+function renderConversations() {
+
+  const container =
+    document.getElementById(
+      "conversationList"
+    );
+
+
+  const search =
+    document
+      .getElementById(
+        "conversationSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    conversations.filter(
+      function(conversation) {
+
+        const name =
+          getPersonName(
+            conversation
+          ).toLowerCase();
+
+        const preview =
+          String(
+            conversation.last_message ||
+            conversation.message ||
+            ""
+          ).toLowerCase();
+
+
+        return (
+          !search ||
+          name.includes(search) ||
+          preview.includes(search)
+        );
+
+      }
+    );
+
+
+  if (!filtered.length) {
+
+    container.innerHTML = `
+      <div class="empty-conversations">
+        <div style="font-size:32px;margin-bottom:8px;">
+          💬
+        </div>
+
+        ${
+          
+    search
+      ? "Aucune conversation trouvée."
+      : "Aucune conversation pour le moment."
+  }
+
+  return;
+}
+
+
+container.innerHTML =
+  filtered.map(function(conversation) {
+
+    const id =
+      getConversationId(
+        conversation
+      );
+
+    const name =
+      getPersonName(
+        conversation
+      );
+
+    const image =
+      getPersonImage(
+        conversation
+      );
+
+    const preview =
+      conversation.last_message ||
+      conversation.message ||
+      "Nouvelle conversation";
+
+    const unread =
+      Number(
+        conversation.unread_count ||
+        conversation.unread ||
+        0
+      );
+
+
+    return `
+      <button
+        type="button"
+        class="conversation ${
+          currentConversation &&
+          String(
+            getConversationId(
+              currentConversation
+            )
+          ) === String(id)
+            ? "active"
+            : ""
+        }"
+        data-id="${safe(id)}"
+      >
+
+        <div class="conversation-avatar">
+
+          ${
+            image
+              ? `
+                <img
+                  src="${safe(image)}"
+                  alt="${safe(name)}"
+                >
+              `
+              : safe(
+                  getInitials(name)
+                )
+          }
+
+        </div>
+
+
+        <div class="conversation-info">
+
+          <div class="conversation-name-row">
+
+            <span class="conversation-name">
+              ${safe(name)}
+            </span>
+
+            <span class="conversation-time">
+              ${safe(
+                formatTime(
+                  conversation.last_message_at ||
+                  conversation.updated_at
+                )
+              )}
+            </span>
+
+          </div>
+
+
+          <div class="conversation-preview">
+
+            ${safe(preview)}
+
+            ${
+              unread > 0
+                ? `
+                  <span class="unread-badge">
+                    ${
+                      unread > 9
+                        ? "9+"
+                        : unread
+                    }
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+
+      </button>
+    `;
+
+  }).join("");
+
+
+container
+  .querySelectorAll(
+    ".conversation"
+  )
+  .forEach(function(button) {
+
+    button.addEventListener(
+      "click",
+      function() {
+
+        const id =
+          this.dataset.id;
+
+        const conversation =
+          conversations.find(
+            function(item) {
+
+              return String(
+                getConversationId(item)
+              ) === String(id);
+
+            }
+          );
+
+
+        if (conversation) {
+
+          openConversation(
+            conversation
+          );
+
+        }
+
+      }
+    );
+
+  });
+
+}
+
+
+/* ==================================================
+   OUVRIR UNE CONVERSATION
+================================================== */
+
+async function openConversation(
+  conversation
+) {
+
+  currentConversation =
+    conversation;
+
+
+  document
+    .getElementById(
+      "conversationsPanel"
+    )
+    .classList.add(
+      "mobile-hidden"
+    );
+
+
+  document
+    .getElementById(
+      "chatPanel"
+    )
+    .classList.remove(
+      "mobile-hidden"
+    );
+
+
+  updateChatHeader(
+    conversation
+  );
+
+
+  await loadConversationMessages(
+    conversation
+  );
+
+
+  renderConversations();
+
+}
+
+
+/* ==================================================
+   HEADER DU CHAT
+================================================== */
+
+function updateChatHeader(
+  conversation
+) {
+
+  const name =
+    getPersonName(
+      conversation
+    );
+
+  const image =
+    getPersonImage(
+      conversation
+    );
+
+  const phone =
+    getPersonPhone(
+      conversation
+    );
+
+  const whatsapp =
+    getPersonWhatsapp(
+      conversation
+    );
+
+
+  document
+    .getElementById(
+      "chatUserName"
+    )
+    .textContent =
+    name;
+
+
+  document
+    .getElementById(
+      "chatUserStatus"
+    )
+    .textContent =
+    "Conversation HELPY";
+
+
+  const avatar =
+    document.getElementById(
+      "chatAvatar"
+    );
+
+
+  if (image) {
+
+    avatar.innerHTML = `
+      <img
+        src="${safe(image)}"
+        alt="${safe(name)}"
+      >
+    `;
+
+  } else {
+
+    avatar.textContent =
+      getInitials(name);
+
+  }
+
+
+  const callButton =
+    document.getElementById(
+      "callButton"
+    );
+
+  const whatsappButton =
+    document.getElementById(
+      "whatsappButton"
+    );
+
+
+  if (phone) {
+
+    callButton.style.display =
+      "block";
+
+    callButton.onclick =
+      function() {
+
+        window.location.href =
+          "tel:" + phone;
+
+      };
+
+  } else {
+
+    callButton.style.display =
+      "none";
+
+  }
+
+
+  if (whatsapp) {
+
+    whatsappButton.style.display =
+      "block";
+
+    whatsappButton.onclick =
+      function() {
+
+        const clean =
+          String(whatsapp)
+            .replace(
+              /[^0-9+]/g,
+              ""
+            );
+
+        const number =
+          clean.replace(
+            /^\+/,
+            ""
+          );
+
+        window.open(
+          "https://wa.me/" + number,
+          "_blank"
+        );
+
+      };
+
+  } else {
+
+    whatsappButton.style.display =
+      "none";
+
+  }
+
+
+  document
+    .getElementById(
+      "messageForm"
+    )
+    .style.display =
+    "flex";
+
+}
+
+
+/* ==================================================
+   CHARGER LES MESSAGES
+================================================== */
+
+async function loadConversationMessages(
+  conversation
+) {
+
+  const container =
+    document.getElementById(
+      "messagesList"
+    );
+
+
+  container.innerHTML = `
+    <div class="chat-empty">
+      Chargement des messages...
+    </div>
+  `;
+
+
+  const conversationId =
+    getConversationId(
+      conversation
+    );
+
+
+  try {
+
+    let response;
+
+
+    try {
+
+      response =
+        await apiRequest(
+          "/api/messages/" +
+          encodeURIComponent(
+            conversationId
+          )
+        );
+
+    } catch (firstError) {
+
+      response =
+        await apiRequest(
+          "/api/messages?conversation_id=" +
+          encodeURIComponent(
+            conversationId
+          )
+        );
+
+    }
+
+
+    if (response.error) {
+
+      throw new Error(
+        response.error
+      );
+
+    }
+
+
+    let messages =
+      response.messages ||
+      response.data ||
+      response;
+
+
+    if (!Array.isArray(messages)) {
+      messages = [];
+    }
+
+
+    allMessages =
+      messages;
+
+
+    renderMessages(
+      messages
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    allMessages = [];
+
+
+    container.innerHTML = `
+      <div class="chat-empty">
+
+        <div>
+
+          <div
+            style="
+              font-size:38px;
+              margin-bottom:10px;
+            "
+          >
+            💬
+          </div>
+
+          Aucun message dans cette conversation.
+
+          <br>
+
+          <span style="font-size:11px;">
+            Vous pouvez envoyer le premier message.
+          </span>
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* ==================================================
+   AFFICHER LES MESSAGES
+================================================== */
+
+function renderMessages(
+  messages
+) {
+
+  const container =
+    document.getElementById(
+      "messagesList"
+    );
+
+
+  if (!messages.length) {
+
+    container.innerHTML = `
+      <div class="chat-empty">
+
+        <div>
+
+          <div
+            style="
+              font-size:38px;
+              margin-bottom:10px;
+            "
+          >
+            👋
+          </div>
+
+          Aucun message pour le moment.
+
+          <br>
+
+          Commencez la conversation.
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    messages.map(function(message) {
+
+      const senderId =
+        message.sender_id ??
+        message.user_id ??
+        message.from_user_id;
+
+
+      const mine =
+        String(senderId) ===
+        String(currentUserId);
+
+
+      const content =
+        message.content ||
+        message.message ||
+        message.text ||
+        "";
+
+
+      const time =
+        message.created_at ||
+        message.sent_at ||
+        message.date ||
+        "";
+
+
+      return `
+        <div
+          class="message-row ${
+            mine
+              ? "mine"
+              : "theirs"
+          }"
+        >
+
+          <div class="message-bubble">
+
+            <div class="message-text">
+              ${safe(content)}
+            </div>
+
+            <div class="message-time">
+              ${safe(
+                formatTime(time)
+              )}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  container.scrollTop =
+    container.scrollHeight;
+
+}
+
+
+/* ==================================================
+   ENVOYER UN MESSAGE
+================================================== */
+
+async function sendMessage(
+  event
+) {
+
+  event.preventDefault();
+
+
+  if (!currentConversation) {
+    return;
+  }
+
+
+  const input =
+    document.getElementById(
+      "messageInput"
+    );
+
+  const button =
+    document.getElementById(
+      "sendButton"
+    );
+
+
+  const content =
+    input.value.trim();
+
+
+  if (!content) {
+    return;
+  }
+
+
+  const conversationId =
+    getConversationId(
+      currentConversation
+    );
+
+
+  const receiverId =
+    currentConversation.other_user_id ||
+    currentConversation.recipient_id ||
+    currentConversation.user_id ||
+    currentConversation.receiver_id;
+
+
+  button.disabled = true;
+
+
+  try {
+
+    const data = {
+
+      conversation_id:
+        conversationId,
+
+      receiver_id:
+        receiverId,
+
+      recipient_id:
+        receiverId,
+
+      content:
+        content,
+
+      message:
+        content
+
+    };
+
+
+    const response =
+      await apiRequest(
+        "/api/messages",
+        "POST",
+        data
+      );
+
+
+    if (response.error) {
+
+      throw new Error(
+        response.error
+      );
+
+    }
+
+
+    input.value = "";
+
+    input.style.height =
+      "auto";
+
+
+    const newMessage =
+      response.message ||
+      response.data ||
+      {
+
+        sender_id:
+          currentUserId,
+
+        receiver_id:
+          receiverId,
+
+        content:
+          content,
+
+        created_at:
+          new Date().toISOString()
+
+      };
+
+
+    allMessages.push(
+      newMessage
+    );
+
+
+    renderMessages(
+      allMessages
+    );
+
+
+    currentConversation.last_message =
+      content;
+
+
+    currentConversation.last_message_at =
+      new Date().toISOString();
+
+
+    renderConversations();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      error.message ||
+      "Impossible d'envoyer le message."
+    );
+
+  } finally {
+
+    button.disabled = false;
+
+    input.focus();
+
+  }
+
+}
+
+
+/* ==================================================
+   BOUTON RETOUR MOBILE
+================================================== */
+
+function setupBackButton() {
+
+  document
+    .getElementById(
+      "backButton"
+    )
+    .addEventListener(
+      "click",
+      function() {
+
+        document
+          .getElementById(
+            "chatPanel"
+          )
+          .classList.add(
+            "mobile-hidden"
+          );
+
+
+        document
+          .getElementById(
+            "conversationsPanel"
+          )
+          .classList.remove(
+            "mobile-hidden"
+          );
+
+      }
+    );
+
+}
+
+
+/* ==================================================
+   RECHERCHE
+================================================== */
+
+function setupConversationSearch() {
+
+  document
+    .getElementById(
+      "conversationSearch"
+    )
+    .addEventListener(
+      "input",
+      renderConversations
+    );
+
+}
+
+
+/* ==================================================
+   CHAMP MESSAGE
+================================================== */
+
+function setupMessageInput() {
+
+  const input =
+    document.getElementById(
+      "messageInput"
+    );
+
+
+  input.addEventListener(
+    "input",
+    function() {
+
+      this.style.height =
+        "auto";
+
+      this.style.height =
+        Math.min(
+          this.scrollHeight,
+          110
+        ) + "px";
+
+    }
+  );
+
+
+  input.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        document
+          .getElementById(
+            "messageForm"
+          )
+          .requestSubmit();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   INITIALISATION
+================================================== */
+
+async function initializeMessages() {
+
+  currentUserId =
+    getUserId();
+
+
+  if (!currentUserId) {
+
+    document
+      .getElementById(
+        "messagesLayout"
+      )
+      .style.display =
+      "none";
+
+
+    document
+      .getElementById(
+        "loginMessage"
+      )
+      .style.display =
+      "block";
+
+
+    return;
+
+  }
+
+
+  setupBackButton();
+
+  setupConversationSearch();
+
+  setupMessageInput();
+
+
+  document
+    .getElementById(
+      "messageForm"
+    )
+    .addEventListener(
+      "submit",
+      sendMessage
+    );
+
+
+  await loadConversations();
+
+}
+
+
+/* ==================================================
+   LANCEMENT
+================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeMessages
+);
+
+</script>
+
+</body>
+</html>
