@@ -1,1 +1,1903 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>reviews — HELPY</title><link rel="stylesheet" href="style.css"></head><body><main class="container"><div class="card"><h1>reviews</h1><p class="muted">Cette section est prête dans l'interface HELPY et sera alimentée par les données du compte.</p><a class="btn" href="index.html">Retour à l'accueil</a></div></main></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Avis et évaluations - HELPY</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <style>
+    /* ==================================================
+       HELPY - REVIEWS
+    ================================================== */
+
+    .reviews-page {
+      min-height: 100vh;
+      background: #f7f7fb;
+      padding-bottom: 90px;
+    }
+
+    .reviews-header {
+      background: #ffffff;
+      border-bottom: 1px solid #ececf2;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .reviews-header-inner {
+      max-width: 1180px;
+      margin: auto;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .reviews-back {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 0;
+      background: #f1efff;
+      color: #5b45e6;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .reviews-title-wrap {
+      flex: 1;
+    }
+
+    .reviews-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: #18181f;
+    }
+
+    .reviews-subtitle {
+      margin: 3px 0 0;
+      color: #777783;
+      font-size: 13px;
+    }
+
+    .reviews-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px 16px;
+    }
+
+    /* ==================================================
+       SUMMARY
+    ================================================== */
+
+    .reviews-summary {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 20px rgba(20, 20, 40, 0.05);
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .average-rating {
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .average-number {
+      display: block;
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 900;
+      color: #18181f;
+    }
+
+    .average-stars {
+      margin-top: 8px;
+      color: #f5a623;
+      font-size: 19px;
+      letter-spacing: 1px;
+    }
+
+    .average-count {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #777783;
+    }
+
+    .rating-bars {
+      flex: 1;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 7px 0;
+    }
+
+    .rating-label {
+      width: 28px;
+      font-size: 13px;
+      color: #555563;
+    }
+
+    .rating-track {
+      flex: 1;
+      height: 7px;
+      background: #eeeeF3;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .rating-fill {
+      height: 100%;
+      background: #f5a623;
+      border-radius: 20px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .rating-count {
+      width: 30px;
+      text-align: right;
+      font-size: 12px;
+      color: #777783;
+    }
+
+    /* ==================================================
+       WRITE REVIEW
+    ================================================== */
+
+    .write-review {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 20px rgba(20, 20, 40, 0.05);
+    }
+
+    .section-heading {
+      margin: 0 0 5px;
+      font-size: 18px;
+      color: #18181f;
+    }
+
+    .section-description {
+      margin: 0 0 18px;
+      color: #777783;
+      font-size: 13px;
+    }
+
+    .star-selector {
+      display: flex;
+      gap: 7px;
+      margin: 12px 0 18px;
+    }
+
+    .star-button {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 12px;
+      background: #f4f3f8;
+      color: #bdbdc8;
+      font-size: 23px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .star-button.active {
+      background: #fff4dc;
+      color: #f5a623;
+      transform: translateY(-1px);
+    }
+
+    .review-input {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border: 1px solid #e3e3eb;
+      border-radius: 14px;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .review-input:focus {
+      border-color: #5b45e6;
+      box-shadow: 0 0 0 3px rgba(91, 69, 230, 0.08);
+    }
+
+    .review-submit {
+      margin-top: 14px;
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px;
+      background: #5b45e6;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .review-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .review-message {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .review-message.success {
+      display: block;
+      background: #eaf8ef;
+      color: #18733c;
+    }
+
+    .review-message.error {
+      display: block;
+      background: #fff0f0;
+      color: #b42323;
+    }
+
+    /* ==================================================
+       REVIEWS LIST
+    ================================================== */
+
+    .reviews-list-section {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 5px 20px rgba(20, 20, 40, 0.05);
+    }
+
+    .reviews-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .reviews-list-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .review-filter {
+      border: 1px solid #e2e2e9;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .review-card {
+      padding: 17px 0;
+      border-bottom: 1px solid #eeeeF3;
+    }
+
+    .review-card:last-child {
+      border-bottom: 0;
+    }
+
+    .review-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .review-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #eeeef5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #5b45e6;
+    }
+
+    .review-user-info {
+      flex: 1;
+    }
+
+    .review-user-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #22222a;
+    }
+
+    .review-date {
+      margin-top: 2px;
+      font-size: 11px;
+      color: #888893;
+    }
+
+    .review-stars {
+      color: #f5a623;
+      font-size: 15px;
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    .review-comment {
+      margin: 9px 0 0;
+      color: #4e4e59;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .review-empty {
+      text-align: center;
+      padding: 35px 15px;
+      color: #858590;
+    }
+
+    .review-empty-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .review-loading {
+      text-align: center;
+      padding: 30px;
+      color: #777783;
+    }
+
+    /* ==================================================
+       BOTTOM NAV
+    ================================================== */
+
+    .reviews-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 64px;
+      background: #ffffff;
+      border-top: 1px solid #e8e8ef;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .reviews-bottom-nav a {
+      text-decoration: none;
+      color: #777783;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .reviews-bottom-nav a span {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .reviews-bottom-nav a.active {
+      color: #5b45e6;
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       DESKTOP
+    ================================================== */
+
+    @media (min-width: 768px) {
+
+      .reviews-container {
+        padding-top: 30px;
+      }
+
+      .reviews-bottom-nav {
+        display: none;
+      }
+
+      .review-submit {
+        width: auto;
+        padding-left: 30px;
+        padding-right: 30px;
+      }
+
+    }
+
+    @media (max-width: 560px) {
+
+      .summary-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .average-rating {
+        text-align: left;
+      }
+
+      .star-button {
+        width: 39px;
+        height: 39px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="reviews-page">
+
+  <!-- ==================================================
+       HEADER
+  ================================================== -->
+
+  <header class="reviews-header">
+
+    <div class="reviews-header-inner">
+
+      <button
+        type="button"
+        class="reviews-back"
+        onclick="history.back()"
+        aria-label="Retour"
+      >
+        ←
+      </button>
+
+      <div class="reviews-title-wrap">
+
+        <h1 class="reviews-title">
+          Avis et évaluations
+        </h1>
+
+        <p class="reviews-subtitle">
+          Découvrez les expériences des utilisateurs
+        </p>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="reviews-container">
+
+    <!-- ==================================================
+         SUMMARY
+    ================================================== -->
+
+    <section class="reviews-summary">
+
+      <div class="summary-top">
+
+        <div class="average-rating">
+
+          <span
+            id="averageNumber"
+            class="average-number"
+          >
+            0.0
+          </span>
+
+          <div
+            id="averageStars"
+            class="average-stars"
+          >
+            ☆☆☆☆☆
+          </div>
+
+          <div
+            id="averageCount"
+            class="average-count"
+          >
+            0 avis
+          </div>
+
+        </div>
+
+
+        <div class="rating-bars">
+
+          <div class="rating-row">
+
+            <span class="rating-label">
+              5★
+            </span>
+
+            <div class="rating-track">
+              <div
+                id="bar5"
+                class="rating-fill"
+              ></div>
+            </div>
+
+            <span
+              id="count5"
+              class="rating-count"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="rating-row">
+
+            <span class="rating-label">
+              4★
+            </span>
+
+            <div class="rating-track">
+              <div
+                id="bar4"
+                class="rating-fill"
+              ></div>
+            </div>
+
+            <span
+              id="count4"
+              class="rating-count"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="rating-row">
+
+            <span class="rating-label">
+              3★
+            </span>
+
+            <div class="rating-track">
+              <div
+                id="bar3"
+                class="rating-fill"
+              ></div>
+            </div>
+
+            <span
+              id="count3"
+              class="rating-count"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="rating-row">
+
+            <span class="rating-label">
+              2★
+            </span>
+
+            <div class="rating-track">
+              <div
+                id="bar2"
+                class="rating-fill"
+              ></div>
+            </div>
+
+            <span
+              id="count2"
+              class="rating-count"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="rating-row">
+
+            <span class="rating-label">
+              1★
+            </span>
+
+            <div class="rating-track">
+              <div
+                id="bar1"
+                class="rating-fill"
+              ></div>
+            </div>
+
+            <span
+              id="count1"
+              class="rating-count"
+            >
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         WRITE REVIEW
+    ================================================== -->
+
+    <section class="write-review">
+
+      <h2 class="section-heading">
+        Laisser un avis
+      </h2>
+
+      <p class="section-description">
+        Partagez votre expérience avec la communauté HELPY.
+      </p>
+
+
+      <div
+        id="starSelector"
+        class="star-selector"
+      >
+
+        <button
+          type="button"
+          class="star-button"
+          data-rating="1"
+        >
+          ★
+        </button>
+
+        <button
+          type="button"
+          class="star-button"
+          data-rating="2"
+        >
+          ★
+        </button>
+
+        <button
+          type="button"
+          class="star-button"
+          data-rating="3"
+        >
+          ★
+        </button>
+
+        <button
+          type="button"
+          class="star-button"
+          data-rating="4"
+        >
+          ★
+        </button>
+
+        <button
+          type="button"
+          class="star-button"
+          data-rating="5"
+        >
+          ★
+        </button>
+
+      </div>
+
+
+      <textarea
+        id="reviewComment"
+        class="review-input"
+        maxlength="1000"
+        placeholder="Écrivez votre avis..."
+      ></textarea>
+
+
+      <button
+        id="submitReview"
+        type="button"
+        class="review-submit"
+      >
+        Publier mon avis
+      </button>
+
+
+      <div
+        id="reviewMessage"
+        class="review-message"
+      ></div>
+
+    </section>
+
+
+    <!-- ==================================================
+         REVIEWS LIST
+    ================================================== -->
+
+    <section class="reviews-list-section">
+
+      <div class="reviews-list-header">
+
+        <h2>
+          Avis des utilisateurs
+        </h2>
+
+        <select
+          id="reviewFilter"
+          class="review-filter"
+        >
+          <option value="all">
+            Tous
+          </option>
+
+          <option value="5">
+            5 étoiles
+          </option>
+
+          <option value="4">
+            4 étoiles
+          </option>
+
+          <option value="3">
+            3 étoiles
+          </option>
+
+          <option value="2">
+            2 étoiles
+          </option>
+
+          <option value="1">
+            1 étoile
+          </option>
+        </select>
+
+      </div>
+
+
+      <div
+        id="reviewsList"
+      >
+
+        <div class="review-loading">
+          Chargement des avis...
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==================================================
+       MOBILE NAVIGATION
+  ================================================== -->
+
+  <nav class="reviews-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      Accueil
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      Recherche
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      Publier
+    </a>
+
+    <a href="favorites.html">
+      <span>♡</span>
+      Favoris
+    </a>
+
+    <a
+      href="profile.html"
+      class="active"
+    >
+      <span>♙</span>
+      Profil
+    </a>
+
+  </nav>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   HELPY - REVIEWS JAVASCRIPT
+================================================== */
+
+const API_BASE =
+  window.HELPY &&
+  typeof HELPY.apiFetch === "function"
+    ? HELPY
+    : null;
+
+
+/* ==================================================
+   ÉTAT
+================================================== */
+
+let allReviews = [];
+
+let selectedRating = 0;
+
+let targetType =
+  new URLSearchParams(
+    window.location.search
+  ).get("type") || "";
+
+let targetId =
+  new URLSearchParams(
+    window.location.search
+  ).get("id") || "";
+
+
+/* ==================================================
+   UTILITAIRES
+================================================== */
+
+function escapeReviewHTML(value) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.escapeHTML === "function"
+  ) {
+
+    return HELPY.escapeHTML(
+      String(value ?? "")
+    );
+
+  }
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function starsHTML(rating) {
+
+  const number =
+    Math.max(
+      0,
+      Math.min(
+        5,
+        Number(rating) || 0
+      )
+    );
+
+  let html = "";
+
+  for (let i = 1; i <= 5; i++) {
+
+    html +=
+      i <= number
+        ? "★"
+        : "☆";
+
+  }
+
+  return html;
+}
+
+
+function getUserName(review) {
+
+  return (
+    review.user_name ||
+    review.username ||
+    review.name ||
+    review.nom ||
+    review.author_name ||
+    "Utilisateur HELPY"
+  );
+
+}
+
+
+function getReviewComment(review) {
+
+  return (
+    review.comment ||
+    review.review ||
+    review.content ||
+    review.text ||
+    review.message ||
+    ""
+  );
+
+}
+
+
+function getReviewRating(review) {
+
+  return Number(
+    review.rating ||
+    review.stars ||
+    review.note ||
+    0
+  );
+
+}
+
+
+function getReviewDate(review) {
+
+  const value =
+    review.created_at ||
+    review.createdAt ||
+    review.date;
+
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+  return date.toLocaleDateString(
+    "fr-FR",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+function getInitials(name) {
+
+  const clean =
+    String(name || "")
+      .trim();
+
+  if (!clean) {
+    return "H";
+  }
+
+  const parts =
+    clean.split(/\s+/);
+
+  if (parts.length === 1) {
+
+    return parts[0]
+      .substring(0, 2)
+      .toUpperCase();
+
+  }
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+
+}
+
+
+/* ==================================================
+   MESSAGE
+================================================== */
+
+function showReviewMessage(
+  message,
+  type
+) {
+
+  const box =
+    document.getElementById(
+      "reviewMessage"
+    );
+
+  if (!box) {
+    return;
+  }
+
+  box.textContent =
+    message || "";
+
+  box.className =
+    "review-message " +
+    (type || "success");
+
+}
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function fetchReviews() {
+
+  let url =
+    "/api/reviews";
+
+  const params = [];
+
+  if (targetType) {
+
+    params.push(
+      "type=" +
+      encodeURIComponent(
+        targetType
+      )
+    );
+
+  }
+
+  if (targetId) {
+
+    params.push(
+      "id=" +
+      encodeURIComponent(
+        targetId
+      )
+    );
+
+  }
+
+  if (params.length) {
+
+    url +=
+      "?" +
+      params.join("&");
+
+  }
+
+
+  try {
+
+    if (
+      window.HELPY &&
+      typeof HELPY.apiFetch === "function"
+    ) {
+
+      return await HELPY.apiFetch(
+        url
+      );
+
+    }
+
+
+    const response =
+      await fetch(url);
+
+    return await response.json();
+
+  } catch (error) {
+
+    console.error(
+      "Erreur avis:",
+      error
+    );
+
+    return {
+      error:
+        "Impossible de charger les avis."
+    };
+
+  }
+
+}
+
+
+/* ==================================================
+   NORMALISATION
+================================================== */
+
+function normalizeReviews(data) {
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.reviews
+    )
+  ) {
+
+    return data.reviews;
+
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.avis
+    )
+  ) {
+
+    return data.avis;
+
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.data
+    )
+  ) {
+
+    return data.data;
+
+  }
+
+  return [];
+
+}
+
+
+/* ==================================================
+   STATISTIQUES
+================================================== */
+
+function updateStatistics(
+  reviews
+) {
+
+  const total =
+    reviews.length;
+
+  let sum = 0;
+
+  const counts = {
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0
+  };
+
+
+  reviews.forEach(
+    function(review) {
+
+      const rating =
+        Math.round(
+          getReviewRating(
+            review
+          )
+        );
+reviews.forEach(
+  function(review) {
+
+    const rating =
+      Math.round(
+        getReviewRating(
+          review
+        )
+      );
+
+    if (
+      rating >= 1 &&
+      rating <= 5
+    ) {
+
+      counts[rating]++;
+
+      sum += rating;
+
+    }
+
+  }
+);
+
+
+const average =
+  total > 0
+    ? sum / total
+    : 0;
+
+
+document.getElementById(
+  "averageNumber"
+).textContent =
+  average.toFixed(1);
+
+
+document.getElementById(
+  "averageStars"
+).textContent =
+  starsHTML(
+    Math.round(average)
+  );
+
+
+document.getElementById(
+  "averageCount"
+).textContent =
+  total +
+  (
+    total > 1
+      ? " avis"
+      : " avis"
+  );
+
+
+for (
+  let rating = 1;
+  rating <= 5;
+  rating++
+) {
+
+  const percentage =
+    total > 0
+      ? (
+          counts[rating] /
+          total
+        ) * 100
+      : 0;
+
+
+  const bar =
+    document.getElementById(
+      "bar" + rating
+    );
+
+  const count =
+    document.getElementById(
+      "count" + rating
+    );
+
+
+  if (bar) {
+
+    bar.style.width =
+      percentage + "%";
+
+  }
+
+
+  if (count) {
+
+    count.textContent =
+      counts[rating];
+
+  }
+
+}
+
+
+/* ==================================================
+   AFFICHAGE DES AVIS
+================================================== */
+
+function renderReviews(
+  reviews
+) {
+
+  const container =
+    document.getElementById(
+      "reviewsList"
+    );
+
+  if (!container) {
+    return;
+  }
+
+
+  if (!reviews.length) {
+
+    container.innerHTML = `
+      <div class="review-empty">
+
+        <div class="review-empty-icon">
+          ⭐
+        </div>
+
+        <strong>
+          Aucun avis pour le moment
+        </strong>
+
+        <p>
+          Soyez le premier à partager votre expérience.
+        </p>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    reviews.map(
+      function(review) {
+
+        const name =
+          getUserName(
+            review
+          );
+
+        const comment =
+          getReviewComment(
+            review
+          );
+
+        const rating =
+          getReviewRating(
+            review
+          );
+
+        const date =
+          getReviewDate(
+            review
+          );
+
+        const avatar =
+          review.user_avatar ||
+          review.avatar ||
+          review.profile_photo ||
+          review.photo ||
+          "";
+
+
+        const avatarHTML =
+          avatar
+            ? `
+              <img
+                src="${escapeReviewHTML(avatar)}"
+                class="review-avatar"
+                alt=""
+              >
+            `
+            : `
+              <div class="review-avatar">
+                ${escapeReviewHTML(
+                  getInitials(name)
+                )}
+              </div>
+            `;
+
+
+        return `
+          <article
+            class="review-card"
+            data-rating="${rating}"
+          >
+
+            <div class="review-user">
+
+              ${avatarHTML}
+
+              <div class="review-user-info">
+
+                <div class="review-user-name">
+                  ${escapeReviewHTML(name)}
+                </div>
+
+                <div class="review-date">
+                  ${escapeReviewHTML(date)}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="review-stars">
+              ${starsHTML(rating)}
+            </div>
+
+            <p class="review-comment">
+              ${escapeReviewHTML(comment)}
+            </p>
+
+          </article>
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+/* ==================================================
+   FILTRE DES AVIS
+================================================== */
+
+function filterReviews() {
+
+  const select =
+    document.getElementById(
+      "reviewFilter"
+    );
+
+  if (!select) {
+    return;
+  }
+
+
+  const value =
+    select.value;
+
+
+  if (value === "all") {
+
+    renderReviews(
+      allReviews
+    );
+
+    return;
+
+  }
+
+
+  const rating =
+    Number(value);
+
+
+  const filtered =
+    allReviews.filter(
+      function(review) {
+
+        return (
+          getReviewRating(
+            review
+          ) === rating
+        );
+
+      }
+    );
+
+
+  renderReviews(
+    filtered
+  );
+
+}
+
+
+/* ==================================================
+   SÉLECTION DES ÉTOILES
+================================================== */
+
+function setupStarSelector() {
+
+  const buttons =
+    document.querySelectorAll(
+      ".star-button"
+    );
+
+
+  buttons.forEach(
+    function(button) {
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          selectedRating =
+            Number(
+              button.dataset.rating
+            );
+
+
+          buttons.forEach(
+            function(item) {
+
+              const rating =
+                Number(
+                  item.dataset.rating
+                );
+
+
+              item.classList.toggle(
+                "active",
+                rating <=
+                selectedRating
+              );
+
+            }
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   PUBLICATION D'UN AVIS
+================================================== */
+
+async function submitReview() {
+
+  const button =
+    document.getElementById(
+      "submitReview"
+    );
+
+  const comment =
+    document.getElementById(
+      "reviewComment"
+    ).value.trim();
+
+
+  if (!selectedRating) {
+
+    showReviewMessage(
+      "Veuillez sélectionner une note.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!comment) {
+
+    showReviewMessage(
+      "Veuillez écrire un commentaire.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const user =
+    window.HELPY &&
+    typeof HELPY.currentUser === "function"
+      ? HELPY.currentUser()
+      : null;
+
+
+  if (!user) {
+
+    window.location.href =
+      "login.html?redirect=" +
+      encodeURIComponent(
+        window.location.pathname +
+        window.location.search
+      );
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Publication...";
+
+
+  const payload = {
+
+    rating:
+      selectedRating,
+
+    stars:
+      selectedRating,
+
+    comment:
+      comment,
+
+    user_id:
+      user.id ||
+      user.user_id,
+
+    target_type:
+      targetType ||
+      null,
+
+    target_id:
+      targetId
+        ? Number(targetId)
+        : null
+
+  };
+
+
+  try {
+
+    let response;
+
+
+    if (
+      window.HELPY &&
+      typeof HELPY.apiFetch === "function"
+    ) {
+
+      response =
+        await HELPY.apiFetch(
+          "/api/reviews",
+          "POST",
+          payload
+        );
+
+    } else {
+
+      const request =
+        await fetch(
+          "/api/reviews",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              "x-user-id":
+                String(
+                  user.id ||
+                  user.user_id
+                )
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              )
+          }
+        );
+
+
+      response =
+        await request.json();
+
+    }
+
+
+    if (
+      response &&
+      response.error
+    ) {
+
+      throw new Error(
+        response.error
+      );
+
+    }
+
+
+    showReviewMessage(
+      response.message ||
+      "Votre avis a été publié avec succès.",
+      "success"
+    );
+
+
+    document.getElementById(
+      "reviewComment"
+    ).value = "";
+
+
+    selectedRating = 0;
+
+
+    document
+      .querySelectorAll(
+        ".star-button"
+      )
+      .forEach(
+        function(star) {
+
+          star.classList.remove(
+            "active"
+          );
+
+        }
+      );
+
+
+    await loadReviews();
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    showReviewMessage(
+      error.message ||
+      "Impossible de publier votre avis.",
+      "error"
+    );
+
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      "Publier mon avis";
+
+  }
+
+}
+
+
+/* ==================================================
+   CHARGEMENT DES AVIS
+================================================== */
+
+async function loadReviews() {
+
+  const container =
+    document.getElementById(
+      "reviewsList"
+    );
+
+
+  if (container) {
+
+    container.innerHTML = `
+      <div class="review-loading">
+        Chargement des avis...
+      </div>
+    `;
+
+  }
+
+
+  const data =
+    await fetchReviews();
+
+
+  if (
+    data &&
+    data.error
+  ) {
+
+    allReviews = [];
+
+    updateStatistics([]);
+
+    if (container) {
+
+      container.innerHTML = `
+        <div class="review-empty">
+
+          <div class="review-empty-icon">
+            ⭐
+          </div>
+
+          <strong>
+            Les avis ne sont pas encore disponibles
+          </strong>
+
+          <p>
+            Cette fonctionnalité sera disponible prochainement.
+          </p>
+
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+
+  allReviews =
+    normalizeReviews(
+      data
+    );
+
+
+  updateStatistics(
+    allReviews
+  );
+
+
+  filterReviews();
+
+}
+
+
+/* ==================================================
+   INITIALISATION
+================================================== */
+
+function initializeReviews() {
+
+  setupStarSelector();
+
+
+  const filter =
+    document.getElementById(
+      "reviewFilter"
+    );
+
+
+  if (filter) {
+
+    filter.addEventListener(
+      "change",
+      filterReviews
+    );
+
+  }
+
+
+  const submitButton =
+    document.getElementById(
+      "submitReview"
+    );
+
+
+  if (submitButton) {
+
+    submitButton.addEventListener(
+      "click",
+      submitReview
+    );
+
+  }
+
+
+  loadReviews();
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeReviews
+);
+
+</script>
+
+</body>
+</html>
