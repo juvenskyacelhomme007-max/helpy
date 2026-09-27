@@ -1,1 +1,376 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entreprises — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><h1>Entreprises</h1><div id="grid" class="grid">Chargement...</div></main><script>(async()=>{const r=await apiFetch('/api/businesses');grid.innerHTML=(r.entreprises||[]).map(x=>`<article class="card"><h3>${x.name}</h3><p>${x.description||''}</p><p class="muted">${x.category||''} · ${x.city||x.country||''}</p><a class="btn" href="business-details.html?id=${x.id}">Voir</a></article>`).join('')||'<p>Aucune entreprise pour le moment.</p>'})()</script></body></html>
+<!doctype html>
+<html lang="fr">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Entreprises — HELPY</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <script src="app.js"></script>
+
+</head>
+
+
+<body>
+
+  <main class="container">
+
+    <div class="section-heading">
+
+      <div>
+
+        <h1>
+          Entreprises
+        </h1>
+
+        <p class="muted">
+          Découvrez des entreprises, commerces et professionnels partout dans le monde.
+        </p>
+
+      </div>
+
+
+      <a
+        class="btn light"
+        href="publish.html"
+      >
+        ＋ Publier
+      </a>
+
+    </div>
+
+
+    <div
+      id="grid"
+      class="grid"
+    >
+
+      <div class="card">
+        Chargement des entreprises...
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const grid =
+      document.getElementById(
+        "grid"
+      );
+
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+        .replace(
+          /[&<>"']/g,
+          char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          }[char])
+        );
+
+    }
+
+
+    function getBusinessesPayload(result) {
+
+      if (
+        Array.isArray(
+          result?.entreprises
+        )
+      ) {
+
+        return result.entreprises;
+
+      }
+
+
+      if (
+        Array.isArray(
+          result?.businesses
+        )
+      ) {
+
+        return result.businesses;
+
+      }
+
+
+      if (
+        Array.isArray(
+          result?.data
+        )
+      ) {
+
+        return result.data;
+
+      }
+
+
+      if (
+        Array.isArray(result)
+      ) {
+
+        return result;
+
+      }
+
+
+      return [];
+
+    }
+
+
+    function renderBusinesses(
+      businesses
+    ) {
+
+      if (!businesses.length) {
+
+        grid.innerHTML = `
+
+          <div class="card">
+
+            <h3>
+              Aucune entreprise pour le moment
+            </h3>
+
+            <p class="muted">
+              Les entreprises publiées apparaîtront ici.
+            </p>
+
+            <a
+              class="btn"
+              href="publish.html"
+            >
+              Créer mon entreprise
+            </a>
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      grid.innerHTML =
+        businesses.map(
+          business => {
+
+            const id =
+              business.id;
+
+            const title =
+              business.name ||
+              business.nom ||
+              business.business_name ||
+              "Entreprise HELPY";
+
+            const description =
+              business.description ||
+              "Aucune description disponible.";
+
+            const category =
+              business.category ||
+              business.categorie ||
+              "Entreprise";
+
+            const location =
+              business.city ||
+              business.location ||
+              business.country ||
+              "";
+
+            const image =
+              business.image ||
+              business.image_url ||
+              "";
+
+
+            return `
+
+              <article class="card">
+
+                <div class="pic">
+
+                  ${
+                    image
+
+                    ?
+
+                    `<img
+                      src="${escapeHTML(image)}"
+                      alt="${escapeHTML(title)}"
+                      style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        border-radius:13px;
+                      "
+                      onerror="
+                        this.style.display='none';
+                        this.parentElement.textContent='🏢';
+                      "
+                    >`
+
+                    :
+
+                    "🏢"
+
+                  }
+
+                </div>
+
+
+                <h3>
+                  ${escapeHTML(title)}
+                </h3>
+
+
+                <p class="muted">
+
+                  ${escapeHTML(category)}
+
+                  ${
+                    location
+                      ? " · " + escapeHTML(location)
+                      : ""
+                  }
+
+                </p>
+
+
+                <p>
+                  ${escapeHTML(description)}
+                </p>
+
+
+                <a
+                  class="btn"
+                  href="business-details.html?id=${encodeURIComponent(id)}"
+                >
+                  Voir détails
+                </a>
+
+              </article>
+
+            `;
+
+          }
+        ).join("");
+
+    }
+
+
+    async function loadBusinesses() {
+
+      grid.innerHTML = `
+
+        <div class="card">
+          Chargement des entreprises...
+        </div>
+
+      `;
+
+
+      try {
+
+        const result =
+          await apiFetch(
+            "/api/businesses"
+          );
+
+
+        if (
+          !result ||
+          result.error
+        ) {
+
+          throw new Error(
+            result?.message ||
+            "Impossible de charger les entreprises."
+          );
+
+        }
+
+
+        const businesses =
+          getBusinessesPayload(
+            result
+          );
+
+
+        renderBusinesses(
+          businesses
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "HELPY businesses:",
+          error
+        );
+
+
+        grid.innerHTML = `
+
+          <div class="card">
+
+            <h3>
+              Impossible de charger les entreprises
+            </h3>
+
+            <p class="muted">
+              ${escapeHTML(
+                error.message
+              )}
+            </p>
+
+            <button
+              class="btn"
+              type="button"
+              onclick="loadBusinesses()"
+            >
+              Réessayer
+            </button>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadBusinesses
+    );
+
+  </script>
+
+</body>
+
+</html>
