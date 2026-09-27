@@ -1,1 +1,717 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HELPY — Acheter, vendre et trouver des services</title><link rel="stylesheet" href="style.css"></head><body><header class="header"><nav class="nav"><a class="logo" href="index.html">HELPY</a><div class="navlinks"><a href="products.html">Produits</a><a href="services.html">Services</a><a href="businesses.html">Entreprises</a><a href="search.html">Recherche</a></div><a class="btn light" href="login.html">Connexion</a></nav></header><main class="container"><section class="hero"><h1>Tout ce dont tu as besoin, au même endroit.</h1><p>Achète, vends, propose tes services ou présente ton entreprise sur HELPY.</p><div class="actions"><a class="btn" href="publish.html">Publier</a><a class="btn light" href="listings.html">Explorer</a></div></section><h2>Découvrir HELPY</h2><div class="grid"><a class="card" href="products.html"><h3>🛍️ Produits</h3><p class="muted">Découvre des produits proposés par des vendeurs.</p></a><a class="card" href="services.html"><h3>🛠️ Services</h3><p class="muted">Trouve des personnes et professionnels qui proposent leurs services.</p></a><a class="card" href="businesses.html"><h3>🏢 Entreprises</h3><p class="muted">Découvre des entreprises et commerces.</p></a></div></main></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>HELPY — Acheter, vendre et trouver des services</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav">
+
+      <a class="logo" href="index.html">
+        HELPY
+      </a>
+
+      <div class="navlinks">
+        <a href="products.html">Produits</a>
+        <a href="services.html">Services</a>
+        <a href="businesses.html">Entreprises</a>
+        <a href="search.html">Recherche</a>
+      </div>
+
+      <a class="btn light" href="login.html">
+        Connexion
+      </a>
+
+    </nav>
+  </header>
+
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <span class="hero-badge">
+          🌍 HELPY Marketplace
+        </span>
+
+        <h1>
+          Tout ce dont tu as besoin,
+          <span>au même endroit.</span>
+        </h1>
+
+        <p>
+          Achète, vends, trouve des services et découvre
+          des entreprises partout dans le monde.
+        </p>
+
+
+        <!-- SEARCH -->
+        <form class="search-box" action="search.html">
+
+          <span class="search-icon">🔎</span>
+
+          <input
+            type="search"
+            name="q"
+            placeholder="Que recherchez-vous ?"
+            aria-label="Rechercher sur HELPY"
+          >
+
+          <button type="submit">
+            Rechercher
+          </button>
+
+        </form>
+
+
+        <!-- ACTIONS -->
+        <div class="actions">
+
+          <a class="btn" href="products.html">
+            🛍️ Acheter
+          </a>
+
+          <a class="btn light" href="publish.html">
+            ＋ Publier
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CATEGORIES -->
+    <section class="container">
+
+      <div class="section-heading">
+
+        <div>
+          <h2>Explorer</h2>
+
+          <p class="muted">
+            Découvrez ce qui vous intéresse
+          </p>
+        </div>
+
+        <a href="search.html">
+          Voir tout
+        </a>
+
+      </div>
+
+
+      <div class="category-grid">
+
+        <a class="category-card" href="products.html">
+          <div class="category-icon">
+            🛍️
+          </div>
+
+          <strong>
+            Produits
+          </strong>
+
+          <span>
+            Acheter & vendre
+          </span>
+        </a>
+
+
+        <a class="category-card" href="services.html">
+          <div class="category-icon">
+            🛠️
+          </div>
+
+          <strong>
+            Services
+          </strong>
+
+          <span>
+            Trouver un professionnel
+          </span>
+        </a>
+
+
+        <a class="category-card" href="businesses.html">
+          <div class="category-icon">
+            🏢
+          </div>
+
+          <strong>
+            Entreprises
+          </strong>
+
+          <span>
+            Découvrir des entreprises
+          </span>
+        </a>
+
+
+        <a class="category-card" href="search.html?q=mode">
+          <div class="category-icon">
+            👕
+          </div>
+
+          <strong>
+            Mode
+          </strong>
+
+          <span>
+            Vêtements & accessoires
+          </span>
+        </a>
+
+
+        <a class="category-card" href="search.html?q=electronique">
+          <div class="category-icon">
+            📱
+          </div>
+
+          <strong>
+            Électronique
+          </strong>
+
+          <span>
+            Téléphones & appareils
+          </span>
+        </a>
+
+
+        <a class="category-card" href="search.html?q=maison">
+          <div class="category-icon">
+            🏠
+          </div>
+
+          <strong>
+            Maison
+          </strong>
+
+          <span>
+            Tout pour votre maison
+          </span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- PRODUCTS -->
+    <section class="container">
+
+      <div class="section-heading">
+
+        <div>
+          <h2>
+            Produits populaires
+          </h2>
+
+          <p class="muted">
+            Découvrez les dernières annonces
+          </p>
+        </div>
+
+        <a href="products.html">
+          Voir plus
+        </a>
+
+      </div>
+
+
+      <div
+        id="home-products"
+        class="product-grid"
+      >
+
+        <div class="card loading-card">
+          Chargement des produits...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SERVICES -->
+    <section class="container">
+
+      <div class="section-heading">
+
+        <div>
+          <h2>
+            Services
+          </h2>
+
+          <p class="muted">
+            Trouvez les services dont vous avez besoin
+          </p>
+        </div>
+
+        <a href="services.html">
+          Voir plus
+        </a>
+
+      </div>
+
+
+      <div
+        id="home-services"
+        class="product-grid"
+      >
+
+        <div class="card loading-card">
+          Chargement des services...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- BUSINESS -->
+    <section class="container">
+
+      <div class="section-heading">
+
+        <div>
+          <h2>
+            Entreprises
+          </h2>
+
+          <p class="muted">
+            Découvrez des entreprises et commerces
+          </p>
+        </div>
+
+        <a href="businesses.html">
+          Voir plus
+        </a>
+
+      </div>
+
+
+      <div
+        id="home-businesses"
+        class="product-grid"
+      >
+
+        <div class="card loading-card">
+          Chargement des entreprises...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SELL / PROVIDE -->
+    <section class="container">
+
+      <div class="publish-banner">
+
+        <div>
+
+          <span class="hero-badge">
+            HELPY
+          </span>
+
+          <h2>
+            Vous avez quelque chose à proposer ?
+          </h2>
+
+          <p>
+            Vendez vos produits, proposez vos services
+            ou présentez votre entreprise sur HELPY.
+          </p>
+
+        </div>
+
+
+        <div class="publish-actions">
+
+          <a class="btn" href="publish.html">
+            Publier maintenant
+          </a>
+
+          <a class="btn light" href="register.html">
+            Créer un compte
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+
+    <a href="index.html" class="active">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>🔎</span>
+      <small>Recherche</small>
+    </a>
+
+    <a href="publish.html" class="publish-nav">
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="favorites.html">
+      <span>♡</span>
+      <small>Favoris</small>
+    </a>
+
+    <a href="profile.html">
+      <span>👤</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <!-- FOOTER -->
+  <footer class="footer">
+
+    <div class="container">
+
+      <strong>HELPY</strong>
+
+      <p>
+        Acheter • Vendre • Services • Entreprises
+      </p>
+
+      <div class="footer-links">
+
+        <a href="products.html">
+          Produits
+        </a>
+
+        <a href="services.html">
+          Services
+        </a>
+
+        <a href="businesses.html">
+          Entreprises
+        </a>
+
+        <a href="search.html">
+          Recherche
+        </a>
+
+        <a href="login.html">
+          Connexion
+        </a>
+
+      </div>
+
+      <p class="muted">
+        © 2026 HELPY. Tous droits réservés.
+      </p>
+
+    </div>
+
+  </footer>
+
+
+  <!-- APP JS -->
+  <script src="app.js"></script>
+
+
+  <!-- HOME PAGE DATA -->
+  <script>
+
+    async function loadHomeData() {
+
+      const productsContainer =
+        document.getElementById("home-products");
+
+      const servicesContainer =
+        document.getElementById("home-services");
+
+      const businessesContainer =
+        document.getElementById("home-businesses");
+
+
+      /* PRODUITS */
+
+      try {
+
+        const response =
+          await fetch("/api/products");
+
+        const data =
+          await response.json();
+
+        const products =
+          data.produits ||
+          data.products ||
+          [];
+
+
+        if (!products.length) {
+
+          productsContainer.innerHTML =
+            '<div class="card">Aucun produit disponible pour le moment.</div>';
+
+        } else {
+
+          productsContainer.innerHTML =
+            products.slice(0, 6).map(product => {
+
+              const title =
+                product.title ||
+                product.name ||
+                "Produit";
+
+
+              const price =
+                product.price !== undefined &&
+                product.price !== null
+                  ? `${product.price} ${product.currency || ""}`
+                  : "Prix sur demande";
+
+
+              return `
+
+                <a
+                  class="product-card"
+                  href="product-details.html?id=${product.id}"
+                >
+
+                  <div class="product-image">
+
+                    ${
+                      product.image
+                        ? `<img src="${product.image}" alt="${title}">`
+                        : `<span>🛍️</span>`
+                    }
+
+                  </div>
+
+
+                  <div class="product-info">
+
+                    <h3>${title}</h3>
+
+                    <strong>${price}</strong>
+
+                    <p>
+                      ${product.city || ""}
+                    </p>
+
+                  </div>
+
+                </a>
+
+              `;
+
+            }).join("");
+
+        }
+
+      } catch (error) {
+
+        productsContainer.innerHTML =
+          '<div class="card">Impossible de charger les produits.</div>';
+
+      }
+
+
+      /* SERVICES */
+
+      try {
+
+        const response =
+          await fetch("/api/services");
+
+        const data =
+          await response.json();
+
+        const services =
+          data.services ||
+          data.produits ||
+          [];
+
+
+        if (!services.length) {
+
+          servicesContainer.innerHTML =
+            '<div class="card">Aucun service disponible pour le moment.</div>';
+
+        } else {
+
+          servicesContainer.innerHTML =
+            services.slice(0, 6).map(service => {
+
+              const title =
+                service.title ||
+                service.name ||
+                "Service";
+
+
+              const price =
+                service.price !== undefined &&
+                service.price !== null
+                  ? `${service.price} ${service.currency || ""}`
+                  : "Prix sur demande";
+
+
+              return `
+
+                <a
+                  class="product-card"
+                  href="service-details.html?id=${service.id}"
+                >
+
+                  <div class="product-image">
+
+                    ${
+                      service.image
+                        ? `<img src="${service.image}" alt="${title}">`
+                        : `<span>🛠️</span>`
+                    }
+
+                  </div>
+
+
+                  <div class="product-info">
+
+                    <h3>${title}</h3>
+
+                    <strong>${price}</strong>
+
+                    <p>
+                      ${service.city || ""}
+                    </p>
+
+                  </div>
+
+                </a>
+
+              `;
+
+            }).join("");
+
+        }
+
+      } catch (error) {
+
+        servicesContainer.innerHTML =
+          '<div class="card">Impossible de charger les services.</div>';
+
+      }
+
+
+      /* ENTREPRISES */
+
+      try {
+
+        const response =
+          await fetch("/api/businesses");
+
+        const data =
+          await response.json();
+
+        const businesses =
+          data.entreprises ||
+          data.businesses ||
+          [];
+
+
+        if (!businesses.length) {
+
+          businessesContainer.innerHTML =
+            '<div class="card">Aucune entreprise disponible pour le moment.</div>';
+
+        } else {
+
+          businessesContainer.innerHTML =
+            businesses.slice(0, 6).map(business => {
+
+              const title =
+                business.name ||
+                business.nom ||
+                "Entreprise";
+
+
+              return `
+
+                <a
+                  class="product-card"
+                  href="business-details.html?id=${business.id}"
+                >
+
+                  <div class="product-image">
+
+                    ${
+                      business.image
+                        ? `<img src="${business.image}" alt="${title}">`
+                        : `<span>🏢</span>`
+                    }
+
+                  </div>
+
+
+                  <div class="product-info">
+
+                    <h3>${title}</h3>
+
+                    <p>
+                      ${business.category || ""}
+                    </p>
+
+                    <p>
+                      ${business.city || ""}
+                    </p>
+
+                  </div>
+
+                </a>
+
+              `;
+
+            }).join("");
+
+        }
+
+      } catch (error) {
+
+        businessesContainer.innerHTML =
+          '<div class="card">Impossible de charger les entreprises.</div>';
+
+      }
+
+    }
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadHomeData
+    );
+
+  </script>
+
+</body>
+</html>
