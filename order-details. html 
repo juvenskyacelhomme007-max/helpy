@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Détails de la commande — HELPY</title>
+
+  <meta
+    name="description"
+    content="Consultez les détails de votre commande sur HELPY."
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ==================================================
+       HELPY — ORDER DETAILS
+    ================================================== */
+
+    :root {
+      --primary: #5b45e6;
+      --primary-dark: #4935c9;
+      --soft: #f4f2ff;
+      --bg: #f7f7fa;
+      --card: #ffffff;
+      --text: #17171c;
+      --muted: #74747d;
+      --border: #e8e8ee;
+      --success: #159447;
+      --warning: #d88900;
+      --danger: #d93636;
+      --shadow: 0 8px 25px rgba(30, 25, 80, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+      padding-bottom: 82px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    /* ==================================================
+       HEADER
+    ================================================== */
+
+    .order-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .order-header-inner {
+      max-width: 1200px;
+      min-height: 64px;
+      margin: auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-button {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .order-header-title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-header-title strong {
+      display: block;
+      font-size: 17px;
+    }
+
+    .order-header-title span {
+      display: block;
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .home-button {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+    }
+
+    /* ==================================================
+       PAGE
+    ================================================== */
+
+    .order-page {
+      width: 100%;
+      max-width: 1050px;
+      margin: auto;
+      padding: 18px 14px 35px;
+    }
+
+    .loading,
+    .error-box,
+    .empty-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px 18px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .loading-icon {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    .error-box {
+      border-color: #ffd5d5;
+    }
+
+    .error-icon {
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .error-box h2 {
+      margin: 5px 0 8px;
+      font-size: 20px;
+    }
+
+    .error-box p {
+      color: var(--muted);
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 46px;
+      border-radius: 13px;
+      padding: 0 18px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .primary-button {
+      color: white;
+      background: var(--primary);
+    }
+
+    .primary-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .secondary-button {
+      background: var(--soft);
+      color: var(--primary);
+    }
+
+    /* ==================================================
+       ORDER TOP
+    ================================================== */
+
+    .order-top-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .order-number-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .order-number-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .order-number {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .order-date {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-pending {
+      background: #fff3d7;
+      color: #a76b00;
+    }
+
+    .status-confirmed {
+      background: #e9e5ff;
+      color: #4d39c9;
+    }
+
+    .status-shipped {
+      background: #e1f0ff;
+      color: #1669a8;
+    }
+
+    .status-delivered {
+      background: #e4f7eb;
+      color: #087738;
+    }
+
+    .status-cancelled {
+      background: #ffe7e7;
+      color: #b92828;
+    }
+
+    .status-default {
+      background: #eeeeF2;
+      color: #55555d;
+    }
+
+    /* ==================================================
+       PROGRESS
+    ================================================== */
+
+    .progress-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0 0 16px;
+    }
+
+    .progress {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .progress-line {
+      position: absolute;
+      top: 15px;
+      left: 13%;
+      right: 13%;
+      height: 3px;
+      background: #e4e4eb;
+      z-index: 0;
+    }
+
+    .progress-line-fill {
+      position: absolute;
+      top: 15px;
+      left: 13%;
+      height: 3px;
+      width: 0;
+      background: var(--primary);
+      z-index: 1;
+      transition: width .3s ease;
+    }
+
+    .progress-step {
+      width: 25%;
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .progress-circle {
+      width: 31px;
+      height: 31px;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #dedee7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .progress-step.active .progress-circle {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .progress-step.completed .progress-circle {
+      border-color: var(--success);
+      background: var(--success);
+      color: white;
+    }
+
+    .progress-label {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .progress-step.active .progress-label,
+    .progress-step.completed .progress-label {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* ==================================================
+       PRODUCT
+    ================================================== */
+
+    .product-card,
+    .info-card,
+    .summary-card,
+    .actions-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .product-card {
+      padding: 14px;
+      display: flex;
+      gap: 13px;
+    }
+
+    .product-image {
+      width: 95px;
+      height: 95px;
+      border-radius: 14px;
+      background: #f1f1f5;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-placeholder {
+      font-size: 30px;
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 7px;
+    }
+
+    .product-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .product-price {
+      margin-top: 7px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .view-product {
+      margin-top: 9px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    /* ==================================================
+       INFO
+    ================================================== */
+
+    .info-card {
+      padding: 17px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f0f4;
+      font-size: 13px;
+    }
+
+    .info-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      color: var(--muted);
+    }
+
+    .info-value {
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    /* ==================================================
+       SUMMARY
+    ================================================== */
+
+    .summary-card {
+      padding: 17px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .summary-total {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .summary-total span:last-child {
+      color: var(--primary);
+    }
+
+    /* ==================================================
+       ACTIONS
+    ================================================== */
+
+    .actions-card {
+      padding: 14px;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .action-link {
+      min-height: 47px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .action-call {
+      background: #e9f8ef;
+      color: #087738;
+    }
+
+    .action-whatsapp {
+      background: #e6f8ec;
+      color: #14833b;
+    }
+
+    .action-back {
+      background: var(--soft);
+      color: var(--primary);
+    }
+
+    /* ==================================================
+       ADDRESS
+    ================================================== */
+
+    .address-text {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    /* ==================================================
+       BOTTOM NAV
+    ================================================== */
+
+    .mobile-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 66px;
+      z-index: 100;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .bottom-item span:first-child {
+      font-size: 19px;
+    }
+
+    .bottom-item.active {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       DESKTOP
+    ================================================== */
+
+    @media (min-width: 700px) {
+
+      body {
+        padding-bottom: 0;
+      }
+
+      .order-page {
+        padding: 28px 20px 50px;
+      }
+
+      .actions-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .mobile-bottom-nav {
+        display: none;
+      }
+
+      .product-image {
+        width: 125px;
+        height: 125px;
+      }
+
+      .progress-card {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================================================
+       HEADER
+  ================================================== -->
+
+  <header class="order-header">
+    <div class="order-header-inner">
+
+      <button
+        type="button"
+        class="back-button"
+        id="backButton"
+        aria-label="Retour"
+      >
+        ←
+      </button>
+
+      <div class="order-header-title">
+        <strong>Détails de la commande</strong>
+        <span id="headerOrderNumber">Chargement...</span>
+      </div>
+
+      <a
+        href="index.html"
+        class="home-button"
+        aria-label="Accueil"
+      >
+        🏠
+      </a>
+
+    </div>
+  </header>
+
+
+  <!-- ==================================================
+       PAGE
+  ================================================== -->
+
+  <main class="order-page">
+
+    <div id="pageContent">
+
+      <div class="loading">
+
+        <div class="loading-icon">⏳</div>
+
+        <strong>Chargement de la commande...</strong>
+
+        <p style="color:#74747d;">
+          Veuillez patienter.
+        </p>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==================================================
+       MOBILE NAV
+  ================================================== -->
+
+  <nav class="mobile-bottom-nav">
+
+    <a
+      href="index.html"
+      class="bottom-item"
+    >
+      <span>⌂</span>
+      <span>Accueil</span>
+    </a>
+
+    <a
+      href="search.html"
+      class="bottom-item"
+    >
+      <span>⌕</span>
+      <span>Recherche</span>
+    </a>
+
+    <a
+      href="publish.html"
+      class="bottom-item"
+    >
+      <span>＋</span>
+      <span>Publier</span>
+    </a>
+
+    <a
+      href="favorites.html"
+      class="bottom-item"
+    >
+      <span>♡</span>
+      <span>Favoris</span>
+    </a>
+
+    <a
+      href="profile.html"
+      class="bottom-item"
+    >
+      <span>◯</span>
+      <span>Profil</span>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+
+    /* ==================================================
+       UTILITAIRES
+    ================================================== */
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const orderId =
+      params.get("id");
+
+
+    function escapeText(value) {
+
+      if (
+        window.HELPY &&
+        typeof HELPY.escapeHTML === "function"
+      ) {
+        return HELPY.escapeHTML(
+          String(value ?? "")
+        );
+      }
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    function formatPrice(
+      value,
+      currency
+    ) {
+
+      if (
+        window.HELPY &&
+        typeof HELPY.formatPrice === "function"
+      ) {
+        return HELPY.formatPrice(
+          value,
+          currency
+        );
+      }
+
+      const amount =
+        Number(value || 0);
+
+      return (
+        new Intl.NumberFormat(
+          "fr-FR"
+        ).format(amount) +
+        " " +
+        (currency || "")
+      );
+    }
+
+
+    function getImage(order) {
+
+      if (!order) {
+        return "";
+      }
+
+      if (
+        typeof order.image === "string" &&
+        order.image.trim()
+      ) {
+        return order.image;
+      }
+
+      if (
+        typeof order.image_url === "string" &&
+        order.image_url.trim()
+      ) {
+        return order.image_url;
+      }
+
+      if (
+        typeof order.product_image === "string" &&
+        order.product_image.trim()
+      ) {
+        return order.product_image;
+      }
+
+      if (
+        Array.isArray(order.images) &&
+        order.images.length
+      ) {
+        return order.images[0];
+      }
+
+      return "";
+    }
+
+
+    function formatDate(value) {
+
+      if (!value) {
+        return "Date non disponible";
+      }
+
+      const date =
+        new Date(value);
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
+
+      return date.toLocaleString(
+        "fr-FR",
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
+    }
+
+
+    function normalizeStatus(
+      order
+    ) {
+
+      const raw =
+        String(
+          order?.status ||
+          order?.statut ||
+          order?.order_status ||
+          "pending"
+        )
+        .toLowerCase()
+        .trim();
+
+      const map = {
+
+        pending: "pending",
+        en_attente: "pending",
+        attente: "pending",
+
+        confirmed: "confirmed",
+        confirme: "confirmed",
+        confirmée: "confirmed",
+        confirmed_order: "confirmed",
+
+        shipped: "shipped",
+        expedie: "shipped",
+        expédié: "shipped",
+        livraison: "shipped",
+
+        delivered: "delivered",
+        livre: "delivered",
+        livré: "delivered",
+
+        cancelled: "cancelled",
+        annule: "cancelled",
+        annulée: "cancelled",
+        canceled: "cancelled"
+
+      };
+
+      return (
+        map[raw] ||
+        "pending"
+      );
+    }
+
+
+    function statusLabel(
+      status
+    ) {
+
+      const labels = {
+
+        pending: "En attente",
+
+        confirmed: "Confirmée",
+
+        shipped: "Expédiée",
+
+        delivered: "Livrée",
+
+        cancelled: "Annulée"
+
+      };
+
+      return (
+        labels[status] ||
+        "En attente"
+      );
+    }
+
+
+    function statusClass(
+      status
+    ) {
+
+      return (
+        "status-badge status-" +
+        status
+      );
+    }
+
+
+    /* ==================================================
+       CHARGEMENT
+    ================================================== */
+
+    async function fetchOrder() {
+
+      if (!orderId) {
+
+        throw new Error(
+          "Identifiant de commande manquant."
+        );
+
+      }
+
+      let response;
+
+      if (
+        window.HELPY &&
+        typeof HELPY.apiFetch === "function"
+      ) {
+
+        response =
+          await HELPY.apiFetch(
+            "/api/orders/" +
+            encodeURIComponent(orderId)
+          );
+
+      } else {
+
+        const request =
+          await fetch(
+            "/api/orders/" +
+            encodeURIComponent(orderId)
+          );
+
+        response =
+          await request.json();
+
+      }
+
+      if (
+        response &&
+        response.error
+      ) {
+
+        throw new Error(
+          response.error
+        );
+
+      }
+
+      return (
+        response?.order ||
+        response?.commande ||
+        response?.data ||
+        response
+      );
+
+    }
+
+
+    /* ==================================================
+       STATUT
+    ================================================== */
+
+    function getProgressIndex(
+      status
+    ) {
+
+      if (
+        status === "cancelled"
+      ) {
+        return -1;
+      }
+
+      const indexes = {
+
+        pending: 0,
+
+        confirmed: 1,
+
+        shipped: 2,
+
+        delivered: 3
+
+      };
+
+      return (
+        indexes[status] ??
+        0
+      );
+
+    }
+
+
+    function renderProgress(
+      status
+    ) {
+
+      if (
+        status === "cancelled"
+      ) {
+
+        return `
+
+          <div class="progress-card">
+
+            <h2 class="section-title">
+              Suivi de la commande
+            </h2>
+
+            <div
+              style="
+                padding:16px;
+                border-radius:14px;
+                background:#ffeaea;
+                color:#b92828;
+                text-align:center;
+                              >
+                ❌ Cette commande a été annulée.
+            </div>
+
+          </div>
+
+        `;
+
+      }
+
+      const index =
+        getProgressIndex(
+          status
+        );
+
+      const steps = [
+
+        {
+          icon: "✓",
+          label: "Commande"
+        },
+
+        {
+          icon: "✓",
+          label: "Confirmée"
+        },
+
+        {
+          icon: "🚚",
+          label: "Expédiée"
+        },
+
+        {
+          icon: "✓",
+          label: "Livrée"
+        }
+
+      ];
+
+      const width =
+        index <= 0
+          ? "0%"
+          : index === 1
+            ? "25%"
+            : index === 2
+              ? "58%"
+              : "74%";
+
+      return `
+
+        <div class="progress-card">
+
+          <h2 class="section-title">
+            Suivi de la commande
+          </h2>
+
+          <div class="progress">
+
+            <div class="progress-line"></div>
+
+            <div
+              class="progress-line-fill"
+              style="width:${width};"
+            ></div>
+
+            ${steps.map(
+              (step, i) => {
+
+                let className =
+                  "progress-step";
+
+                if (i < index) {
+                  className +=
+                    " completed";
+                }
+
+                if (i === index) {
+                  className +=
+                    " active";
+                }
+
+                return `
+
+                  <div
+                    class="${className}"
+                  >
+
+                    <div
+                      class="progress-circle"
+                    >
+                      ${step.icon}
+                    </div>
+
+                    <div
+                      class="progress-label"
+                    >
+                      ${step.label}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            ).join("")}
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ==================================================
+       RENDU DE LA COMMANDE
+    ================================================== */
+
+    function renderOrder(
+      order
+    ) {
+
+      const status =
+        normalizeStatus(
+          order
+        );
+
+      const number =
+        order.order_number ||
+        order.orderNumber ||
+        order.reference ||
+        order.reference_number ||
+        order.id ||
+        orderId;
+
+      const title =
+        order.product_title ||
+        order.product_name ||
+        order.title ||
+        order.name ||
+        "Article";
+
+      const quantity =
+        Number(
+          order.quantity ||
+          order.qty ||
+          1
+        );
+
+      const unitPrice =
+        Number(
+          order.unit_price ??
+          order.price ??
+          order.product_price ??
+          0
+        );
+
+      const total =
+        Number(
+          order.total ??
+          order.total_price ??
+          order.amount ??
+          unitPrice * quantity
+        );
+
+      const currency =
+        order.currency ||
+        order.devise ||
+        "HTG";
+
+      const image =
+        getImage(order);
+
+      const phone =
+        order.phone ||
+        order.seller_phone ||
+        order.provider_phone ||
+        order.contact_phone ||
+        "";
+
+      const whatsapp =
+        order.whatsapp ||
+        order.seller_whatsapp ||
+        order.provider_whatsapp ||
+        phone ||
+        "";
+
+      const country =
+        order.country ||
+        order.pays ||
+        "";
+
+      const city =
+        order.city ||
+        order.ville ||
+        order.location ||
+        "";
+
+      const address =
+        order.address ||
+        order.adresse ||
+        "";
+
+      const payment =
+        order.payment_method ||
+        order.payment ||
+        order.paymentMethod ||
+        "Non précisé";
+
+      const createdAt =
+        order.created_at ||
+        order.createdAt ||
+        order.date ||
+        order.order_date;
+
+      const imageHTML =
+        image
+          ? `
+            <img
+              src="${escapeText(image)}"
+              alt="${escapeText(title)}"
+              onerror="this.style.display='none';"
+            >
+          `
+          : `
+            <div class="product-placeholder">
+              🛍️
+            </div>
+          `;
+
+      const locationText =
+        [city, country]
+          .filter(Boolean)
+          .join(", ");
+
+      const contactPhone =
+        String(phone || "")
+          .replace(/[^\d+]/g, "");
+
+      const whatsappNumber =
+        String(whatsapp || "")
+          .replace(/[^\d]/g, "");
+
+      document.getElementById(
+        "headerOrderNumber"
+      ).textContent =
+        "Commande #" +
+        number;
+
+      return `
+
+        <!-- ==================================================
+             COMMANDE
+        ================================================== -->
+
+        <section class="order-top-card">
+
+          <div class="order-number-row">
+
+            <div>
+
+              <div class="order-number-label">
+                Numéro de commande
+              </div>
+
+              <div class="order-number">
+                #${escapeText(number)}
+              </div>
+
+              <div class="order-date">
+                ${escapeText(
+                  formatDate(createdAt)
+                )}
+              </div>
+
+            </div>
+
+            <span
+              class="${statusClass(status)}"
+            >
+              ${statusLabel(status)}
+            </span>
+
+          </div>
+
+        </section>
+
+
+        ${renderProgress(status)}
+
+
+        <!-- ==================================================
+             ARTICLE
+        ================================================== -->
+
+        <section class="product-card">
+
+          <div class="product-image">
+            ${imageHTML}
+          </div>
+
+          <div class="product-info">
+
+            <div class="product-title">
+              ${escapeText(title)}
+            </div>
+
+            <div class="product-meta">
+
+              Quantité :
+              <strong>
+                ${escapeText(quantity)}
+              </strong>
+
+              <br>
+
+              Prix unitaire :
+              <strong>
+                ${escapeText(
+                  formatPrice(
+                    unitPrice,
+                    currency
+                  )
+                )}
+              </strong>
+
+            </div>
+
+            <div class="product-price">
+
+              ${escapeText(
+                formatPrice(
+                  total,
+                  currency
+                )
+              )}
+
+            </div>
+
+            ${
+              order.product_id ||
+              order.productId
+                ? `
+                  <a
+                    class="view-product"
+                    href="product-details.html?id=${encodeURIComponent(
+                      order.product_id ||
+                      order.productId
+                    )}"
+                  >
+                    Voir l'article →
+                  </a>
+                `
+                : ""
+            }
+
+          </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             INFORMATIONS
+        ================================================== -->
+
+        <section class="info-card">
+
+          <h2 class="section-title">
+            Informations de commande
+          </h2>
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Statut
+            </span>
+
+            <span class="info-value">
+              ${escapeText(
+                statusLabel(status)
+              )}
+            </span>
+
+          </div>
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Paiement
+            </span>
+
+            <span class="info-value">
+              ${escapeText(payment)}
+            </span>
+
+          </div>
+
+          <div class="info-row">
+
+            <span class="info-label">
+              Quantité
+            </span>
+
+            <span class="info-value">
+              ${escapeText(quantity)}
+            </span>
+
+          </div>
+
+          ${
+            locationText
+              ? `
+                <div class="info-row">
+
+                  <span class="info-label">
+                    Localisation
+                  </span>
+
+                  <span class="info-value">
+                    ${escapeText(
+                      locationText
+                    )}
+                  </span>
+
+                </div>
+              `
+              : ""
+          }
+
+        </section>
+
+
+        <!-- ==================================================
+             ADRESSE
+        ================================================== -->
+
+        ${
+          address ||
+          locationText
+            ? `
+
+              <section class="info-card">
+
+                <h2 class="section-title">
+                  Adresse / localisation
+                </h2>
+
+                <div class="address-text">
+
+                  ${
+                    address
+                      ? escapeText(address)
+                      : "Localisation : " +
+                        escapeText(
+                          locationText
+                        )
+                  }
+
+                </div>
+
+              </section>
+
+            `
+            : ""
+        }
+
+
+        <!-- ==================================================
+             TOTAL
+        ================================================== -->
+
+        <section class="summary-card">
+
+          <h2 class="section-title">
+            Résumé du paiement
+          </h2>
+
+          <div class="summary-row">
+
+            <span>
+              Prix unitaire
+            </span>
+
+            <strong>
+              ${escapeText(
+                formatPrice(
+                  unitPrice,
+                  currency
+                )
+              )}
+            </strong>
+
+          </div>
+
+          <div class="summary-row">
+
+            <span>
+              Quantité
+            </span>
+
+            <strong>
+              × ${escapeText(quantity)}
+            </strong>
+
+          </div>
+
+          ${
+            Number(
+              order.shipping_cost ||
+              order.delivery_fee ||
+              0
+            ) > 0
+              ? `
+                <div class="summary-row">
+
+                  <span>
+                    Livraison
+                  </span>
+
+                  <strong>
+                    ${escapeText(
+                      formatPrice(
+                        Number(
+                          order.shipping_cost ||
+                          order.delivery_fee ||
+                          0
+                        ),
+                        currency
+                      )
+                    )}
+                  </strong>
+
+                </div>
+              `
+              : ""
+          }
+
+          <div class="summary-row summary-total">
+
+            <span>
+              Total
+            </span>
+
+            <span>
+              ${escapeText(
+                formatPrice(
+                  total,
+                  currency
+                )
+              )}
+            </span>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             CONTACT
+        ================================================== -->
+
+        <section class="actions-card">
+
+          <div class="actions-grid">
+
+            ${
+              contactPhone
+                ? `
+                  <a
+                    class="action-link action-call"
+                    href="tel:${escapeText(
+                      contactPhone
+                    )}"
+                  >
+                    📞 Appeler
+                  </a>
+                `
+                : ""
+            }
+
+            ${
+              whatsappNumber
+                ? `
+                  <a
+                    class="action-link action-whatsapp"
+                    href="https://wa.me/${escapeText(
+                      whatsappNumber
+                    )}"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    💬 WhatsApp
+                  </a>
+                `
+                : ""
+            }
+
+            <a
+              class="action-link action-back"
+              href="orders.html"
+            >
+              ← Mes commandes
+            </a>
+
+          </div>
+
+        </section>
+
+      `;
+
+    }
+
+
+    /* ==================================================
+       AFFICHAGE ERREUR
+    ================================================== */
+
+    function showError(
+      message
+    ) {
+
+      document.getElementById(
+        "pageContent"
+      ).innerHTML = `
+
+        <div class="error-box">
+
+          <div class="error-icon">
+            ⚠️
+          </div>
+
+          <h2>
+            Commande introuvable
+          </h2>
+
+          <p>
+            ${escapeText(
+              message ||
+              "Impossible de charger les détails de cette commande."
+            )}
+          </p>
+
+          <a
+            href="orders.html"
+            class="primary-button"
+          >
+            ← Retour aux commandes
+          </a>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ==================================================
+       INITIALISATION
+    ================================================== */
+
+    async function initializeOrderDetails() {
+
+      const backButton =
+        document.getElementById(
+          "backButton"
+        );
+
+      if (backButton) {
+
+        backButton.addEventListener(
+          "click",
+          function() {
+
+            if (
+              window.history.length > 1
+            ) {
+
+              window.history.back();
+
+            } else {
+
+              window.location.href =
+                "orders.html";
+
+            }
+
+          }
+        );
+
+      }
+
+
+      if (!orderId) {
+
+        showError(
+          "Aucun identifiant de commande n'a été fourni."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const order =
+          await fetchOrder();
+
+        if (
+          !order ||
+          typeof order !== "object"
+        ) {
+
+          throw new Error(
+            "Les informations de cette commande sont indisponibles."
+          );
+
+        }
+
+        document.getElementById(
+          "pageContent"
+        ).innerHTML =
+          renderOrder(order);
+
+      } catch (error) {
+
+        console.error(
+          "HELPY order details:",
+          error
+        );
+
+        showError(
+          error.message
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       LANCEMENT
+    ================================================== */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeOrderDetails
+    );
+
+  </script>
+
+</body>
+</html>
