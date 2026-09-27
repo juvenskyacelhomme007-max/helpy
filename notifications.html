@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <meta name="theme-color" content="#5b45e6">
+
+  <title>Notifications - HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .notifications-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 18px 12px 95px;
+    }
+
+    .notifications-header-card {
+      background: linear-gradient(135deg, #5b45e6, #7966ed);
+      color: #fff;
+      border-radius: 22px;
+      padding: 22px 18px;
+      margin-bottom: 15px;
+    }
+
+    .notifications-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .notifications-header-card h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .notifications-header-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: .92;
+    }
+
+    .notification-count {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 50px;
+      background: rgba(255,255,255,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .notifications-toolbar {
+      background: #fff;
+      border-radius: 18px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 5px 22px rgba(0,0,0,.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .notification-filter {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    .notification-filter button {
+      border: 1px solid #e4e1f8;
+      background: #fff;
+      color: #555;
+      border-radius: 20px;
+      padding: 8px 12px;
+      white-space: nowrap;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .notification-filter button.active {
+      background: #5b45e6;
+      border-color: #5b45e6;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .mark-all-button {
+      border: 0;
+      background: #f1efff;
+      color: #5b45e6;
+      border-radius: 11px;
+      padding: 9px 11px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .notifications-list {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 5px 22px rgba(0,0,0,.05);
+    }
+
+    .notification-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .notification-item:last-child {
+      border-bottom: 0;
+    }
+
+    .notification-item:hover {
+      background: #faf9ff;
+    }
+
+    .notification-item.unread {
+      background: #f8f7ff;
+    }
+
+    .notification-item.unread::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #5b45e6;
+    }
+
+    .notification-icon {
+      width: 45px;
+      height: 45px;
+      flex: 0 0 45px;
+      border-radius: 14px;
+      background: #eeeaff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notification-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .notification-title {
+      color: #222;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .notification-time {
+      color: #999;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .notification-text {
+      margin-top: 4px;
+      color: #707070;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .notification-unread-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border-radius: 50%;
+      background: #5b45e6;
+      margin-top: 5px;
+    }
+
+    .notification-action {
+      margin-top: 8px;
+      display: inline-block;
+      color: #5b45e6;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .empty-notifications {
+      padding: 60px 20px;
+      text-align: center;
+      color: #777;
+    }
+
+    .empty-notifications-icon {
+      font-size: 46px;
+      margin-bottom: 12px;
+    }
+
+    .empty-notifications h2 {
+      margin: 0 0 7px;
+      color: #333;
+      font-size: 18px;
+    }
+
+    .empty-notifications p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .notifications-loading {
+      padding: 45px 20px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+    }
+
+    .notifications-error {
+      padding: 30px 20px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .notifications-error button {
+      margin-top: 12px;
+      border: 0;
+      background: #5b45e6;
+      color: #fff;
+      border-radius: 11px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .login-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: 0 5px 22px rgba(0,0,0,.05);
+    }
+
+    .login-box .icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+
+    .login-box h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .login-box p {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .login-box a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #5b45e6;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    @media (min-width: 700px) {
+      .notifications-page {
+        padding-top: 30px;
+      }
+
+      .notifications-header-card {
+        padding: 28px 25px;
+      }
+
+      .notifications-header-card h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+
+  <div class="header-inner">
+
+    <a href="index.html" class="logo">
+      HELPY
+    </a>
+
+    <nav class="nav-links">
+
+      <a href="products.html">
+        Produits
+      </a>
+
+      <a href="services.html">
+        Services
+      </a>
+
+      <a href="businesses.html">
+        Entreprises
+      </a>
+
+      <a href="search.html">
+        Recherche
+      </a>
+
+    </nav>
+
+    <div class="header-actions">
+
+      <a
+        href="profile.html"
+        class="profile-link"
+      >
+        👤
+      </a>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="notifications-page">
+
+  <!-- HEADER -->
+
+  <section class="notifications-header-card">
+
+    <div class="notifications-header-top">
+
+      <div>
+
+        <h1>
+          Notifications 🔔
+        </h1>
+
+        <p>
+          Retrouvez ici les dernières activités
+          liées à votre compte HELPY.
+        </p>
+
+      </div>
+
+      <div
+        id="notificationCount"
+        class="notification-count"
+      >
+        0
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- MESSAGE DE CONNEXION -->
+
+  <div
+    id="loginBox"
+    style="display:none;"
+  >
+
+    <div class="login-box">
+
+      <div class="icon">
+        🔐
+      </div>
+
+      <h2>
+        Connectez-vous à HELPY
+      </h2>
+
+      <p>
+        Vous devez être connecté pour consulter
+        vos notifications.
+      </p>
+
+      <a href="login.html?redirect=notifications.html">
+        Se connecter
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <!-- CONTENU -->
+
+  <div
+    id="notificationsContent"
+  >
+
+    <!-- BARRE D'OUTILS -->
+
+    <section class="notifications-toolbar">
+
+      <div class="notification-filter">
+
+        <button
+          type="button"
+          class="active"
+          data-filter="all"
+        >
+          Toutes
+        </button>
+
+        <button
+          type="button"
+          data-filter="unread"
+        >
+          Non lues
+        </button>
+
+        <button
+          type="button"
+          data-filter="message"
+        >
+          Messages
+        </button>
+
+        <button
+          type="button"
+          data-filter="activity"
+        >
+          Activités
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        id="markAllButton"
+        class="mark-all-button"
+      >
+        Tout lire
+      </button>
+
+    </section>
+
+
+    <!-- LISTE -->
+
+    <section
+      id="notificationsList"
+      class="notifications-list"
+    >
+
+      <div class="notifications-loading">
+        Chargement des notifications...
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<!-- NAVIGATION MOBILE -->
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+
+    <span>⌂</span>
+
+    <small>
+      Accueil
+    </small>
+
+  </a>
+
+
+  <a href="search.html">
+
+    <span>⌕</span>
+
+    <small>
+      Recherche
+    </small>
+
+  </a>
+
+
+  <a href="publish.html">
+
+    <span>＋</span>
+
+    <small>
+      Publier
+    </small>
+
+  </a>
+
+
+  <a href="favorites.html">
+
+    <span>♡</span>
+
+    <small>
+      Favoris
+    </small>
+
+  </a>
+
+
+  <a href="profile.html">
+
+    <span>👤</span>
+
+    <small>
+      Profil
+    </small>
+
+  </a>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+<script>
+
+/* ==================================================
+   HELPY - NOTIFICATIONS
+================================================== */
+
+
+let currentUserId = null;
+
+let notifications = [];
+
+let activeFilter = "all";
+
+
+/* ==================================================
+   UTILITAIRES
+================================================== */
+
+function safeNotification(value) {
+
+  if (
+    typeof escapeHTML === "function"
+  ) {
+
+    return escapeHTML(
+      value || ""
+    );
+
+  }
+
+
+  return String(value || "")
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function getNotificationUserId() {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.currentUserId === "function"
+  ) {
+
+    return HELPY.currentUserId();
+
+  }
+
+
+  return (
+    localStorage.getItem(
+      "helpy_user_id"
+    ) ||
+    localStorage.getItem(
+      "user_id"
+    ) ||
+    ""
+  );
+
+}
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function notificationAPI(
+  endpoint,
+  method = "GET",
+  data = null
+) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.apiFetch === "function"
+  ) {
+
+    return HELPY.apiFetch(
+      endpoint,
+      method,
+      data
+    );
+
+  }
+
+
+  const options = {
+
+    method: method,
+
+    headers: {
+
+      "Content-Type":
+        "application/json",
+
+      "x-user-id":
+        currentUserId
+
+    }
+
+  };
+
+
+  if (data !== null) {
+
+    options.body =
+      JSON.stringify(data);
+
+  }
+
+
+  const response =
+    await fetch(
+      endpoint,
+      options
+    );
+
+
+  return response.json();
+
+}
+
+
+/* ==================================================
+   TYPE DE NOTIFICATION
+================================================== */
+
+function getNotificationType(
+  notification
+) {
+
+  return (
+    notification.type ||
+    notification.category ||
+    notification.notification_type ||
+    "activity"
+  ).toLowerCase();
+
+}
+
+
+function getNotificationIcon(
+  notification
+) {
+
+  const type =
+    getNotificationType(
+      notification
+    );
+
+
+  if (
+    type.includes("message") ||
+    type.includes("chat")
+  ) {
+
+    return "💬";
+
+  }
+
+
+  if (
+    type.includes("favorite") ||
+    type.includes("fav")
+  ) {
+
+    return "❤️";
+
+  }
+
+
+  if (
+    type.includes("review") ||
+    type.includes("rating")
+  ) {
+
+    return "⭐";
+
+  }
+
+
+  if (
+    type.includes("order") ||
+    type.includes("purchase")
+  ) {
+
+    return "🛒";
+
+  }
+
+
+  if (
+    type.includes("security") ||
+    type.includes("warning")
+  ) {
+
+    return "🛡️";
+
+  }
+
+
+  if (
+    type.includes("business") ||
+    type.includes("enterprise")
+  ) {
+
+    return "🏢";
+
+  }
+
+
+  if (
+    type.includes("product")
+  ) {
+
+    return "📦";
+
+  }
+
+
+  if (
+    type.includes("service")
+  ) {
+
+    return "🔧";
+
+  }
+
+
+  return "🔔";
+
+}
+
+
+/* ==================================================
+   TITRE
+================================================== */
+
+function getNotificationTitle(
+  notification
+) {
+
+  return (
+    notification.title ||
+    notification.subject ||
+    notification.name ||
+    "Nouvelle notification"
+  );
+
+}
+
+
+/* ==================================================
+   MESSAGE
+================================================== */
+
+function getNotificationText(
+  notification
+) {
+
+  return (
+    notification.message ||
+    notification.content ||
+    notification.description ||
+    notification.text ||
+    ""
+  );
+
+}
+
+
+/* ==================================================
+   DATE
+================================================== */
+
+function formatNotificationDate(
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+
+  try {
+
+    const date =
+      new Date(value);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return "";
+
+    }
+
+
+    const now =
+      new Date();
+
+
+    const difference =
+      now.getTime() -
+      date.getTime();
+
+
+    const minute =
+      60 * 1000;
+
+    const hour =
+      60 * minute;
+
+    const day =
+      24 * hour;
+
+
+    if (
+      difference >= 0 &&
+      difference < minute
+    ) {
+
+      return "À l'instant";
+
+    }
+
+
+    if (
+      difference >= minute &&
+      difference < hour
+    ) {
+
+      const minutes =
+        Math.floor(
+          difference / minute
+        );
+
+      return (
+        "Il y a " +
+        minutes +
+        " min"
+      );
+
+    }
+
+
+    if (
+      difference >= hour &&
+      difference < day
+    ) {
+
+      const hours =
+        Math.floor(
+          difference / hour
+        );
+
+      return (
+        "Il y a " +
+        hours +
+        " h"
+      );
+
+    }
+
+
+    if (
+      difference >= day &&
+      difference < 7 * day
+    ) {
+
+      const days =
+        Math.floor(
+          difference / day
+        );
+
+      return (
+        "Il y a " +
+        days +
+        " j"
+      );
+
+    }
+
+
+    return date.toLocaleDateString(
+      "fr-FR",
+      {
+        day: "2-digit",
+        month: "short"
+      }
+    );
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+
+/* ==================================================
+   ÉTAT LU / NON LU
+================================================== */
+
+function isNotificationUnread(
+  notification
+) {
+
+  return !(
+    notification.read === true ||
+    notification.is_read === true ||
+    notification.read_at
+  );
+
+}
+
+
+/* ==================================================
+   CHARGER LES NOTIFICATIONS
+================================================== */
+
+async function loadNotifications() {
+
+  const container =
+    document.getElementById(
+      "notificationsList"
+    );
+
+
+  container.innerHTML = `
+    <div class="notifications-loading">
+      Chargement des notifications...
+    </div>
+  `;
+
+
+  try {
+
+    const response =
+      await notificationAPI(
+        "/api/notifications"
+      );
+
+
+    if (
+      response &&
+      response.error
+    ) {
+
+      throw new Error(
+        response.error
+      );
+
+    }
+
+
+    let list =
+      response.notifications ||
+      response.data ||
+      response.items ||
+      response;
+
+
+    if (
+      !Array.isArray(list)
+    ) {
+
+      list = [];
+
+    }
+
+
+    notifications =
+      list;
+
+
+    renderNotifications();
+
+
+  } catch (error) {
+
+    console.error(
+      "Notifications:",
+      error
+    );
+
+
+    /*
+     * Si la route API n'est pas encore
+     * disponible, on affiche simplement
+     * l'état vide au lieu de casser la page.
+     */
+
+    notifications = [];
+
+
+    renderNotifications();
+
+  }
+
+}
+
+
+/* ==================================================
+   FILTRAGE
+================================================== */
+
+function getFilteredNotifications() {
+
+  return notifications.filter(
+    function(notification) {
+
+      const type =
+        getNotificationType(
+          notification
+        );
+
+
+      const unread =
+        isNotificationUnread(
+          notification
+        );
+
+
+      if (
+        activeFilter ===
+        "unread"
+      ) {
+
+        return unread;
+
+      }
+
+
+      if (
+        activeFilter ===
+        "message"
+      ) {
+
+        return (
+          type.includes(
+            "message"
+          ) ||
+          type.includes(
+            "chat"
+          )
+        );
+
+      }
+
+
+      if (
+        activeFilter ===
+        "activity"
+      ) {
+
+        return !(
+          type.includes(
+            "message"
+          ) ||
+          type.includes(
+            "chat"
+          )
+        );
+
+      }
+
+
+      return true;
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   AFFICHAGE
+================================================== */
+
+function renderNotifications() {
+
+  const container =
+    document.getElementById(
+      "notificationsList"
+    );
+
+
+  const filtered =
+    getFilteredNotifications();
+
+
+  updateUnreadCount();
+
+
+  if (
+    !filtered.length
+  ) {
+
+    container.innerHTML = `
+
+      <div class="empty-notifications">
+
+        <div class="empty-notifications-icon">
+          🔔
+        </div>
+
+        <h2>
+          ${
+            activeFilter === "unread"
+              ? "Aucune notification non lue"
+              : "Aucune notification"
+          }
+        </h2>
+
+        <p>
+          ${
+            activeFilter === "unread"
+              ? "Vous avez consulté toutes vos notifications."
+              : "Les nouvelles activités de votre compte apparaîtront ici."
+          }
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    filtered
+      .map(
+        function(notification) {
+
+          return renderNotification(
+            notification
+          );
+
+        }
+      )
+      .join("");
+
+
+  setupNotificationClicks();
+
+}
+
+
+/* ==================================================
+   UNE NOTIFICATION
+================================================== */
+
+function renderNotification(
+  notification
+) {
+
+  const unread =
+    isNotificationUnread(
+      notification
+    );
+
+
+  const icon =
+    getNotificationIcon(
+      notification
+    );
+
+
+  const title =
+    getNotificationTitle(
+      notification
+    );
+
+
+  const message =
+    getNotificationText(
+      notification
+    );
+
+
+  const date =
+    notification.created_at ||
+    notification.date ||
+    notification.timestamp ||
+    notification.updated_at ||
+    "";
+
+
+  const action =
+    notification.action_url ||
+    notification.url ||
+    notification.link ||
+    "";
+
+
+  const id =
+    notification.id ||
+    notification.notification_id ||
+    "";
+
+
+  return `
+
+    <article
+      class="
+        notification-item
+        ${unread ? "unread" : ""}
+      "
+      data-id="${safeNotification(id)}"
+      data-url="${safeNotification(action)}"
+    >
+
+      <div class="notification-icon">
+        ${icon}
+      </div>
+
+
+      <div class="notification-content">
+
+        <div class="notification-title-row">
+
+          <div class="notification-title">
+            ${safeNotification(title)}
+          </div>
+
+          <div class="notification-time">
+            ${safeNotification(
+              formatNotificationDate(
+                date
+              )
+            )}
+          </div>
+
+        </div>
+
+
+        ${
+          message
+            ? `
+              <div class="notification-text">
+                ${safeNotification(message)}
+              </div>
+            `
+            : ""
+        }
+
+
+        ${
+          action
+            ? `
+              <div class="notification-action">
+                Voir →
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+
+      ${
+        unread
+          ? `
+            <div
+              class="notification-unread-dot"
+              title="Non lue"
+            ></div>
+          `
+          : ""
+      }
+
+    </article>
+
+  `;
+
+}
+
+
+/* ==================================================
+   COMPTEUR
+================================================== */
+
+function updateUnreadCount() {
+
+  const count =
+    notifications.filter(
+      function(notification) {
+
+        return isNotificationUnread(
+          notification
+        );
+
+      }
+    ).length;
+
+
+  const element =
+    document.getElementById(
+      "notificationCount"
+    );
+
+
+  if (element) {
+
+    element.textContent =
+      count > 99
+        ? "99+"
+        : String(count);
+
+  }
+
+
+  /*
+   * Sauvegarde locale du compteur.
+   */
+
+  try {
+
+    localStorage.setItem(
+      "helpy_notification_count",
+      String(count)
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "Impossible de sauvegarder le compteur.",
+      error
+    );
+
+  }
+
+}
+
+
+/* ==================================================
+   CLIQUER SUR UNE NOTIFICATION
+================================================== */
+
+function setupNotificationClicks() {
+
+  document
+    .querySelectorAll(
+      ".notification-item"
+    )
+    .forEach(
+      function(item) {
+
+        item.addEventListener(
+          "click",
+          async function() {
+
+            const id =
+              this.dataset.id;
+
+            const url =
+              this.dataset.url;
+
+
+            if (id) {
+
+              await markNotificationAsRead(
+                id
+              );
+
+            }
+
+
+            if (url) {
+
+              window.location.href =
+                url;
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* ==================================================
+   MARQUER UNE NOTIFICATION COMME LUE
+================================================== */
+
+async function markNotificationAsRead(
+  id
+) {
+
+  try {
+
+    await notificationAPI(
+      "/api/notifications/" +
+      encodeURIComponent(id) +
+      "/read",
+      "PUT"
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "La route de lecture n'est pas disponible.",
+      error
+    );
+
+  }
+
+
+  const notification =
+    notifications.find(
+      function(item) {
+
+        return String(
+          item.id ||
+          item.notification_id
+        ) === String(id);
+
+      }
+    );
+
+
+  if (notification) {
+
+    notification.read =
+      true;
+
+    notification.is_read =
+      true;
+
+    notification.read_at =
+      new Date().toISOString();
+
+  }
+
+
+  renderNotifications();
+
+}
+
+
+/* ==================================================
+   TOUT MARQUER COMME LU
+================================================== */
+
+async function markAllNotificationsAsRead() {
+
+  const unread =
+    notifications.filter(
+      function(notification) {
+
+        return isNotificationUnread(
+          notification
+        );
+
+      }
+    );
+
+
+  if (!unread.length) {
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "markAllButton"
+    );
+
+
+  const originalText =
+    button.textContent;
+
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Lecture...";
+
+
+  try {
+
+    /*
+     * On essaie d'abord la route globale.
+     */
+
+    try {
+
+      const response =
+        await notificationAPI(
+          "/api/notifications/read-all",
+          "PUT"
+        );
+
+
+      if (
+        response &&
+        response.error
+      ) {
+
+        throw new Error(
+          response.error
+        );
+
+      }
+
+    } catch (globalError) {
+
+      /*
+       * Si la route globale n'existe pas,
+       * on essaie notification par notification.
+       */
+
+      for (
+        const notification
+        of unread
+      ) {
+
+        const id =
+          notification.id ||
+          notification.notification_id;
+
+
+        if (!id) {
+          continue;
+        }
+
+
+        try {
+
+          await notificationAPI(
+            "/api/notifications/" +
+            encodeURIComponent(id) +
+            "/read",
+            "PUT"
+          );
+
+        } catch (singleError) {
+
+          console.warn(
+            "Notification non marquée :",
+            singleError
+          );
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * Mise à jour immédiate de l'interface.
+     */
+
+    notifications.forEach(
+      function(notification) {
+
+        notification.read =
+          true;
+
+        notification.is_read =
+          true;
+
+        notification.read_at =
+          new Date().toISOString();
+
+      }
+    );
+
+
+    renderNotifications();
+
+
+  } catch (error) {
+
+    console.error(
+      "Erreur lors du marquage des notifications :",
+      error
+    );
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      originalText;
+
+  }
+
+}
+
+
+/* ==================================================
+   FILTRES
+================================================== */
+
+function setupFilters() {
+
+  const buttons =
+    document.querySelectorAll(
+      ".notification-filter button"
+    );
+
+
+  buttons.forEach(
+    function(button) {
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          buttons.forEach(
+            function(item) {
+
+              item.classList.remove(
+                "active"
+              );
+
+            }
+          );
+
+
+          this.classList.add(
+            "active"
+          );
+
+
+          activeFilter =
+            this.dataset.filter ||
+            "all";
+
+
+          renderNotifications();
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   INITIALISATION
+================================================== */
+
+async function initializeNotifications() {
+
+  currentUserId =
+    getNotificationUserId();
+
+
+  /*
+   * Vérification de connexion.
+   */
+
+  if (!currentUserId) {
+
+    document
+      .getElementById(
+        "notificationsContent"
+      )
+      .style.display =
+      "none";
+
+
+    document
+      .getElementById(
+        "loginBox"
+      )
+      .style.display =
+      "block";
+
+
+    return;
+
+  }
+
+
+  /*
+   * Préparer les filtres.
+   */
+
+  setupFilters();
+
+
+  /*
+   * Bouton "Tout lire".
+   */
+
+  document
+    .getElementById(
+      "markAllButton"
+    )
+    .addEventListener(
+      "click",
+      markAllNotificationsAsRead
+    );
+
+
+  /*
+   * Charger les notifications.
+   */
+
+  await loadNotifications();
+
+}
+
+
+/* ==================================================
+   LANCEMENT
+================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeNotifications
+);
+
+</script>
+
+</body>
+</html>
