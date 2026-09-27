@@ -1,1 +1,1502 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entreprise — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><div id="box" class="card">Chargement...</div></main><script>(async()=>{const id=new URLSearchParams(location.search).get('id'),r=await apiFetch('/api/businesses/'+id),x=r.entreprise;if(!x){box.textContent=r.message||'Introuvable';return}box.innerHTML=`<h1>${x.name}</h1><p>${x.description||''}</p><p>${x.category||''} · ${x.city||x.country||''}</p><p>${x.address||''}</p><a class="btn" href="https://wa.me/${String(x.whatsapp||'').replace(/[^0-9]/g,'')}">WhatsApp</a>`})()</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Entreprise | HELPY</title>
+
+  <meta
+    name="description"
+    content="Découvrez cette entreprise sur HELPY."
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* =========================================================
+       HELPY — BUSINESS DETAILS
+       ========================================================= */
+
+    .business-page {
+      min-height: 100vh;
+      background: #f7f7fb;
+      padding-bottom: 90px;
+    }
+
+    .business-container {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto;
+    }
+
+    .business-top {
+      padding: 18px 0 10px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .business-card {
+      background: #fff;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+      margin-top: 12px;
+    }
+
+    .business-cover {
+      position: relative;
+      background: #eee;
+      min-height: 250px;
+    }
+
+    .business-main-image {
+      width: 100%;
+      height: 300px;
+      display: block;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .business-image-placeholder {
+      width: 100%;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      background: #f0eefc;
+      color: #5b45e6;
+    }
+
+    .business-actions {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .round-action {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 5px 18px rgba(0,0,0,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      cursor: pointer;
+    }
+
+    .round-action.active {
+      color: #5b45e6;
+    }
+
+    .business-content {
+      padding: 20px;
+    }
+
+    .business-category {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: #f0eefc;
+      color: #5b45e6;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .business-title {
+      margin: 0;
+      color: #171717;
+      font-size: 27px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .business-description {
+      color: #666;
+      line-height: 1.7;
+      font-size: 15px;
+      margin: 14px 0 0;
+      white-space: pre-line;
+    }
+
+    .business-info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .business-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #eeeef3;
+      border-radius: 15px;
+      background: #fff;
+    }
+
+    .business-info-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0eefc;
+      color: #5b45e6;
+      font-size: 17px;
+    }
+
+    .business-info-label {
+      display: block;
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .business-info-value {
+      display: block;
+      color: #222;
+      font-size: 14px;
+      font-weight: 650;
+      word-break: break-word;
+    }
+
+    .business-section {
+      margin-top: 24px;
+    }
+
+    .business-section-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: #222;
+    }
+
+    .business-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .business-thumb {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 13px;
+      cursor: pointer;
+      background: #eee;
+    }
+
+    .business-contact {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .business-contact a,
+    .business-contact button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      font-size: 15px;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .business-call {
+      background: #5b45e6;
+      color: #fff;
+    }
+
+    .business-whatsapp {
+      background: #e9f8ee;
+      color: #16833d;
+    }
+
+    .business-address {
+      color: #666;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .business-loading,
+    .business-error {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+
+    .business-error {
+      display: none;
+    }
+
+    .business-error h2 {
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .business-error a {
+      display: inline-flex;
+      margin-top: 16px;
+      padding: 11px 17px;
+      border-radius: 12px;
+      background: #5b45e6;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .business-owner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      border-radius: 15px;
+      background: #f8f8fb;
+      margin-top: 22px;
+    }
+
+    .owner-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #e8e4ff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .owner-label {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .owner-name {
+      color: #222;
+      font-size: 14px;
+      font-weight: 750;
+      margin-top: 2px;
+    }
+
+    @media (min-width: 700px) {
+      .business-container {
+        width: min(1100px, calc(100% - 40px));
+      }
+
+      .business-main-image,
+      .business-image-placeholder {
+        height: 430px;
+      }
+
+      .business-content {
+        padding: 28px;
+      }
+
+      .business-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .business-contact {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .business-gallery {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .business-thumb {
+        height: 130px;
+      }
+    }
+
+    @media (min-width: 1000px) {
+      .business-card {
+        display: grid;
+        grid-template-columns: 48% 52%;
+      }
+
+      .business-cover {
+        min-height: 100%;
+      }
+
+      .business-main-image,
+      .business-image-placeholder {
+        height: 100%;
+        min-height: 620px;
+      }
+
+      .business-content {
+        padding: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="business-page">
+
+    <!-- HEADER -->
+    <header class="site-header">
+      <div class="container header-inner">
+
+        <a href="index.html" class="logo">
+          HELPY
+        </a>
+
+        <nav class="nav-links">
+          <a href="products.html">Produits</a>
+          <a href="services.html">Services</a>
+          <a href="businesses.html" class="active">Entreprises</a>
+          <a href="search.html">Recherche</a>
+        </nav>
+
+        <a href="profile.html" class="header-profile">
+          👤
+        </a>
+
+      </div>
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="business-container">
+
+      <div class="business-top">
+        <a href="businesses.html" class="back-link">
+          ← Retour aux entreprises
+        </a>
+      </div>
+
+
+      <!-- LOADING -->
+      <div id="businessLoading" class="business-card">
+        <div class="business-loading">
+          Chargement de l’entreprise...
+        </div>
+      </div>
+
+
+      <!-- ERROR -->
+      <div id="businessError" class="business-card business-error">
+        <h2>Entreprise introuvable</h2>
+        <p id="businessErrorText">
+          Cette entreprise n’est pas disponible actuellement.
+        </p>
+
+        <a href="businesses.html">
+          Voir les entreprises
+        </a>
+      </div>
+
+
+      <!-- BUSINESS -->
+      <article
+        id="businessCard"
+        class="business-card"
+        style="display:none;"
+      >
+
+        <!-- IMAGE -->
+        <div class="business-cover">
+
+          <div id="businessImageContainer">
+            <div class="business-image-placeholder">
+              🏢
+            </div>
+          </div>
+
+          <div class="business-actions">
+
+            <button
+              id="favoriteButton"
+              class="round-action"
+              type="button"
+              aria-label="Ajouter aux favoris"
+            >
+              ♡
+            </button>
+
+            <button
+              id="shareButton"
+              class="round-action"
+              type="button"
+              aria-label="Partager"
+            >
+              ↗
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- CONTENT -->
+        <div class="business-content">
+
+          <span
+            id="businessCategory"
+            class="business-category"
+          >
+            Entreprise
+          </span>
+
+          <h1
+            id="businessTitle"
+            class="business-title"
+          >
+            —
+          </h1>
+
+          <p
+            id="businessDescription"
+            class="business-description"
+          ></p>
+
+
+          <!-- INFORMATIONS -->
+          <div class="business-info-grid">
+
+            <div class="business-info">
+
+              <div class="business-info-icon">
+                📍
+              </div>
+
+              <div>
+                <span class="business-info-label">
+                  Pays
+                </span>
+
+                <span
+                  id="businessCountry"
+                  class="business-info-value"
+                >
+                  —
+                </span>
+              </div>
+
+            </div>
+
+
+            <div class="business-info">
+
+              <div class="business-info-icon">
+                🏙️
+              </div>
+
+              <div>
+                <span class="business-info-label">
+                  Ville / zone
+                </span>
+
+                <span
+                  id="businessCity"
+                  class="business-info-value"
+                >
+                  —
+                </span>
+              </div>
+
+            </div>
+
+
+            <div class="business-info">
+
+              <div class="business-info-icon">
+                📞
+              </div>
+
+              <div>
+                <span class="business-info-label">
+                  Téléphone
+                </span>
+
+                <span
+                  id="businessPhone"
+                  class="business-info-value"
+                >
+                  —
+                </span>
+              </div>
+
+            </div>
+
+
+            <div class="business-info">
+
+              <div class="business-info-icon">
+                💬
+              </div>
+
+              <div>
+                <span class="business-info-label">
+                  WhatsApp
+                </span>
+
+                <span
+                  id="businessWhatsapp"
+                  class="business-info-value"
+                >
+                  —
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ADDRESS -->
+          <section class="business-section">
+
+            <h2 class="business-section-title">
+              Adresse
+            </h2>
+
+            <div class="business-info">
+
+              <div class="business-info-icon">
+                🏠
+              </div>
+
+              <div>
+                <div
+                  id="businessAddress"
+                  class="business-address"
+                >
+                  Adresse non renseignée.
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- GALLERY -->
+          <section
+            id="gallerySection"
+            class="business-section"
+            style="display:none;"
+          >
+
+            <h2 class="business-section-title">
+              Photos
+            </h2>
+
+            <div
+              id="businessGallery"
+              class="business-gallery"
+            ></div>
+
+          </section>
+
+
+          <!-- OWNER -->
+          <div
+            id="ownerBox"
+            class="business-owner"
+            style="display:none;"
+          >
+
+            <div class="owner-avatar">
+              👤
+            </div>
+
+            <div>
+              <div class="owner-label">
+                Publié par
+              </div>
+
+              <div
+                id="ownerName"
+                class="owner-name"
+              >
+                —
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- CONTACT -->
+          <div class="business-contact">
+
+            <a
+              id="callButton"
+              class="business-call"
+              href="#"
+            >
+              📞 Appeler
+            </a>
+
+            <a
+              id="whatsappButton"
+              class="business-whatsapp"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              💬 WhatsApp
+            </a>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="products.html">
+      <span>♡</span>
+      <small>Favoris</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+    /* =========================================================
+       HELPY — BUSINESS DETAILS SCRIPT
+       ========================================================= */
+
+    let currentBusiness = null;
+
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const businessId = params.get("id");
+
+
+    function safeText(value, fallback = "") {
+      if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ""
+      ) {
+        return fallback;
+      }
+
+      return String(value);
+    }
+
+
+    function normalizePhone(phone) {
+      if (!phone) return "";
+
+      return String(phone)
+        .trim()
+        .replace(/[^\d+]/g, "");
+    }
+
+
+    function whatsappUrl(phone) {
+      if (!phone) return "";
+
+      let number = String(phone)
+        .trim()
+        .replace(/[^\d]/g, "");
+
+      if (number.startsWith("00")) {
+        number = number.substring(2);
+      }
+
+      return number
+        ? "https://wa.me/" + number
+        : "";
+    }
+
+
+    function getBusinessImages(business) {
+
+      const result = [];
+
+      const possibleImages = [
+        business?.images,
+        business?.photos,
+        business?.image_urls,
+        business?.image
+      ];
+
+      for (const source of possibleImages) {
+
+        if (Array.isArray(source)) {
+
+          source.forEach(item => {
+
+            if (
+              item &&
+              typeof item === "string" &&
+              !result.includes(item)
+            ) {
+              result.push(item);
+            }
+
+          });
+
+        } else if (
+          typeof source === "string" &&
+          source.trim()
+        ) {
+
+          try {
+
+            const parsed = JSON.parse(source);
+
+            if (Array.isArray(parsed)) {
+
+              parsed.forEach(item => {
+
+                if (
+                  item &&
+                  typeof item === "string" &&
+                  !result.includes(item)
+                ) {
+                  result.push(item);
+                }
+
+              });
+
+            } else if (
+              !result.includes(source)
+            ) {
+
+              result.push(source);
+
+            }
+
+          } catch {
+
+            if (!result.includes(source)) {
+              result.push(source);
+            }
+
+          }
+
+        }
+
+      }
+
+      return result;
+    }
+
+
+    function getFavorites() {
+
+      try {
+
+        const saved =
+          localStorage.getItem(
+            "helpy_business_favorites"
+          );
+
+        if (!saved) return [];
+
+        const parsed = JSON.parse(saved);
+
+        return Array.isArray(parsed)
+          ? parsed.map(String)
+          : [];
+
+      } catch {
+
+        return [];
+
+      }
+    }
+
+
+    function saveFavorites(list) {
+
+      localStorage.setItem(
+        "helpy_business_favorites",
+        JSON.stringify(list)
+      );
+    }
+
+
+    function updateFavoriteButton() {
+
+      const button =
+        document.getElementById(
+          "favoriteButton"
+        );
+
+      if (!button || !currentBusiness) {
+        return;
+      }
+
+      const id =
+        String(currentBusiness.id);
+
+      const favorites =
+        getFavorites();
+
+      const active =
+        favorites.includes(id);
+
+      button.textContent =
+        active ? "♥" : "♡";
+
+      button.classList.toggle(
+        "active",
+        active
+      );
+
+      button.setAttribute(
+        "aria-label",
+        active
+          ? "Retirer des favoris"
+          : "Ajouter aux favoris"
+      );
+    }
+
+
+    function renderImages() {
+
+      if (!currentBusiness) {
+        return;
+      }
+
+      const images =
+        getBusinessImages(
+          currentBusiness
+        );
+
+      const container =
+        document.getElementById(
+          "businessImageContainer"
+        );
+
+      const gallery =
+        document.getElementById(
+          "businessGallery"
+        );
+
+      const gallerySection =
+        document.getElementById(
+          "gallerySection"
+        );
+
+      if (!container) return;
+
+
+      if (images.length > 0) {
+
+        container.innerHTML = "";
+
+        const mainImage =
+          document.createElement("img");
+
+        mainImage.className =
+          "business-main-image";
+
+        mainImage.src =
+          images[0];
+
+        mainImage.alt =
+          safeText(
+            currentBusiness.name ||
+            currentBusiness.title,
+            "Entreprise"
+          );
+
+        mainImage.onerror = () => {
+
+          mainImage.style.display =
+            "none";
+
+          container.innerHTML =
+            '<div class="business-image-placeholder">🏢</div>';
+
+        };
+
+        container.appendChild(
+          mainImage
+        );
+
+
+        if (
+          gallery &&
+          images.length > 1
+        ) {
+
+          gallery.innerHTML = "";
+
+          images.forEach(
+            (image, index) => {
+
+              const img =
+                document.createElement("img");
+
+              img.className =
+                "business-thumb";
+
+              img.src = image;
+
+              img.alt =
+                "Photo " +
+                (index + 1);
+
+              img.loading =
+                "lazy";
+
+              img.addEventListener(
+                "click",
+                () => {
+
+                  mainImage.src =
+                    image;
+
+                  window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                  });
+
+                }
+              );
+
+              img.onerror = () => {
+                img.remove();
+              };
+
+              gallery.appendChild(img);
+
+            }
+          );
+
+          gallerySection.style.display =
+            "block";
+        }
+
+      } else {
+
+        container.innerHTML =
+          '<div class="business-image-placeholder">🏢</div>';
+
+        if (gallerySection) {
+          gallerySection.style.display =
+            "none";
+        }
+
+      }
+
+    }
+
+
+    function renderBusiness() {
+
+      if (!currentBusiness) {
+        return;
+      }
+
+      const business =
+        currentBusiness;
+
+
+      const title =
+        safeText(
+            business.name ||
+          business.title ||
+          business.business_name,
+          "Entreprise"
+        );
+
+      const category =
+        safeText(
+          business.category ||
+          business.categorie,
+          "Entreprise"
+        );
+
+      const description =
+        safeText(
+          business.description,
+          "Aucune description disponible."
+        );
+
+      const country =
+        safeText(
+          business.country ||
+          business.pays,
+          "Non renseigné"
+        );
+
+      const city =
+        safeText(
+          business.city ||
+          business.location ||
+          business.ville,
+          "Non renseignée"
+        );
+
+      const address =
+        safeText(
+          business.address ||
+          business.adresse,
+          "Adresse non renseignée."
+        );
+
+      const phone =
+        normalizePhone(
+          business.phone ||
+          business.telephone ||
+          business.contact
+        );
+
+      const whatsapp =
+        normalizePhone(
+          business.whatsapp ||
+          business.whatsapp_number ||
+          phone
+        );
+
+
+      document.title =
+        title + " | HELPY";
+
+
+      document.getElementById(
+        "businessTitle"
+      ).textContent =
+        title;
+
+
+      document.getElementById(
+        "businessCategory"
+      ).textContent =
+        category;
+
+
+      document.getElementById(
+        "businessDescription"
+      ).textContent =
+        description;
+
+
+      document.getElementById(
+        "businessCountry"
+      ).textContent =
+        country;
+
+
+      document.getElementById(
+        "businessCity"
+      ).textContent =
+        city;
+
+
+      document.getElementById(
+        "businessPhone"
+      ).textContent =
+        phone || "Non renseigné";
+
+
+      document.getElementById(
+        "businessWhatsapp"
+      ).textContent =
+        whatsapp || "Non renseigné";
+
+
+      document.getElementById(
+        "businessAddress"
+      ).textContent =
+        address;
+
+
+      const callButton =
+        document.getElementById(
+          "callButton"
+        );
+
+      if (phone) {
+
+        callButton.href =
+          "tel:" + phone;
+
+        callButton.style.display =
+          "flex";
+
+      } else {
+
+        callButton.style.display =
+          "none";
+
+      }
+
+
+      const whatsappButton =
+        document.getElementById(
+          "whatsappButton"
+        );
+
+      const whatsappLink =
+        whatsappUrl(
+          whatsapp
+        );
+
+      if (whatsappLink) {
+
+        whatsappButton.href =
+          whatsappLink;
+
+        whatsappButton.style.display =
+          "flex";
+
+      } else {
+
+        whatsappButton.style.display =
+          "none";
+
+      }
+
+
+      const owner =
+        business.owner_name ||
+        business.seller_name ||
+        business.user_name ||
+        business.provider_name;
+
+
+      if (owner) {
+
+        document.getElementById(
+          "ownerName"
+        ).textContent =
+          owner;
+
+        document.getElementById(
+          "ownerBox"
+        ).style.display =
+          "flex";
+
+      }
+
+
+      renderImages();
+
+      updateFavoriteButton();
+
+    }
+
+
+    async function loadBusiness() {
+
+      const loading =
+        document.getElementById(
+          "businessLoading"
+        );
+
+      const error =
+        document.getElementById(
+          "businessError"
+        );
+
+      const card =
+        document.getElementById(
+          "businessCard"
+        );
+
+
+      if (!businessId) {
+
+        loading.style.display =
+          "none";
+
+        error.style.display =
+          "block";
+
+        document.getElementById(
+          "businessErrorText"
+        ).textContent =
+          "Aucune entreprise n’a été sélectionnée.";
+
+        return;
+
+      }
+
+
+      try {
+
+        const response =
+          await HELPY.apiFetch(
+            "/api/businesses/" +
+            encodeURIComponent(
+              businessId
+            )
+          );
+
+
+        if (
+          !response ||
+          response.error ||
+          response.statut === "erreur"
+        ) {
+          throw new Error(
+            response?.error ||
+            response?.message ||
+            "Entreprise introuvable."
+          );
+        }
+
+
+        currentBusiness =
+          response.business ||
+          response.entreprise ||
+          response.data ||
+          response;
+
+
+        if (
+          !currentBusiness ||
+          !currentBusiness.id
+        ) {
+          throw new Error(
+            "Entreprise introuvable."
+          );
+        }
+
+
+        renderBusiness();
+
+
+        loading.style.display =
+          "none";
+
+        card.style.display =
+          "grid";
+
+
+      } catch (errorObject) {
+
+        console.error(
+          "HELPY business details:",
+          errorObject
+        );
+
+
+        loading.style.display =
+          "none";
+
+        error.style.display =
+          "block";
+
+        document.getElementById(
+          "businessErrorText"
+        ).textContent =
+          errorObject?.message ||
+          "Impossible de charger cette entreprise.";
+
+      }
+
+    }
+
+
+    document
+      .getElementById(
+        "favoriteButton"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          if (!currentBusiness) {
+            return;
+          }
+
+          const id =
+            String(
+              currentBusiness.id
+            );
+
+          let favorites =
+            getFavorites();
+
+          if (
+            favorites.includes(id)
+          ) {
+
+            favorites =
+              favorites.filter(
+                item =>
+                  item !== id
+              );
+
+          } else {
+
+            favorites.push(id);
+
+          }
+
+          saveFavorites(
+            favorites
+          );
+
+          updateFavoriteButton();
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "shareButton"
+      )
+      .addEventListener(
+        "click",
+        async () => {
+
+          const title =
+            currentBusiness?.name ||
+            currentBusiness?.title ||
+            "Entreprise HELPY";
+
+          const shareData = {
+            title:
+              title + " | HELPY",
+            text:
+              "Découvrez cette entreprise sur HELPY.",
+            url:
+              window.location.href
+          };
+
+
+          try {
+
+            if (
+              navigator.share
+            ) {
+
+              await navigator.share(
+                shareData
+              );
+
+            } else {
+
+              await navigator.clipboard.writeText(
+                window.location.href
+              );
+
+              alert(
+                "Lien copié."
+              );
+
+            }
+
+          } catch (errorObject) {
+
+            if (
+              errorObject?.name !==
+              "AbortError"
+            ) {
+
+              try {
+
+                await navigator.clipboard.writeText(
+                  window.location.href
+                );
+
+                alert(
+                  "Lien copié."
+                );
+
+              } catch {
+
+                alert(
+                  "Impossible de partager ce lien."
+                );
+
+              }
+
+            }
+
+          }
+
+        }
+      );
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        if (
+          typeof HELPY ===
+          "undefined"
+        ) {
+
+          console.error(
+            "HELPY app.js introuvable."
+          );
+
+          return;
+
+        }
+
+        loadBusiness();
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
