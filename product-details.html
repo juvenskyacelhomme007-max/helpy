@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Détails du produit — HELPY</title>
+  <meta
+    name="description"
+    content="Découvrez les détails de ce produit sur HELPY."
+  >
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* =========================================================
+       HELPY — PRODUCT DETAILS
+       ========================================================= */
+
+    .product-page {
+      min-height: 100vh;
+      background: #f7f7fb;
+      padding-bottom: 90px;
+    }
+
+    .product-container {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto;
+    }
+
+    .product-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 0;
+    }
+
+    .back-btn,
+    .share-btn {
+      border: 0;
+      background: #fff;
+      color: #222;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 3px 14px rgba(0,0,0,.07);
+    }
+
+    .product-gallery {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+
+    .main-image-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #f1f1f5;
+      overflow: hidden;
+    }
+
+    .main-product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: #999;
+      font-size: 15px;
+    }
+
+    .image-placeholder-icon {
+      font-size: 48px;
+    }
+
+    .favorite-overlay {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 4px 16px rgba(0,0,0,.14);
+      cursor: pointer;
+      font-size: 23px;
+    }
+
+    .favorite-overlay.active {
+      color: #e53935;
+    }
+
+    .thumbnail-list {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      overflow-x: auto;
+      background: #fff;
+    }
+
+    .thumbnail {
+      flex: 0 0 66px;
+      width: 66px;
+      height: 66px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 0;
+      overflow: hidden;
+      background: #f2f2f5;
+      cursor: pointer;
+    }
+
+    .thumbnail.active {
+      border-color: #5b45e6;
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-info {
+      margin-top: 14px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    }
+
+    .product-category {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f0edff;
+      color: #5b45e6;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .product-title {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.25;
+      color: #171717;
+    }
+
+    .product-price {
+      margin-top: 12px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #5b45e6;
+    }
+
+    .product-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .meta-box {
+      background: #f7f7fa;
+      border-radius: 12px;
+      padding: 11px;
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #222;
+      word-break: break-word;
+    }
+
+    .section-card {
+      margin-top: 14px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    }
+
+    .section-card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: #171717;
+    }
+
+    .description {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .seller-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .seller-avatar {
+      width: 52px;
+      height: 52px;
+      flex: 0 0 52px;
+      border-radius: 50%;
+      background: #eeeaff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .seller-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #222;
+    }
+
+    .seller-location {
+      color: #777;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .contact-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .contact-btn {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 13px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .call-btn {
+      background: #f1efff;
+      color: #5b45e6;
+    }
+
+    .whatsapp-btn {
+      background: #20b95a;
+      color: #fff;
+    }
+
+    .contact-btn.disabled {
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .loading-state,
+    .error-state {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    }
+
+    .loading-icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .error-state h2 {
+      margin: 0 0 8px;
+    }
+
+    .error-state p {
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .error-state button {
+      margin-top: 12px;
+      border: 0;
+      background: #5b45e6;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 82px;
+      transform: translateX(-50%) translateY(20px);
+      background: #222;
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      z-index: 9999;
+      max-width: calc(100% - 30px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+    }
+
+    @media (min-width: 768px) {
+      .product-container {
+        width: min(1100px, calc(100% - 40px));
+      }
+
+      .product-main-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr);
+        gap: 20px;
+        align-items: start;
+      }
+
+      .product-info {
+        margin-top: 0;
+      }
+
+      .main-image-wrapper {
+        aspect-ratio: 1 / .9;
+      }
+
+      .contact-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .product-page {
+        padding-bottom: 30px;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      .product-container {
+        width: min(1180px, calc(100% - 60px));
+      }
+
+      .main-image-wrapper {
+        aspect-ratio: 1 / .8;
+      }
+
+      .product-title {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="product-page">
+
+    <header class="site-header">
+      <div class="header-inner">
+
+        <a href="index.html" class="logo">
+          HELPY
+        </a>
+
+        <nav class="nav-links">
+          <a href="products.html">Produits</a>
+          <a href="services.html">Services</a>
+          <a href="businesses.html">Entreprises</a>
+          <a href="search.html">Recherche</a>
+        </nav>
+
+        <div class="header-actions">
+          <a href="login.html" id="header-login">Connexion</a>
+        </div>
+
+      </div>
+    </header>
+
+
+    <main class="product-container">
+
+      <div class="product-topbar">
+
+        <button
+          type="button"
+          class="back-btn"
+          id="back-button"
+          aria-label="Retour"
+        >
+          ←
+        </button>
+
+        <button
+          type="button"
+          class="share-btn"
+          id="share-button"
+          aria-label="Partager"
+        >
+          ↗
+        </button>
+
+      </div>
+
+
+      <div id="loading-state" class="loading-state">
+
+        <div class="loading-icon">⏳</div>
+
+        <strong>Chargement du produit...</strong>
+
+        <p>
+          Veuillez patienter quelques secondes.
+        </p>
+
+      </div>
+
+
+      <div id="error-state" class="error-state" style="display:none;">
+
+        <h2>Produit introuvable</h2>
+
+        <p id="error-message">
+          Ce produit n'est pas disponible ou n'existe plus.
+        </p>
+
+        <button
+          type="button"
+          id="return-products"
+        >
+          Voir les produits
+        </button>
+
+      </div>
+
+
+      <div id="product-content" style="display:none;">
+
+        <div class="product-main-layout">
+
+          <!-- =========================
+               GALERIE
+               ========================= -->
+
+          <section class="product-gallery">
+
+            <div class="main-image-wrapper">
+
+              <img
+                id="main-product-image"
+                class="main-product-image"
+                src=""
+                alt=""
+                style="display:none;"
+              >
+
+              <div
+                id="image-placeholder"
+                class="image-placeholder"
+              >
+                <div class="image-placeholder-icon">📦</div>
+                <span>Pas de photo disponible</span>
+              </div>
+
+              <button
+                type="button"
+                id="favorite-button"
+                class="favorite-overlay"
+                aria-label="Ajouter aux favoris"
+              >
+                ♡
+              </button>
+
+            </div>
+
+
+            <div
+              id="thumbnail-list"
+              class="thumbnail-list"
+              style="display:none;"
+            ></div>
+
+          </section>
+
+
+          <!-- =========================
+               INFORMATIONS
+               ========================= -->
+
+          <section class="product-info">
+
+            <span
+              id="product-category"
+              class="product-category"
+            >
+              Produit
+            </span>
+
+            <h1
+              id="product-title"
+              class="product-title"
+            >
+              —
+            </h1>
+
+            <div
+              id="product-price"
+              class="product-price"
+            >
+              —
+            </div>
+
+
+            <div class="product-meta">
+
+              <div class="meta-box">
+
+                <span class="meta-label">
+                  État
+                </span>
+
+                <span
+                  id="product-condition"
+                  class="meta-value"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="meta-box">
+
+                <span class="meta-label">
+                  Quantité
+                </span>
+
+                <span
+                  id="product-quantity"
+                  class="meta-value"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="meta-box">
+
+                <span class="meta-label">
+                  Pays
+                </span>
+
+                <span
+                  id="product-country"
+                  class="meta-value"
+                >
+                  —
+                </span>
+
+              </div>
+
+
+              <div class="meta-box">
+
+                <span class="meta-label">
+                  Ville / zone
+                </span>
+
+                <span
+                  id="product-city"
+                  class="meta-value"
+                >
+                  —
+                </span>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+
+        <!-- =========================
+             DESCRIPTION
+             ========================= -->
+
+        <section class="section-card">
+
+          <h2>
+            Description
+          </h2>
+
+          <div
+            id="product-description"
+            class="description"
+          >
+            —
+          </div>
+
+        </section>
+
+
+        <!-- =========================
+             VENDEUR
+             ========================= -->
+
+        <section class="section-card">
+
+          <h2>
+            Vendeur
+          </h2>
+
+          <div class="seller-card">
+
+            <div
+              id="seller-avatar"
+              class="seller-avatar"
+            >
+              ?
+            </div>
+
+            <div>
+
+              <div
+                id="seller-name"
+                class="seller-name"
+              >
+                —
+              </div>
+
+              <div
+                id="seller-location"
+                class="seller-location"
+              >
+                —
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="contact-actions">
+
+            <a
+              id="call-button"
+              class="contact-btn call-btn disabled"
+              href="#"
+            >
+              📞 Appeler
+            </a>
+
+            <a
+              id="whatsapp-button"
+              class="contact-btn whatsapp-btn disabled"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              💬 WhatsApp
+            </a>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+
+  <nav class="bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="products.html">
+      <span>♡</span>
+      <small>Favoris</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <div
+    id="toast"
+    class="toast"
+  ></div>
+
+
+  <script src="app.js"></script>
+
+
+  <script>
+    /* =========================================================
+       HELPY — PRODUCT DETAILS SCRIPT
+       ========================================================= */
+
+    let currentProduct = null;
+
+    const loadingState =
+      document.getElementById("loading-state");
+
+    const errorState =
+      document.getElementById("error-state");
+
+    const errorMessage =
+      document.getElementById("error-message");
+
+    const productContent =
+      document.getElementById("product-content");
+
+    const mainImage =
+      document.getElementById("main-product-image");
+
+    const imagePlaceholder =
+      document.getElementById("image-placeholder");
+
+    const thumbnailList =
+      document.getElementById("thumbnail-list");
+
+    const favoriteButton =
+      document.getElementById("favorite-button");
+
+    const shareButton =
+      document.getElementById("share-button");
+
+    const toast =
+      document.getElementById("toast");
+
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
+
+    function showToast(message) {
+
+      toast.textContent = message;
+
+      toast.classList.add("show");
+
+      clearTimeout(window.helpyToastTimer);
+
+      window.helpyToastTimer =
+        setTimeout(() => {
+
+          toast.classList.remove("show");
+
+        }, 2500);
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+       ========================================================= */
+
+    function safeText(value) {
+
+      if (typeof escapeHTML === "function") {
+        return escapeHTML(String(value ?? ""));
+      }
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    /* =========================================================
+       PRODUCT ID
+       ========================================================= */
+
+    function getProductId() {
+
+      const params =
+        new URLSearchParams(window.location.search);
+
+      return params.get("id");
+    }
+
+
+    /* =========================================================
+       FAVORITES
+       ========================================================= */
+
+    function getFavorites() {
+
+      try {
+
+        const value =
+          localStorage.getItem("helpy_favorites");
+
+        const parsed =
+          value ? JSON.parse(value) : [];
+
+        return Array.isArray(parsed)
+          ? parsed
+          : [];
+
+      } catch (error) {
+
+        return [];
+
+      }
+    }
+
+
+    function saveFavorites(list) {
+
+      localStorage.setItem(
+        "helpy_favorites",
+        JSON.stringify(list)
+      );
+    }
+
+
+    function isFavorite(id) {
+
+      return getFavorites()
+        .map(String)
+        .includes(String(id));
+
+    }
+
+
+    function updateFavoriteButton() {
+
+      if (!currentProduct) {
+        return;
+      }
+
+      const active =
+        isFavorite(currentProduct.id);
+
+      favoriteButton.textContent =
+        active ? "♥" : "♡";
+
+      favoriteButton.classList.toggle(
+        "active",
+        active
+      );
+
+      favoriteButton.setAttribute(
+        "aria-label",
+        active
+          ? "Retirer des favoris"
+          : "Ajouter aux favoris"
+      );
+    }
+
+
+    favoriteButton.addEventListener(
+      "click",
+      () => {
+
+        if (!currentProduct) {
+          return;
+        }
+
+        const id =
+          String(currentProduct.id);
+
+        let favorites =
+          getFavorites();
+
+        if (favorites.map(String).includes(id)) {
+
+          favorites =
+            favorites.filter(
+              item => String(item) !== id
+            );
+
+          showToast(
+            "Produit retiré des favoris."
+          );
+
+        } else {
+
+          favorites.push(
+            currentProduct.id
+          );
+
+          showToast(
+            "Produit ajouté aux favoris."
+          );
+        }
+
+        saveFavorites(favorites);
+
+        updateFavoriteButton();
+      }
+    );
+
+
+    /* =========================================================
+       IMAGES
+       ========================================================= */
+
+    function normalizeImages(product) {
+
+      let images = [];
+
+      if (Array.isArray(product.images)) {
+
+        images = product.images;
+
+      } else if (Array.isArray(product.photos)) {
+
+        images = product.photos;
+
+      } else if (product.image) {
+
+        images = [product.image];
+
+      } else if (product.photo) {
+
+        images = [product.photo];
+
+      }
+
+      return images
+        .filter(Boolean)
+        .map(item => {
+
+          if (typeof item === "string") {
+            return item;
+          }
+
+          if (typeof item === "object") {
+
+            return (
+              item.url ||
+              item.src ||
+              item.image ||
+              ""
+            );
+          }
+
+          return "";
+
+        })
+        .filter(Boolean);
+    }
+
+
+    function setMainImage(url) {
+
+      if (!url) {
+
+        mainImage.style.display =
+          "none";
+
+        imagePlaceholder.style.display =
+          "flex";
+
+        return;
+      }
+
+      mainImage.src = url;
+
+            mainImage.alt =
+        currentProduct?.title ||
+        currentProduct?.name ||
+        "Produit HELPY";
+
+      mainImage.style.display =
+        "block";
+
+      imagePlaceholder.style.display =
+        "none";
+    }
+
+
+    /* =========================================================
+       IMAGES
+       ========================================================= */
+
+    function renderGallery(product) {
+
+      const images =
+        normalizeImages(product);
+
+      thumbnailList.innerHTML = "";
+
+      if (!images.length) {
+
+        thumbnailList.style.display =
+          "none";
+
+        setMainImage("");
+
+        return;
+      }
+
+      thumbnailList.style.display =
+        "flex";
+
+      setMainImage(images[0]);
+
+      images.forEach(
+        (image, index) => {
+
+          const button =
+            document.createElement("button");
+
+          button.type =
+            "button";
+
+          button.className =
+            "thumbnail" +
+            (index === 0
+              ? " active"
+              : "");
+
+          const img =
+            document.createElement("img");
+
+          img.src = image;
+
+          img.alt =
+            "Photo " +
+            (index + 1);
+
+          img.loading =
+            "lazy";
+
+          button.appendChild(img);
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              setMainImage(image);
+
+              document
+                .querySelectorAll(
+                  ".thumbnail"
+                )
+                .forEach(
+                  item => {
+
+                    item.classList.remove(
+                      "active"
+                    );
+
+                  }
+                );
+
+              button.classList.add(
+                "active"
+              );
+
+            }
+          );
+
+          thumbnailList.appendChild(
+            button
+          );
+
+        }
+      );
+    }
+
+
+    /* =========================================================
+       PRICE
+       ========================================================= */
+
+    function displayPrice(product) {
+
+      const price =
+        product.price ??
+        product.prix ??
+        0;
+
+      const currency =
+        product.currency ||
+        product.devise ||
+        "HTG";
+
+      if (
+        typeof formatPrice ===
+        "function"
+      ) {
+
+        try {
+
+          return formatPrice(
+            price,
+            currency
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Erreur formatage prix:",
+            error
+          );
+
+        }
+      }
+
+      const number =
+        Number(price);
+
+      if (
+        Number.isFinite(number)
+      ) {
+
+        return (
+          new Intl.NumberFormat(
+            "fr-FR"
+          ).format(number) +
+          " " +
+          currency
+        );
+
+      }
+
+      return (
+        String(price) +
+        " " +
+        currency
+      );
+    }
+
+
+    /* =========================================================
+       TÉLÉPHONE / WHATSAPP
+       ========================================================= */
+
+    function getPhone(product) {
+
+      return (
+        product.phone ||
+        product.telephone ||
+        product.phone_number ||
+        product.seller_phone ||
+        ""
+      );
+
+    }
+
+
+    function getWhatsApp(product) {
+
+      return (
+        product.whatsapp ||
+        product.whatsApp ||
+        product.whatsapp_number ||
+        product.seller_whatsapp ||
+        getPhone(product) ||
+        ""
+      );
+
+    }
+
+
+    function normalizeWhatsApp(number) {
+
+      if (!number) {
+        return "";
+      }
+
+      let value =
+        String(number)
+          .trim()
+          .replace(
+            /[^\d+]/g,
+            ""
+          );
+
+      if (
+        value.startsWith("+")
+      ) {
+
+        value =
+          value.substring(1);
+
+      }
+
+      if (
+        value.startsWith("00")
+      ) {
+
+        value =
+          value.substring(2);
+
+      }
+
+      return value;
+    }
+
+
+    /* =========================================================
+       AFFICHAGE DU PRODUIT
+       ========================================================= */
+
+    function renderProduct(product) {
+
+      currentProduct =
+        product;
+
+      const title =
+        product.title ||
+        product.name ||
+        "Produit sans titre";
+
+      const category =
+        product.category ||
+        product.categorie ||
+        "Produit";
+
+      const description =
+        product.description ||
+        "Aucune description disponible.";
+
+      const condition =
+        product.condition ||
+        product.etat ||
+        "Non précisé";
+
+      const quantity =
+        product.quantity ??
+        product.quantite ??
+        "Non précisée";
+
+      const country =
+        product.country ||
+        product.pays ||
+        "Non précisé";
+
+      const city =
+        product.city ||
+        product.location ||
+        product.ville ||
+        "Non précisée";
+
+      const seller =
+        product.seller_name ||
+        product.seller ||
+        product.provider_name ||
+        product.owner_name ||
+        "Vendeur HELPY";
+
+      const phone =
+        getPhone(product);
+
+      const whatsapp =
+        getWhatsApp(product);
+
+
+      /* TITRE DE LA PAGE */
+
+      document.title =
+        title +
+        " — HELPY";
+
+
+      /* CATÉGORIE */
+
+      document.getElementById(
+        "product-category"
+      ).textContent =
+        category;
+
+
+      /* TITRE */
+
+      document.getElementById(
+        "product-title"
+      ).textContent =
+        title;
+
+
+      /* PRIX */
+
+      document.getElementById(
+        "product-price"
+      ).textContent =
+        displayPrice(
+          product
+        );
+
+
+      /* CONDITION */
+
+      document.getElementById(
+        "product-condition"
+      ).textContent =
+        condition;
+
+
+      /* QUANTITÉ */
+
+      document.getElementById(
+        "product-quantity"
+      ).textContent =
+        quantity;
+
+
+      /* PAYS */
+
+      document.getElementById(
+        "product-country"
+      ).textContent =
+        country;
+
+
+      /* VILLE */
+
+      document.getElementById(
+        "product-city"
+      ).textContent =
+        city;
+
+
+      /* DESCRIPTION */
+
+      document.getElementById(
+        "product-description"
+      ).textContent =
+        description;
+
+
+      /* NOM DU VENDEUR */
+
+      document.getElementById(
+        "seller-name"
+      ).textContent =
+        seller;
+
+
+      /* LOCALISATION DU VENDEUR */
+
+      document.getElementById(
+        "seller-location"
+      ).textContent =
+        [
+          city,
+          country
+        ]
+          .filter(
+            value =>
+              value &&
+              value !==
+                "Non précisé"
+          )
+          .join(", ") ||
+        "Localisation non précisée";
+
+
+      /* AVATAR DU VENDEUR */
+
+      const avatar =
+        document.getElementById(
+          "seller-avatar"
+        );
+
+      const firstLetter =
+        String(seller)
+          .trim()
+          .charAt(0)
+          .toUpperCase();
+
+      avatar.textContent =
+        firstLetter || "?";
+
+
+      /* =======================================================
+         BOUTON APPEL
+         ======================================================= */
+
+      const callButton =
+        document.getElementById(
+          "call-button"
+        );
+
+      if (phone) {
+
+        callButton.href =
+          "tel:" +
+          String(phone).replace(
+            /[^\d+]/g,
+            ""
+          );
+
+        callButton.classList.remove(
+          "disabled"
+        );
+
+      } else {
+
+        callButton.href =
+          "#";
+
+        callButton.classList.add(
+          "disabled"
+        );
+
+      }
+
+
+      /* =======================================================
+         BOUTON WHATSAPP
+         ======================================================= */
+
+      const whatsappButton =
+        document.getElementById(
+          "whatsapp-button"
+        );
+
+      const whatsappNumber =
+        normalizeWhatsApp(
+          whatsapp
+        );
+
+      if (whatsappNumber) {
+
+        const message =
+          encodeURIComponent(
+            "Bonjour, je suis intéressé(e) par votre produit « " +
+            title +
+            " » sur HELPY."
+          );
+
+        whatsappButton.href =
+          "https://wa.me/" +
+          whatsappNumber +
+          "?text=" +
+          message;
+
+        whatsappButton.classList.remove(
+          "disabled"
+        );
+
+      } else {
+
+        whatsappButton.href =
+          "#";
+
+        whatsappButton.classList.add(
+          "disabled"
+        );
+
+      }
+
+
+      /* GALERIE */
+
+      renderGallery(
+        product
+      );
+
+
+      /* FAVORI */
+
+      updateFavoriteButton();
+
+
+      /* AFFICHER LA PAGE */
+
+      loadingState.style.display =
+        "none";
+
+      errorState.style.display =
+        "none";
+
+      productContent.style.display =
+        "block";
+    }
+
+
+    /* =========================================================
+       CHARGER LE PRODUIT
+       ========================================================= */
+
+    async function loadProduct() {
+
+      const id =
+        getProductId();
+
+      if (!id) {
+
+        loadingState.style.display =
+          "none";
+
+        errorState.style.display =
+          "block";
+
+        errorMessage.textContent =
+          "Aucun identifiant de produit n'a été fourni.";
+
+        return;
+      }
+
+      try {
+
+        if (
+          !window.HELPY ||
+          typeof HELPY.apiFetch !==
+            "function"
+        ) {
+
+          throw new Error(
+            "Le système HELPY n'est pas disponible."
+          );
+
+        }
+
+
+        const response =
+          await HELPY.apiFetch(
+            "/api/products/" +
+            encodeURIComponent(id)
+          );
+
+
+        if (
+          response &&
+          response.error
+        ) {
+
+          throw new Error(
+            response.message ||
+            "Produit introuvable."
+          );
+
+        }
+
+
+        const product =
+          response?.product ||
+          response?.produit ||
+          response?.data ||
+          response;
+
+
+        if (
+          !product ||
+          typeof product !==
+            "object"
+        ) {
+
+          throw new Error(
+            "Les informations du produit sont invalides."
+          );
+
+        }
+
+
+        renderProduct(
+          product
+        );
+
+      } catch (error) {
+
+        console.error(
+          "HELPY product details:",
+          error
+        );
+
+        loadingState.style.display =
+          "none";
+
+        productContent.style.display =
+          "none";
+
+        errorState.style.display =
+          "block";
+
+        errorMessage.textContent =
+          error.message ||
+          "Impossible de charger ce produit.";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       PARTAGER
+       ========================================================= */
+
+    shareButton.addEventListener(
+      "click",
+      async () => {
+
+        const title =
+          currentProduct?.title ||
+          currentProduct?.name ||
+          "Produit HELPY";
+
+        const shareData = {
+
+          title:
+            title +
+            " — HELPY",
+
+          text:
+            "Découvrez ce produit sur HELPY : " +
+            title,
+
+          url:
+            window.location.href
+
+        };
+
+
+        try {
+
+          if (
+            navigator.share
+          ) {
+
+            await navigator.share(
+              shareData
+            );
+
+          } else if (
+            navigator.clipboard
+          ) {
+
+            await navigator.clipboard.writeText(
+              window.location.href
+            );
+
+            showToast(
+              "Lien copié."
+            );
+
+          } else {
+
+            showToast(
+              "Copiez le lien de cette page pour le partager."
+            );
+
+          }
+
+        } catch (error) {
+
+          if (
+            error?.name !==
+            "AbortError"
+          ) {
+
+            showToast(
+              "Impossible de partager le produit."
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       RETOUR
+       ========================================================= */
+
+    document
+      .getElementById(
+        "back-button"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          if (
+            window.history.length >
+            1
+          ) {
+
+            window.history.back();
+
+          } else {
+
+            window.location.href =
+              "products.html";
+
+          }
+
+        }
+      );
+
+
+    /* =========================================================
+       RETOUR AUX PRODUITS
+       ========================================================= */
+
+    document
+      .getElementById(
+        "return-products"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          window.location.href =
+            "products.html";
+
+        }
+      );
+
+
+    /* =========================================================
+       INITIALISATION
+       ========================================================= */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        loadProduct();
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
