@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Proposer un service — HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .service-page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+
+    .form-header {
+      margin-bottom: 24px;
+    }
+
+    .form-header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .form-header p {
+      margin: 0;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .service-form {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 13px 14px;
+      font-size: 15px;
+      background: #fff;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #5b45e6;
+      box-shadow: 0 0 0 3px rgba(91,69,230,.10);
+    }
+
+    .form-group textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .photo-box {
+      border: 2px dashed #d9d5f7;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      background: #faf9ff;
+    }
+
+    .photo-box strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .photo-box span {
+      display: block;
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .photo-input {
+      width: 100%;
+    }
+
+    .photo-preview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .preview-item {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #eee;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-number {
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      background: rgba(0,0,0,.65);
+      color: #fff;
+      border-radius: 20px;
+      padding: 3px 7px;
+      font-size: 11px;
+    }
+
+    .required {
+      color: #d33;
+    }
+
+    .form-note {
+      background: #f5f3ff;
+      color: #555;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .submit-button {
+      width: 100%;
+      border: 0;
+      border-radius: 13px;
+      padding: 15px;
+      background: #5b45e6;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .submit-button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 16px;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message.error {
+      display: block;
+      background: #fff0f0;
+      color: #b42318;
+    }
+
+    .message.success {
+      display: block;
+      background: #ecfdf3;
+      color: #067647;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #5b45e6;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 650px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-preview {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .service-form {
+        padding: 16px;
+      }
+
+      .form-header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+
+      <a href="index.html" class="logo">
+        HELPY
+      </a>
+
+      <nav class="nav-links">
+        <a href="products.html">Produits</a>
+        <a href="services.html">Services</a>
+        <a href="businesses.html">Entreprises</a>
+        <a href="search.html">Rechercher</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="profile.html" class="profile-link">
+          Profil
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+
+  <main class="service-page">
+
+    <a href="publish.html" class="back-link">
+      ← Retour
+    </a>
+
+    <div class="form-header">
+      <h1>Proposer un service</h1>
+
+      <p>
+        Présentez votre service afin que les utilisateurs puissent
+        le découvrir et vous contacter.
+      </p>
+    </div>
+
+
+    <div id="message" class="message"></div>
+
+
+    <form id="serviceForm" class="service-form">
+
+      <div class="form-note">
+        Remplissez les informations avec précision. Les informations
+        obligatoires sont indiquées par <span class="required">*</span>.
+      </div>
+
+
+      <!-- TITRE -->
+
+      <div class="form-group">
+
+        <label for="title">
+          Nom du service
+          <span class="required">*</span>
+        </label>
+
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Ex. Réparation téléphone"
+          maxlength="120"
+          required
+        >
+
+      </div>
+
+
+      <!-- CATEGORIE -->
+
+      <div class="form-group">
+
+        <label for="category">
+          Catégorie
+          <span class="required">*</span>
+        </label>
+
+        <select
+          id="category"
+          name="category"
+          required
+        >
+
+          <option value="">
+            Sélectionner une catégorie
+          </option>
+
+          <option value="Réparation">
+            Réparation
+          </option>
+
+          <option value="Informatique">
+            Informatique
+          </option>
+
+          <option value="Construction">
+            Construction
+          </option>
+
+          <option value="Transport">
+            Transport
+          </option>
+
+          <option value="Nettoyage">
+            Nettoyage
+          </option>
+
+          <option value="Beauté">
+            Beauté
+          </option>
+
+          <option value="Éducation">
+            Éducation
+          </option>
+
+          <option value="Design">
+            Design
+          </option>
+
+          <option value="Marketing">
+            Marketing
+          </option>
+
+          <option value="Photographie">
+            Photographie
+          </option>
+
+          <option value="Cuisine">
+            Cuisine
+          </option>
+
+          <option value="Événementiel">
+            Événementiel
+          </option>
+
+          <option value="Livraison">
+            Livraison
+          </option>
+
+          <option value="Autres">
+            Autres
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <div class="form-group">
+
+        <label for="description">
+          Description
+          <span class="required">*</span>
+        </label>
+
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Décrivez clairement votre service..."
+          maxlength="3000"
+          required
+        ></textarea>
+
+      </div>
+
+
+      <!-- PRIX -->
+
+      <div class="two-columns">
+
+        <div class="form-group">
+
+          <label for="price">
+            Tarif
+          </label>
+
+          <input
+            type="number"
+            id="price"
+            name="price"
+            placeholder="Ex. 1800"
+            min="0"
+            step="0.01"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="currency">
+            Devise
+          </label>
+
+          <select
+            id="currency"
+            name="currency"
+          >
+
+            <option value="HTG">
+              HTG — Gourde haïtienne
+            </option>
+
+            <option value="USD">
+              USD — Dollar américain
+            </option>
+
+            <option value="EUR">
+              EUR — Euro
+            </option>
+
+            <option value="CAD">
+              CAD — Dollar canadien
+            </option>
+
+            <option value="GBP">
+              GBP — Livre sterling
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- TYPE DE TARIF -->
+
+      <div class="form-group">
+
+        <label for="priceType">
+          Type de tarif
+        </label>
+
+        <select
+          id="priceType"
+          name="priceType"
+        >
+
+          <option value="fixe">
+            Prix fixe
+          </option>
+
+          <option value="heure">
+            Par heure
+          </option>
+
+          <option value="jour">
+            Par jour
+          </option>
+
+          <option value="service">
+            Par prestation
+          </option>
+
+          <option value="negociable">
+            Prix négociable
+          </option>
+
+          <option value="gratuit">
+            Gratuit
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PAYS / VILLE -->
+
+      <div class="two-columns">
+
+        <div class="form-group">
+
+          <label for="country">
+            Pays
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="country"
+            name="country"
+            placeholder="Ex. Haïti"
+            maxlength="100"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="city">
+            Ville / zone
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="city"
+            name="city"
+            placeholder="Ex. Port-au-Prince"
+            maxlength="100"
+            required
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- CONTACT -->
+
+      <div class="two-columns">
+
+        <div class="form-group">
+
+          <label for="phone">
+            Téléphone
+          </label>
+
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Ex. +509..."
+            maxlength="40"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="whatsapp">
+            WhatsApp
+            <span class="required">*</span>
+          </label>
+
+          <input
+            type="tel"
+            id="whatsapp"
+            name="whatsapp"
+            placeholder="Ex. +509..."
+            maxlength="40"
+            required
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- PHOTOS -->
+
+      <div class="form-group">
+
+        <label>
+          Photos du service
+        </label>
+
+        <div class="photo-box">
+
+          <strong>
+            Ajoutez des photos
+          </strong>
+
+          <span>
+            Vous pouvez sélectionner jusqu'à 8 photos.
+          </span>
+
+          <input
+            type="file"
+            id="photos"
+            class="photo-input"
+            accept="image/*"
+            multiple
+          >
+
+          <div
+            id="photoPreview"
+            class="photo-preview"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOUTON -->
+
+      <button
+        type="submit"
+        id="submitButton"
+        class="submit-button"
+      >
+        Publier le service
+      </button>
+
+    </form>
+
+  </main>
+
+
+  <nav class="mobile-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+
+    const form =
+      document.getElementById("serviceForm");
+
+    const photoInput =
+      document.getElementById("photos");
+
+    const photoPreview =
+      document.getElementById("photoPreview");
+
+    const message =
+      document.getElementById("message");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+
+    let selectedImages = [];
+
+
+    /* ==========================================
+       MESSAGE
+    ========================================== */
+
+    function showMessage(text, type = "error") {
+
+      message.textContent = text;
+
+      message.className =
+        "message " + type;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+
+    function clearMessage() {
+
+      message.textContent = "";
+
+      message.className =
+        "message";
+
+    }
+
+
+    /* ==========================================
+       CONVERTIR IMAGE EN BASE64
+    ========================================== */
+
+    function fileToBase64(file) {
+
+      return new Promise((resolve, reject) => {
+
+        const reader =
+          new FileReader();
+
+        reader.onload = () =>
+          resolve(reader.result);
+
+        reader.onerror = () =>
+          reject(new Error(
+            "Impossible de lire l'image."
+          ));
+
+        reader.readAsDataURL(file);
+
+      });
+
+    }
+
+
+    /* ==========================================
+       PREVIEW PHOTOS
+    ========================================== */
+
+    function renderPhotoPreviews() {
+
+      photoPreview.innerHTML = "";
+
+      selectedImages.forEach(
+        (file, index) => {
+
+          const item =
+            document.createElement("div");
+
+          item.className =
+            "preview-item";
+
+          const img =
+            document.createElement("img");
+
+          img.src =
+            URL.createObjectURL(file);
+
+          img.alt =
+            "Photo du service " +
+            (index + 1);
+
+          const number =
+            document.createElement("span");
+
+          number.className =
+            "preview-number";
+
+          number.textContent =
+            index + 1;
+
+          item.appendChild(img);
+
+          item.appendChild(number);
+
+          photoPreview.appendChild(item);
+
+        }
+      );
+
+    }
+
+
+    /* ==========================================
+       SELECTION PHOTOS
+    ========================================== */
+
+    photoInput.addEventListener(
+      "change",
+      function () {
+
+        clearMessage();
+
+        const files =
+          Array.from(
+            photoInput.files || []
+          );
+
+        if (files.length > 8) {
+
+          showMessage(
+            "Vous pouvez sélectionner au maximum 8 photos."
+          );
+
+          photoInput.value = "";
+
+          selectedImages = [];
+
+          renderPhotoPreviews();
+
+          return;
+
+        }
+
+
+        const invalidFile =
+          files.find(
+            file =>
+              !file.type.startsWith("image/")
+          );
+
+        if (invalidFile) {
+
+          showMessage(
+            "Veuillez sélectionner uniquement des images."
+          );
+
+          photoInput.value = "";
+
+          selectedImages = [];
+
+          renderPhotoPreviews();
+
+          return;
+
+        }
+
+
+        const tooLarge =
+          files.find(
+            file =>
+              file.size > 8 * 1024 * 1024
+          );
+
+        if (tooLarge) {
+
+          showMessage(
+            "Chaque image doit faire moins de 8 Mo."
+          );
+
+          photoInput.value = "";
+
+          selectedImages = [];
+
+          renderPhotoPreviews();
+
+          return;
+
+        }
+
+
+        selectedImages = files;
+
+        renderPhotoPreviews();
+
+      }
+    );
+
+
+    /* ==========================================
+       FORM DATA
+    ========================================== */
+
+    function getFormData() {
+
+      return {
+
+        title:
+          document
+            .getElementById("title")
+            .value
+            .trim(),
+
+        name:
+          document
+            .getElementById("title")
+            .value
+            .trim(),
+
+        category:
+          document
+            .getElementById("category")
+            .value
+            .trim(),
+
+        description:
+          document
+            .getElementById("description")
+            .value
+            .trim(),
+
+        price:
+          document
+            .getElementById("price")
+            .value
+            .trim(),
+
+        currency:
+          document
+            .getElementById("currency")
+            .value
+            .trim(),
+
+        price_type:
+          document
+            .getElementById("priceType")
+            .value
+            .trim(),
+
+        tariff_type:
+          document
+            .getElementById("priceType")
+            .value
+            .trim(),
+
+        country:
+          document
+            .getElementById("country")
+            .value
+            .trim(),
+
+        city:
+          document
+            .getElementById("city")
+            .value
+            .trim(),
+
+        location:
+          document
+            .getElementById("city")
+            .value
+            .trim(),
+
+        phone:
+          document
+            .getElementById("phone")
+            .value
+            .trim(),
+
+        whatsapp:
+          document
+            .getElementById("whatsapp")
+            .value
+            .trim()
+
+      };
+
+    }
+
+
+    /* ==========================================
+       VALIDATION
+    ========================================== */
+
+    function validateService(data) {
+
+      if (!data.title) {
+
+        return "Veuillez entrer le nom du service.";
+
+      }
+
+
+      if (data.title.length < 2) {
+
+        return "Le nom du service est trop court.";
+
+      }
+
+
+      if (!data.category) {
+
+        return "Veuillez sélectionner une catégorie.";
+
+      }
+
+
+      if (!data.description) {
+
+        return "Veuillez décrire votre service.";
+
+      }
+
+
+      if (data.description.length < 10) {
+
+        return "La description doit contenir au moins 10 caractères.";
+
+      }
+
+
+      if (!data.country) {
+
+        return "Veuillez indiquer le pays.";
+
+      }
+
+
+      if (!data.city) {
+
+        return "Veuillez indiquer la ville ou la zone.";
+
+      }
+
+
+      if (!data.whatsapp) {
+
+        return "Le numéro WhatsApp est obligatoire.";
+
+      }
+
+
+      if (
+        data.price &&
+        Number(data.price) < 0
+      ) {
+
+        return "Le tarif ne peut pas être négatif.";
+
+      }
+
+
+      return null;
+
+    }
+
+
+    /* ==========================================
+       ENVOI DU FORMULAIRE
+    ========================================== */
+
+    form.addEventListener(
+      "submit",
+      async function (event) {
+
+        event.preventDefault();
+
+        clearMessage();
+
+
+        if (
+          window.HELPY &&
+          typeof HELPY.isLoggedIn === "function" &&
+          !HELPY.isLoggedIn()
+        ) {
+
+          showMessage(
+            "Vous devez être connecté pour proposer un service."
+          );
+
+          setTimeout(() => {
+
+            window.location.href =
+              "login.html?redirect=add-service.html";
+
+          }, 1200);
+
+          return;
+
+        }
+
+
+        const data =
+          getFormData();
+
+
+        const validationError =
+          validateService(data);
+
+
+        if (validationError) {
+
+          showMessage(
+            validationError
+          );
+
+          return;
+
+        }
+
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+          "Publication en cours...";
+
+
+        try {
+
+          /*
+           * Conversion des photos
+           */
+
+          const images = [];
+
+          for (
+            const file of selectedImages
+          ) {
+
+            const base64 =
+              await fileToBase64(file);
+
+            images.push(base64);
+
+          }
+
+
+          /*
+           * Données finales envoyées
+           */
+
+          const payload = {
+
+            title:
+              data.title,
+
+            name:
+              data.name,
+
+            category:
+              data.category,
+
+            description:
+              data.description,
+
+            price:
+              data.price
+                ? Number(data.price)
+     name:
+  data.name,
+
+category:
+  data.category,
+
+description:
+  data.description,
+
+price:
+  data.price
+    ? Number(data.price)
+    : null,
+
+currency:
+  data.currency,
+
+price_type:
+  data.price_type,
+
+tariff_type:
+  data.tariff_type,
+
+country:
+  data.country,
+
+city:
+  data.city,
+
+location:
+  data.location,
+
+phone:
+  data.phone,
+
+whatsapp:
+  data.whatsapp,
+
+images:
+  images,
+
+image:
+  images.length
+    ? images[0]
+    : null
+
+};
+
+
+/*
+ * API HELPY
+ */
+
+let response;
+
+
+if (
+  window.HELPY &&
+  typeof HELPY.apiFetch === "function"
+) {
+
+  response =
+    await HELPY.apiFetch(
+      "/api/services",
+      "POST",
+      payload
+    );
+
+} else {
+
+  const apiResponse =
+    await fetch(
+      "/api/services",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(payload)
+      }
+    );
+
+  response =
+    await apiResponse.json();
+
+}
+
+
+/*
+ * Vérification de la réponse
+ */
+
+if (
+  response &&
+  (
+    response.error ||
+    response.erreur ||
+    response.statut === "error"
+  )
+) {
+
+  throw new Error(
+    response.error ||
+    response.erreur ||
+    response.message ||
+    "Impossible de publier le service."
+  );
+
+}
+
+
+/*
+ * Récupérer le service créé
+ */
+
+const service =
+  response.service ||
+  response.serviceData ||
+  response.data ||
+  response;
+
+
+const serviceId =
+  service &&
+  (
+    service.id ||
+    service.service_id
+  );
+
+
+/*
+ * Succès
+ */
+
+showMessage(
+  "Votre service a été publié avec succès.",
+  "success"
+);
+
+
+/*
+ * Redirection
+ */
+
+setTimeout(() => {
+
+  if (serviceId) {
+
+    window.location.href =
+      "service-details.html?id=" +
+      encodeURIComponent(serviceId);
+
+  } else {
+
+    window.location.href =
+      "services.html";
+
+  }
+
+}, 900);
+
+
+} catch (error) {
+
+  console.error(
+    "HELPY service error:",
+    error
+  );
+
+
+  showMessage(
+    error.message ||
+    "Une erreur est survenue pendant la publication."
+  );
+
+
+  submitButton.disabled = false;
+
+  submitButton.textContent =
+    "Publier le service";
+
+}
+
+});
+
+
+/*
+ * AUTHENTIFICATION
+ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    if (
+      window.HELPY &&
+      typeof HELPY.isLoggedIn === "function"
+    ) {
+
+      if (!HELPY.isLoggedIn()) {
+
+        showMessage(
+          "Connectez-vous pour proposer un service."
+        );
+
+      }
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
