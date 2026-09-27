@@ -1,1 +1,1561 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ajouter une entreprise — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><form class="form" onsubmit="go(event)"><h1>Présenter une entreprise</h1><div class="field"><label>Nom *</label><input id="name" required></div><div class="field"><label>Catégorie</label><input id="category"></div><div class="field"><label>Description</label><textarea id="description"></textarea></div><div class="field"><label>Téléphone</label><input id="phone"></div><div class="field"><label>WhatsApp *</label><input id="whatsapp" required></div><div class="field"><label>Pays</label><input id="country"></div><div class="field"><label>Ville / zone</label><input id="city"></div><div class="field"><label>Adresse</label><input id="address"></div><button class="btn">Publier l'entreprise</button><p id="msg" class="muted"></p></form></main><script>async function go(e){e.preventDefault();const r=await apiFetch('/api/businesses','POST',{name:name.value,category:category.value,description:description.value,phone:phone.value,whatsapp:whatsapp.value,country:country.value,city:city.value,address:address.value});msg.textContent=r.error?r.message:'Entreprise publiée avec succès.'}</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Ajouter une entreprise | HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .add-business-page {
+      min-height: 100vh;
+      background: #f7f7fb;
+      padding-bottom: 100px;
+    }
+
+    .add-business-container {
+      width: min(850px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .form-header {
+      margin-bottom: 18px;
+    }
+
+    .form-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #555;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 650;
+      margin-bottom: 15px;
+    }
+
+    .form-title {
+      margin: 0;
+      font-size: 28px;
+      color: #181818;
+      font-weight: 800;
+    }
+
+    .form-subtitle {
+      margin: 8px 0 0;
+      color: #777;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .business-form-card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+    }
+
+    .form-section {
+      margin-bottom: 25px;
+    }
+
+    .form-section-title {
+      margin: 0 0 5px;
+      font-size: 18px;
+      color: #222;
+    }
+
+    .form-section-description {
+      margin: 0 0 15px;
+      color: #888;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #333;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required {
+      color: #e04444;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #e5e5eb;
+      background: #fafafd;
+      border-radius: 13px;
+      padding: 13px 14px;
+      color: #222;
+      font-size: 15px;
+      outline: none;
+      transition: .2s;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: #5b45e6;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(91,69,230,.08);
+    }
+
+    .field textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .field-help {
+      margin-top: 6px;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .photo-upload {
+      border: 2px dashed #ddd9fa;
+      border-radius: 17px;
+      padding: 22px 15px;
+      text-align: center;
+      background: #faf9ff;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .photo-upload:hover {
+      border-color: #5b45e6;
+      background: #f7f5ff;
+    }
+
+    .photo-upload-icon {
+      font-size: 35px;
+      margin-bottom: 8px;
+    }
+
+    .photo-upload-title {
+      color: #333;
+      font-weight: 750;
+      font-size: 15px;
+    }
+
+    .photo-upload-text {
+      color: #999;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    #businessPhotos {
+      display: none;
+    }
+
+    .photo-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .photo-preview {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #eee;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-photo {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 27px;
+      height: 27px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,.68);
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .photo-number {
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      padding: 3px 7px;
+      border-radius: 7px;
+      background: rgba(0,0,0,.58);
+      color: #fff;
+      font-size: 10px;
+    }
+
+    .form-message {
+      display: none;
+      padding: 13px 14px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .form-message.error {
+      display: block;
+      background: #fff0f0;
+      color: #b52e2e;
+    }
+
+    .form-message.success {
+      display: block;
+      background: #edf9f1;
+      color: #217a40;
+    }
+
+    .submit-button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 18px;
+      background: #5b45e6;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .submit-button:hover {
+      opacity: .94;
+    }
+
+    .submit-button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .form-note {
+      margin-top: 11px;
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .preview-business {
+      margin-top: 15px;
+      display: none;
+      padding: 14px;
+      border-radius: 15px;
+      background: #f7f7fb;
+    }
+
+    .preview-business strong {
+      color: #222;
+    }
+
+    @media (min-width: 650px) {
+      .add-business-container {
+        padding-top: 30px;
+      }
+
+      .business-form-card {
+        padding: 30px;
+      }
+
+      .two-columns {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .photo-preview-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="add-business-page">
+
+    <!-- HEADER -->
+    <header class="site-header">
+      <div class="container header-inner">
+
+        <a href="index.html" class="logo">
+          HELPY
+        </a>
+
+        <nav class="nav-links">
+          <a href="products.html">Produits</a>
+          <a href="services.html">Services</a>
+          <a href="businesses.html" class="active">
+            Entreprises
+          </a>
+          <a href="search.html">Recherche</a>
+        </nav>
+
+        <a href="profile.html" class="header-profile">
+          👤
+        </a>
+
+      </div>
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="add-business-container">
+
+      <div class="form-header">
+
+        <a
+          href="businesses.html"
+          class="form-back"
+        >
+          ← Retour aux entreprises
+        </a>
+
+        <h1 class="form-title">
+          Ajouter une entreprise
+        </h1>
+
+        <p class="form-subtitle">
+          Présentez votre entreprise, votre activité ou votre établissement
+          à des utilisateurs du monde entier sur HELPY.
+        </p>
+
+      </div>
+
+
+      <form
+        id="businessForm"
+        class="business-form-card"
+      >
+
+        <!-- INFORMATIONS PRINCIPALES -->
+        <section class="form-section">
+
+          <h2 class="form-section-title">
+            Informations principales
+          </h2>
+
+          <p class="form-section-description">
+            Donnez les informations essentielles de votre entreprise.
+          </p>
+
+
+          <div class="field">
+
+            <label for="businessName">
+              Nom de l’entreprise
+              <span class="required">*</span>
+            </label>
+
+            <input
+              id="businessName"
+              name="name"
+              type="text"
+              placeholder="Ex. Global Tech Solutions"
+              maxlength="150"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="businessCategory">
+              Catégorie
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="businessCategory"
+              name="category"
+              required
+            >
+
+              <option value="">
+                Choisir une catégorie
+              </option>
+
+              <option value="Technologie">
+                Technologie
+              </option>
+
+              <option value="Commerce">
+                Commerce
+              </option>
+
+              <option value="Restaurant">
+                Restaurant
+              </option>
+
+              <option value="Mode">
+                Mode
+              </option>
+
+              <option value="Beauté">
+                Beauté
+              </option>
+
+              <option value="Transport">
+                Transport
+              </option>
+
+              <option value="Construction">
+                Construction
+              </option>
+
+              <option value="Immobilier">
+                Immobilier
+              </option>
+
+              <option value="Éducation">
+                Éducation
+              </option>
+
+              <option value="Santé">
+                Santé
+              </option>
+
+              <option value="Finance">
+                Finance
+              </option>
+
+              <option value="Agriculture">
+                Agriculture
+              </option>
+
+              <option value="Services">
+                Services
+              </option>
+
+              <option value="Hôtellerie">
+                Hôtellerie
+              </option>
+
+              <option value="Autre">
+                Autre
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="businessDescription">
+              Description
+              <span class="required">*</span>
+            </label>
+
+            <textarea
+              id="businessDescription"
+              name="description"
+              placeholder="Décrivez votre entreprise, vos activités, vos produits ou vos services..."
+              maxlength="3000"
+              required
+            ></textarea>
+
+            <div class="field-help">
+              Une description claire aide les utilisateurs à mieux comprendre
+              votre entreprise.
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- LOCALISATION -->
+        <section class="form-section">
+
+          <h2 class="form-section-title">
+            Localisation
+          </h2>
+
+          <p class="form-section-description">
+            HELPY est une plateforme internationale. Indiquez le pays et la
+            ville ou zone où votre entreprise est située.
+          </p>
+
+
+          <div class="two-columns">
+
+            <div class="field">
+
+              <label for="businessCountry">
+                Pays
+                <span class="required">*</span>
+              </label>
+
+              <input
+                id="businessCountry"
+                name="country"
+                type="text"
+                placeholder="Ex. Haiti"
+                maxlength="100"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="businessCity">
+                Ville / zone
+                <span class="required">*</span>
+              </label>
+
+              <input
+                id="businessCity"
+                name="city"
+                type="text"
+                placeholder="Ex. Port-au-Prince"
+                maxlength="120"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="businessAddress">
+              Adresse
+            </label>
+
+            <input
+              id="businessAddress"
+              name="address"
+              type="text"
+              placeholder="Adresse ou emplacement de l’entreprise"
+              maxlength="250"
+            >
+
+          </div>
+
+        </section>
+
+
+        <!-- CONTACT -->
+        <section class="form-section">
+
+          <h2 class="form-section-title">
+            Coordonnées
+          </h2>
+
+          <p class="form-section-description">
+            Ajoutez les moyens permettant aux clients de vous contacter.
+          </p>
+
+
+          <div class="two-columns">
+
+            <div class="field">
+
+              <label for="businessPhone">
+                Téléphone
+                <span class="required">*</span>
+              </label>
+
+              <input
+                id="businessPhone"
+                name="phone"
+                type="tel"
+                placeholder="Ex. +509 0000 0000"
+                maxlength="40"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="businessWhatsapp">
+                WhatsApp
+                <span class="required">*</span>
+              </label>
+
+              <input
+                id="businessWhatsapp"
+                name="whatsapp"
+                type="tel"
+                placeholder="Ex. +509 0000 0000"
+                maxlength="40"
+                required
+              >
+
+              <div class="field-help">
+                Utilisez de préférence le numéro avec l’indicatif international.
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- PHOTOS -->
+        <section class="form-section">
+
+          <h2 class="form-section-title">
+            Photos de l’entreprise
+          </h2>
+
+          <p class="form-section-description">
+            Ajoutez plusieurs photos pour présenter votre entreprise.
+          </p>
+
+
+          <label
+            for="businessPhotos"
+            class="photo-upload"
+          >
+
+            <div class="photo-upload-icon">
+              📷
+            </div>
+
+            <div class="photo-upload-title">
+              Ajouter des photos
+            </div>
+
+            <div class="photo-upload-text">
+              Jusqu’à 8 photos · JPG, PNG ou WEBP
+            </div>
+
+          </label>
+
+
+          <input
+            id="businessPhotos"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+          >
+
+
+          <div
+            id="photoPreviewGrid"
+            class="photo-preview-grid"
+          ></div>
+
+        </section>
+
+
+        <!-- MESSAGE -->
+        <div
+          id="formMessage"
+          class="form-message"
+        ></div>
+
+
+        <!-- PREVIEW -->
+        <div
+          id="businessPreview"
+          class="preview-business"
+        >
+          <strong>Aperçu :</strong>
+          <span id="businessPreviewText"></span>
+        </div>
+
+
+        <!-- SUBMIT -->
+        <button
+          id="submitBusinessButton"
+          class="submit-button"
+          type="submit"
+        >
+          Publier l’entreprise
+        </button>
+
+        <div class="form-note">
+          Votre publication peut être vérifiée automatiquement par le système
+          HELPY avant sa mise en ligne.
+        </div>
+
+      </form>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="products.html">
+      <span>♡</span>
+      <small>Favoris</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+
+    /* =========================================================
+       HELPY — ADD BUSINESS
+       ========================================================= */
+
+    let selectedPhotos = [];
+
+
+    const form =
+      document.getElementById(
+        "businessForm"
+      );
+
+    const photoInput =
+      document.getElementById(
+        "businessPhotos"
+      );
+
+    const previewGrid =
+      document.getElementById(
+        "photoPreviewGrid"
+      );
+
+    const messageBox =
+      document.getElementById(
+        "formMessage"
+      );
+
+    const submitButton =
+      document.getElementById(
+        "submitBusinessButton"
+      );
+
+
+    function showMessage(
+      message,
+      type = "error"
+    ) {
+
+      messageBox.textContent =
+        message;
+
+      messageBox.className =
+        "form-message " +
+        type;
+
+    }
+
+
+    function clearMessage() {
+
+      messageBox.textContent =
+        "";
+
+      messageBox.className =
+        "form-message";
+
+    }
+
+
+    function formatPhoneForWhatsApp(
+      phone
+    ) {
+
+      if (!phone) {
+        return "";
+      }
+
+      return String(phone)
+        .trim()
+        .replace(/[^\d]/g, "");
+
+    }
+
+
+    function renderPhotoPreviews() {
+
+      previewGrid.innerHTML =
+        "";
+
+      selectedPhotos.forEach(
+        (photo, index) => {
+
+          const wrapper =
+            document.createElement(
+              "div"
+            );
+
+          wrapper.className =
+            "photo-preview";
+
+
+          const image =
+            document.createElement(
+              "img"
+            );
+
+          image.src =
+            photo.preview;
+
+          image.alt =
+            "Photo " +
+            (index + 1);
+
+
+          const removeButton =
+            document.createElement(
+              "button"
+            );
+
+          removeButton.type =
+            "button";
+
+          removeButton.className =
+            "remove-photo";
+
+          removeButton.textContent =
+            "×";
+
+          removeButton.setAttribute(
+            "aria-label",
+            "Supprimer la photo"
+          );
+
+
+          removeButton.addEventListener(
+            "click",
+            () => {
+
+              selectedPhotos.splice(
+                index,
+                1
+              );
+
+              renderPhotoPreviews();
+
+            }
+          );
+
+
+          const number =
+            document.createElement(
+              "span"
+            );
+
+          number.className =
+            "photo-number";
+
+          number.textContent =
+            index === 0
+              ? "Photo principale"
+              : "Photo " + (index + 1);
+
+
+          wrapper.appendChild(
+            image
+          );
+
+          wrapper.appendChild(
+            removeButton
+          );
+
+          wrapper.appendChild(
+            number
+          );
+
+          previewGrid.appendChild(
+            wrapper
+          );
+
+        }
+      );
+
+    }
+
+
+    function readImageFile(
+      file
+    ) {
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const reader =
+            new FileReader();
+
+          reader.onload = () => {
+
+            resolve({
+              file: file,
+              preview:
+                reader.result
+            });
+
+          };
+
+          reader.onerror =
+            reject;
+
+          reader.readAsDataURL(
+            file
+          );
+
+        }
+      );
+
+    }
+
+
+    photoInput.addEventListener(
+      "change",
+      async event => {
+
+        clearMessage();
+
+        const files =
+          Array.from(
+            event.target.files || []
+          );
+
+
+        if (!files.length) {
+          return;
+        }
+
+
+        if (
+          selectedPhotos.length +
+          files.length >
+          8
+        ) {
+
+          showMessage(
+            "Vous pouvez ajouter jusqu’à 8 photos."
+          );
+
+          return;
+
+        }
+
+
+        for (const file of files) {
+
+          if (
+            ![
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ].includes(
+              file.type
+            )
+          ) {
+
+            showMessage(
+              "Format d’image non supporté. Utilisez JPG, PNG ou WEBP."
+            );
+
+            continue;
+
+          }
+
+
+          if (
+            file.size >
+            5 * 1024 * 1024
+          ) {
+
+            showMessage(
+              "Chaque photo doit faire moins de 5 Mo."
+            );
+
+            continue;
+
+          }
+
+
+          try {
+
+            const image =
+              await readImageFile(
+                file
+              );
+
+            selectedPhotos.push(
+              image
+            );
+
+          } catch {
+
+            showMessage(
+              "Impossible de lire une des photos."
+            );
+
+          }
+
+        }
+
+
+        renderPhotoPreviews();
+
+        photoInput.value =
+          "";
+
+      }
+    );
+
+
+    function getFormData() {
+
+      return {
+
+        name:
+          document
+      .getElementById(
+        "businessName"
+      )
+      .value
+      .trim(),
+
+    category:
+      document
+        .getElementById(
+          "businessCategory"
+        )
+        .value
+        .trim(),
+
+    description:
+      document
+        .getElementById(
+          "businessDescription"
+        )
+        .value
+        .trim(),
+
+    country:
+      document
+        .getElementById(
+          "businessCountry"
+        )
+        .value
+        .trim(),
+
+    city:
+      document
+        .getElementById(
+          "businessCity"
+        )
+        .value
+        .trim(),
+
+    address:
+      document
+        .getElementById(
+          "businessAddress"
+        )
+        .value
+        .trim(),
+
+    phone:
+      document
+        .getElementById(
+          "businessPhone"
+        )
+        .value
+        .trim(),
+
+    whatsapp:
+      document
+        .getElementById(
+          "businessWhatsapp"
+        )
+        .value
+        .trim()
+
+  };
+
+}
+
+
+function validateBusiness(
+  data
+) {
+
+  if (!data.name) {
+
+    return (
+      "Le nom de l’entreprise est obligatoire."
+    );
+
+  }
+
+
+  if (!data.category) {
+
+    return (
+      "Veuillez choisir une catégorie."
+    );
+
+  }
+
+
+  if (!data.description) {
+
+    return (
+      "La description de l’entreprise est obligatoire."
+    );
+
+  }
+
+
+  if (
+    data.description.length < 10
+  ) {
+
+    return (
+      "La description doit contenir au moins 10 caractères."
+    );
+
+  }
+
+
+  if (!data.country) {
+
+    return (
+      "Le pays est obligatoire."
+    );
+
+  }
+
+
+  if (!data.city) {
+
+    return (
+      "La ville ou zone est obligatoire."
+    );
+
+  }
+
+
+  if (!data.phone) {
+
+    return (
+      "Le numéro de téléphone est obligatoire."
+    );
+
+  }
+
+
+  if (!data.whatsapp) {
+
+    return (
+      "Le numéro WhatsApp est obligatoire."
+    );
+
+  }
+
+
+  if (
+    formatPhoneForWhatsApp(
+      data.whatsapp
+    ).length < 7
+  ) {
+
+    return (
+      "Veuillez saisir un numéro WhatsApp valide."
+    );
+
+  }
+
+
+  return "";
+
+}
+
+
+function updatePreview() {
+
+  const data =
+    getFormData();
+
+
+  const preview =
+    document.getElementById(
+      "businessPreview"
+    );
+
+
+  const previewText =
+    document.getElementById(
+      "businessPreviewText"
+    );
+
+
+  if (!data.name) {
+
+    preview.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  previewText.textContent =
+    " " +
+    data.name +
+    (
+      data.category
+        ? " · " +
+          data.category
+        : ""
+    ) +
+    (
+      data.city
+        ? " · " +
+          data.city
+        : ""
+    );
+
+
+  preview.style.display =
+    "block";
+
+}
+
+
+[
+  "businessName",
+  "businessCategory",
+  "businessDescription",
+  "businessCountry",
+  "businessCity",
+  "businessAddress",
+  "businessPhone",
+  "businessWhatsapp"
+].forEach(
+  id => {
+
+    const element =
+      document.getElementById(
+        id
+      );
+
+
+    if (!element) {
+      return;
+    }
+
+
+    element.addEventListener(
+      "input",
+      updatePreview
+    );
+
+
+    element.addEventListener(
+      "change",
+      updatePreview
+    );
+
+  }
+);
+
+
+form.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    clearMessage();
+
+
+    if (
+      typeof HELPY ===
+      "undefined"
+    ) {
+
+      showMessage(
+        "Le système HELPY n’est pas disponible."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !HELPY.isLoggedIn()
+    ) {
+
+      showMessage(
+        "Vous devez être connecté pour publier une entreprise."
+      );
+
+
+      setTimeout(
+        () => {
+
+          window.location.href =
+            "login.html?redirect=add-business.html";
+
+        },
+        900
+      );
+
+
+      return;
+
+    }
+
+
+    const data =
+      getFormData();
+
+
+    const validation =
+      validateBusiness(
+        data
+      );
+
+
+    if (validation) {
+
+      showMessage(
+        validation
+      );
+
+      return;
+
+    }
+
+
+    submitButton.disabled =
+      true;
+
+    submitButton.textContent =
+      "Publication en cours...";
+
+
+    try {
+
+      const images =
+        selectedPhotos.map(
+          photo =>
+            photo.preview
+        );
+
+
+      const payload = {
+
+        name:
+          data.name,
+
+        title:
+          data.name,
+
+        category:
+          data.category,
+
+        description:
+          data.description,
+
+        country:
+          data.country,
+
+        city:
+          data.city,
+
+        location:
+          data.city,
+
+        address:
+          data.address,
+
+        phone:
+          data.phone,
+
+        whatsapp:
+          data.whatsapp,
+
+        images:
+          images,
+
+        image:
+          images[0] ||
+          null
+
+      };
+
+
+      const response =
+        await HELPY.apiFetch(
+          "/api/businesses",
+          "POST",
+          payload
+        );
+
+
+      if (
+        !response ||
+        response.error ||
+        response.statut ===
+          "erreur"
+      ) {
+
+        throw new Error(
+          response?.error ||
+          response?.message ||
+          "Impossible de créer l’entreprise."
+        );
+
+      }
+
+
+      showMessage(
+        "Entreprise créée avec succès.",
+        "success"
+      );
+
+
+      submitButton.textContent =
+        "Entreprise publiée";
+
+
+      const created =
+        response.business ||
+        response.entreprise ||
+        response.data ||
+        null;
+
+
+      const createdId =
+        created?.id ||
+        response?.id;
+
+
+      setTimeout(
+        () => {
+
+          if (createdId) {
+
+            window.location.href =
+              "business-details.html?id=" +
+              encodeURIComponent(
+                createdId
+              );
+
+          } else {
+
+            window.location.href =
+              "businesses.html";
+
+          }
+
+        },
+        1000
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "HELPY add business:",
+        error
+      );
+
+
+      showMessage(
+        error?.message ||
+        "Impossible de créer l’entreprise."
+      );
+
+
+      submitButton.disabled =
+        false;
+
+
+      submitButton.textContent =
+        "Publier l’entreprise";
+
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    if (
+      typeof HELPY !==
+        "undefined" &&
+      !HELPY.isLoggedIn()
+    ) {
+
+      showMessage(
+        "Vous devez être connecté pour ajouter une entreprise."
+      );
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
