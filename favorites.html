@@ -1,1 +1,1111 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>favorites — HELPY</title><link rel="stylesheet" href="style.css"></head><body><main class="container"><div class="card"><h1>favorites</h1><p class="muted">Cette section est prête dans l'interface HELPY et sera alimentée par les données du compte.</p><a class="btn" href="index.html">Retour à l'accueil</a></div></main></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5b45e6">
+
+  <title>Mes favoris - HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .favorites-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+
+    .favorites-hero {
+      background: linear-gradient(135deg, #5b45e6, #7864ec);
+      color: #fff;
+      border-radius: 24px;
+      padding: 25px 18px;
+      margin-bottom: 20px;
+    }
+
+    .favorites-hero h1 {
+      margin: 0 0 7px;
+      font-size: 25px;
+    }
+
+    .favorites-hero p {
+      margin: 0;
+      opacity: .9;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .favorites-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 18px;
+      scrollbar-width: none;
+    }
+
+    .favorites-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .favorite-tab {
+      flex: 0 0 auto;
+      border: 1px solid #e4e4e4;
+      background: #fff;
+      color: #555;
+      border-radius: 30px;
+      padding: 10px 15px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .favorite-tab.active {
+      background: #5b45e6;
+      border-color: #5b45e6;
+      color: #fff;
+    }
+
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .favorite-card {
+      position: relative;
+      background: #fff;
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0 6px 22px rgba(0,0,0,.06);
+    }
+
+    .favorite-link {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .favorite-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: block;
+      object-fit: cover;
+      background: #f2f2f2;
+    }
+
+    .remove-favorite {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.95);
+      color: #e53935;
+      font-size: 19px;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(0,0,0,.12);
+      z-index: 2;
+    }
+
+    .favorite-content {
+      padding: 11px;
+    }
+
+    .favorite-type {
+      display: inline-block;
+      background: #f0edff;
+      color: #5b45e6;
+      border-radius: 20px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .favorite-title {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .favorite-price {
+      color: #5b45e6;
+      font-size: 15px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .favorite-location {
+      color: #777;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-favorites {
+      background: #fff;
+      border-radius: 20px;
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: 0 6px 25px rgba(0,0,0,.05);
+      grid-column: 1 / -1;
+    }
+
+    .empty-favorites-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #f0edff;
+      color: #5b45e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 34px;
+    }
+
+    .empty-favorites h2 {
+      margin: 0 0 7px;
+      font-size: 19px;
+    }
+
+    .empty-favorites p {
+      margin: 0 auto 18px;
+      max-width: 400px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .browse-button {
+      display: inline-block;
+      background: #5b45e6;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 13px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    @media (min-width: 650px) {
+      .favorites-page {
+        padding-top: 30px;
+      }
+
+      .favorites-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 1000px) {
+      .favorites-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .favorites-hero {
+        padding: 35px;
+      }
+
+      .favorites-hero h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="index.html" class="logo">
+      HELPY
+    </a>
+
+    <nav class="nav-links">
+      <a href="products.html">Produits</a>
+      <a href="services.html">Services</a>
+      <a href="businesses.html">Entreprises</a>
+      <a href="search.html">Recherche</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="profile.html" class="profile-link">
+        👤
+      </a>
+    </div>
+
+  </div>
+</header>
+
+
+<main class="favorites-page">
+
+  <section class="favorites-hero">
+
+    <h1>Mes favoris ❤️</h1>
+
+    <p>
+      Retrouvez facilement les produits, services
+      et entreprises que vous souhaitez garder.
+    </p>
+
+  </section>
+
+
+  <div class="favorites-tabs">
+
+    <button
+      type="button"
+      class="favorite-tab active"
+      data-type="all"
+    >
+      Tout
+    </button>
+
+    <button
+      type="button"
+      class="favorite-tab"
+      data-type="products"
+    >
+      Produits
+    </button>
+
+    <button
+      type="button"
+      class="favorite-tab"
+      data-type="services"
+    >
+      Services
+    </button>
+
+    <button
+      type="button"
+      class="favorite-tab"
+      data-type="businesses"
+    >
+      Entreprises
+    </button>
+
+  </div>
+
+
+  <section
+    id="favoritesGrid"
+    class="favorites-grid"
+  >
+
+    <div class="loading">
+      Chargement de vos favoris...
+    </div>
+
+  </section>
+
+</main>
+
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    <small>Accueil</small>
+  </a>
+
+  <a href="search.html">
+    <span>⌕</span>
+    <small>Recherche</small>
+  </a>
+
+  <a href="publish.html">
+    <span>＋</span>
+    <small>Publier</small>
+  </a>
+
+  <a href="favorites.html" class="active">
+    <span>♡</span>
+    <small>Favoris</small>
+  </a>
+
+  <a href="profile.html">
+    <span>👤</span>
+    <small>Profil</small>
+  </a>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+<script>
+
+let favoriteItems = [];
+
+let activeType = "all";
+
+
+function safe(value) {
+
+  if (typeof escapeHTML === "function") {
+    return escapeHTML(value || "");
+  }
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function getStoredIds(key) {
+
+  try {
+
+    const data =
+      JSON.parse(
+        localStorage.getItem(key) || "[]"
+      );
+
+    return Array.isArray(data)
+      ? data
+      : [];
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+function getAllFavoriteIds() {
+
+  return {
+
+    products:
+      getStoredIds("helpy_favorites"),
+
+    services:
+      getStoredIds("helpy_service_favorites"),
+
+    businesses:
+      getStoredIds("helpy_business_favorites")
+
+  };
+
+}
+
+
+function saveFavoriteIds(type, ids) {
+
+  let key = "";
+
+  if (type === "product") {
+    key = "helpy_favorites";
+  }
+
+  if (type === "service") {
+    key = "helpy_service_favorites";
+  }
+
+  if (type === "business") {
+    key = "helpy_business_favorites";
+  }
+
+  if (!key) return;
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(ids)
+  );
+
+}
+
+
+function getImage(item) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.getItemImage === "function"
+  ) {
+    return HELPY.getItemImage(item);
+  }
+
+  return (
+    item.image ||
+    item.photo ||
+    (
+      Array.isArray(item.images)
+        ? item.images[0]
+        : ""
+    ) ||
+    "https://placehold.co/600x600?text=HELPY"
+  );
+
+}
+
+
+function getTitle(item) {
+
+  return (
+    item.title ||
+    item.name ||
+    item.nom ||
+    "Sans titre"
+  );
+
+}
+
+
+function getCategory(item) {
+
+  return (
+    item.category ||
+    item.categorie ||
+    "Autre"
+  );
+
+}
+
+
+function getLocation(item) {
+
+  const city =
+    item.city ||
+    item.ville ||
+    item.location ||
+    "";
+
+  const country =
+    item.country ||
+    item.pays ||
+    "";
+
+  return [city, country]
+    .filter(Boolean)
+    .join(", ");
+
+}
+
+
+function getPrice(item) {
+
+  if (
+    item.type === "business"
+  ) {
+    return "Entreprise";
+  }
+
+  const price =
+    item.price ??
+    item.prix ??
+    item.tariff ??
+    item.tarif;
+
+  if (
+    price === null ||
+    price === undefined ||
+    price === ""
+  ) {
+    return "Prix sur demande";
+  }
+
+  if (
+    window.HELPY &&
+    typeof HELPY.formatPrice === "function"
+  ) {
+    return HELPY.formatPrice(
+      price,
+      item.currency ||
+      item.devise
+    );
+  }
+
+  return String(price) +
+    " " +
+    (
+      item.currency ||
+      item.devise ||
+      ""
+    );
+
+}
+
+
+function getTypeLabel(type) {
+
+  if (type === "product") {
+    return "Produit";
+  }
+
+  if (type === "service") {
+    return "Service";
+  }
+
+  return "Entreprise";
+
+}
+
+
+function getDetailsLink(item) {
+
+  const id =
+    encodeURIComponent(item.id);
+
+  if (item.type === "product") {
+    return "product-details.html?id=" + id;
+  }
+
+  if (item.type === "service") {
+    return "service-details.html?id=" + id;
+  }
+
+  return "business-details.html?id=" + id;
+
+}
+
+
+async function loadOneType(
+  endpoint,
+  type,
+  ids
+) {
+
+  if (!ids.length) {
+    return [];
+  }
+
+
+  try {
+
+    const requests =
+      ids.map(function(id) {
+
+        const url =
+          endpoint +
+          "/" +
+          encodeURIComponent(id);
+
+        if (
+          window.HELPY &&
+          typeof HELPY.apiFetch === "function"
+        ) {
+
+          return HELPY.apiFetch(url);
+
+        }
+
+        return fetch(url)
+          .then(function(response) {
+            return response.json();
+          });
+
+      });
+
+
+    const responses =
+      await Promise.allSettled(requests);
+
+
+    const results = [];
+
+
+    responses.forEach(
+      function(result) {
+
+        if (
+          result.status !== "fulfilled"
+        ) {
+          return;
+        }
+
+
+        const response =
+          result.value;
+
+
+        if (response.error) {
+          return;
+        }
+
+
+        const item =
+          response.product ||
+          response.produit ||
+          response.service ||
+          response.business ||
+          response.entreprise ||
+          response.data ||
+          response;
+
+
+        if (
+          item &&
+          item.id !== undefined
+        ) {
+
+          results.push({
+            ...item,
+            type: type
+          });
+
+        }
+
+      }
+    );
+
+
+    return results;
+
+  } catch (error) {
+
+    console.error(
+      "Erreur favoris:",
+      error
+    );
+
+    return [];
+
+  }
+
+}
+
+
+async function loadFavorites() {
+
+  const grid =
+    document.getElementById(
+      "favoritesGrid"
+    );
+
+
+  grid.innerHTML = `
+    <div class="loading">
+      Chargement de vos favoris...
+    </div>
+  `;
+
+
+  const ids =
+    getAllFavoriteIds();
+
+
+  const [
+    products,
+    services,
+    businesses
+  ] = await Promise.all([
+
+    loadOneType(
+      "/api/products",
+      "product",
+      ids.products
+    ),
+
+    loadOneType(
+      "/api/services",
+      "service",
+      ids.services
+    ),
+
+    loadOneType(
+      "/api/businesses",
+      "business",
+      ids.businesses
+    )
+
+  ]);
+
+
+  favoriteItems = [
+    ...products,
+    ...services,
+    ...businesses
+  ];
+
+
+  renderFavorites();
+
+}
+
+
+function renderFavorites() {
+
+  const grid =
+    document.getElementById(
+      "favoritesGrid"
+    );
+
+
+  let items =
+    favoriteItems;
+
+
+  if (activeType !== "all") {
+
+    const wantedType =
+      activeType === "products"
+        ? "product"
+        : activeType === "services"
+          ? "service"
+          : "business";
+
+    items =
+      items.filter(function(item) {
+        return item.type === wantedType;
+      });
+
+  }
+
+
+  if (!items.length) {
+
+    let message =
+      "Vous n'avez encore aucun favori.";
+
+    if (activeType === "products") {
+      message =
+        "Vous n'avez aucun produit favori.";
+    }
+
+    if (activeType === "services") {
+      message =
+        "Vous n'avez aucun service favori.";
+    }
+
+    if (activeType === "businesses") {
+      message =
+        "Vous n'avez aucune entreprise favorite.";
+    }
+
+
+    grid.innerHTML = `
+      <div class="empty-favorites">
+
+        <div class="empty-favorites-icon">
+          ♡
+        </div>
+
+        <h2>
+          Aucun favori
+        </h2>
+
+        <p>
+          ${safe(message)}
+          Ajoutez des éléments à vos favoris
+          pour les retrouver ici.
+        </p>
+
+        <a
+          href="search.html"
+          class="browse-button"
+        >
+          Explorer HELPY
+        </a>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  grid.innerHTML =
+    items.map(function(item) {
+
+      const image =
+        getImage(item);
+
+      const title =
+        getTitle(item);
+
+      const category =
+        getCategory(item);
+
+      const price =
+        getPrice(item);
+
+      const location =
+        getLocation(item);
+
+
+      return `
+        <article
+          class="favorite-card"
+          data-id="${safe(item.id)}"
+          data-type="${safe(item.type)}"
+        >
+
+          <button
+            type="button"
+            class="remove-favorite"
+            data-id="${safe(item.id)}"
+            data-type="${safe(item.type)}"
+            aria-label="Retirer des favoris"
+            title="Retirer des favoris"
+          >
+            ♥
+          </button>
+
+
+          <a
+            href="${getDetailsLink(item)}"
+            class="favorite-link"
+          >
+
+            <img
+              src="${safe(image)}"
+              alt="${safe(title)}"
+              class="favorite-image"
+              loading="lazy"
+              onerror="
+                this.src='https://placehold.co/600x600?text=HELPY'
+              "
+            >
+
+
+            <div class="favorite-content">
+
+              <span class="favorite-type">
+                ${getTypeLabel(item.type)}
+              </span>
+
+              <div class="favorite-title">
+                ${safe(title)}
+              </div>
+
+              <div class="favorite-price">
+                ${safe(price)}
+              </div>
+
+              ${
+                location
+                  ? `
+                    <div class="favorite-location">
+                      📍 ${safe(location)}
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </a>
+
+        </article>
+      `;
+
+    }).join("");
+
+
+  setupRemoveButtons();
+
+}
+
+
+function removeFavorite(
+  id,
+  type
+) {
+
+  const numericOrStringId =
+    String(id);
+
+
+  if (type === "product") {
+
+    const ids =
+      getStoredIds(
+        "helpy_favorites"
+      ).filter(function(value) {
+
+        return String(value) !==
+          numericOrStringId;
+
+      });
+
+    localStorage.setItem(
+      "helpy_favorites",
+      JSON.stringify(ids)
+    );
+
+  }
+
+
+  if (type === "service") {
+
+    const ids =
+      getStoredIds(
+        "helpy_service_favorites"
+      ).filter(function(value) {
+
+        return String(value) !==
+          numericOrStringId;
+
+      });
+
+    localStorage.setItem(
+      "helpy_service_favorites",
+      JSON.stringify(ids)
+    );
+
+  }
+
+
+  if (type === "business") {
+
+    const ids =
+      getStoredIds(
+        "helpy_business_favorites"
+      ).filter(function(value) {
+
+        return String(value) !==
+          numericOrStringId;
+
+      });
+
+    localStorage.setItem(
+      "helpy_business_favorites",
+      JSON.stringify(ids)
+    );
+
+  }
+
+
+  favoriteItems =
+    favoriteItems.filter(function(item) {
+
+      return !(
+        String(item.id) ===
+        numericOrStringId &&
+        item.type === type
+      );
+
+    });
+
+
+  renderFavorites();
+
+}
+
+
+function setupRemoveButtons() {
+
+  document
+    .querySelectorAll(
+      ".remove-favorite"
+    )
+    .forEach(function(button) {
+
+      button.addEventListener(
+        "click",
+        function(event) {
+
+          event.preventDefault();
+
+          event.stopPropagation();
+
+
+          const id =
+            this.dataset.id;
+
+          const type =
+            this.dataset.type;
+
+
+          removeFavorite(
+            id,
+            type
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+function setupTabs() {
+
+  document
+    .querySelectorAll(
+      ".favorite-tab"
+    )
+    .forEach(function(tab) {
+
+      tab.addEventListener(
+        "click",
+        function() {
+
+          document
+            .querySelectorAll(
+              ".favorite-tab"
+            )
+            .forEach(function(item) {
+
+              item.classList.remove(
+                "active"
+              );
+
+            });
+
+
+          this.classList.add(
+            "active"
+          );
+
+
+          activeType =
+            this.dataset.type ||
+            "all";
+
+
+          renderFavorites();
+
+        }
+      );
+
+    });
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    setupTabs();
+
+    loadFavorites();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
