@@ -1,1 +1,377 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Publier — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><form class="form" onsubmit="go(event)"><h1>Publier sur HELPY</h1><div class="field"><label>Type</label><select id="type"><option value="products">Produit</option><option value="services">Service</option></select></div><div class="field"><label>Titre *</label><input id="title" required></div><div class="field"><label>Description</label><textarea id="description"></textarea></div><div class="field"><label>Prix</label><input id="price" type="number" step="0.01"></div><div class="field"><label>Devise</label><input id="currency" value="USD"></div><div class="field"><label>Catégorie</label><input id="category"></div><div class="field"><label>Quantité (produit)</label><input id="quantity" type="number" value="1"></div><div class="field"><label>Pays</label><input id="country"></div><div class="field"><label>Ville / zone</label><input id="city"></div><div class="field"><label>WhatsApp *</label><input id="whatsapp" required></div><button class="btn">Publier</button><p id="msg" class="muted"></p></form></main><script>async function go(e){e.preventDefault();const t=type.value;const d={title:title.value,description:description.value,price:price.value,currency:currency.value,category:category.value,quantity:quantity.value,country:country.value,city:city.value,whatsapp:whatsapp.value};msg.textContent='Publication...';const r=await apiFetch('/api/'+t,'POST',d);msg.textContent=r.error?r.message:r.message||'Publication réussie.'}</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Publier — HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .publish-page {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 24px 16px 110px;
+    }
+
+    .publish-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .publish-header h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .publish-header p {
+      margin: 0;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .publish-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .publish-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+      border: 1px solid #eee;
+      transition: .2s ease;
+    }
+
+    .publish-card:hover {
+      transform: translateY(-3px);
+      border-color: #5b45e6;
+      box-shadow: 0 12px 35px rgba(91,69,230,.12);
+    }
+
+    .publish-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 20px;
+      background: #f1efff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .publish-card h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .publish-card p {
+      margin: 0;
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .publish-info {
+      margin-top: 24px;
+      background: #f6f4ff;
+      border-radius: 16px;
+      padding: 16px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #5b45e6;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+
+      .publish-options {
+        grid-template-columns: 1fr;
+      }
+
+      .publish-card {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        gap: 16px;
+        padding: 18px;
+      }
+
+      .publish-icon {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        margin: 0;
+      }
+
+      .publish-card h2 {
+        margin-bottom: 5px;
+      }
+
+      .publish-header h1 {
+        font-size: 26px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+
+  <header class="site-header">
+
+    <div class="header-inner">
+
+      <a href="index.html" class="logo">
+        HELPY
+      </a>
+
+      <nav class="nav-links">
+
+        <a href="products.html">
+          Produits
+        </a>
+
+        <a href="services.html">
+          Services
+        </a>
+
+        <a href="businesses.html">
+          Entreprises
+        </a>
+
+        <a href="search.html">
+          Rechercher
+        </a>
+
+      </nav>
+
+      <div class="header-actions">
+
+        <a
+          href="profile.html"
+          class="profile-link"
+        >
+          Profil
+        </a>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- CONTENU -->
+
+  <main class="publish-page">
+
+    <a
+      href="index.html"
+      class="back-link"
+    >
+      ← Retour à l'accueil
+    </a>
+
+
+    <section class="publish-header">
+
+      <h1>
+        Que voulez-vous publier ?
+      </h1>
+
+      <p>
+        Choisissez le type de contenu que vous souhaitez
+        proposer sur HELPY.
+      </p>
+
+    </section>
+
+
+    <section class="publish-options">
+
+
+      <!-- PRODUIT -->
+
+      <a
+        href="add-product.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🛍️
+        </div>
+
+        <div>
+
+          <h2>
+            Produit
+          </h2>
+
+          <p>
+            Vendez un produit et présentez-le
+            aux acheteurs.
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <!-- SERVICE -->
+
+      <a
+        href="add-service.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🛠️
+        </div>
+
+        <div>
+
+          <h2>
+            Service
+          </h2>
+
+          <p>
+            Proposez vos compétences ou vos
+            services aux utilisateurs.
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <!-- ENTREPRISE -->
+
+      <a
+        href="add-business.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🏢
+        </div>
+
+        <div>
+
+          <h2>
+            Entreprise
+          </h2>
+
+          <p>
+            Présentez votre entreprise,
+            commerce ou activité professionnelle.
+          </p>
+
+        </div>
+
+      </a>
+
+
+    </section>
+
+
+    <div class="publish-info">
+
+      <strong>
+        💡 Conseil
+      </strong>
+
+      <br>
+
+      Utilisez des informations précises et des photos
+      de bonne qualité afin de présenter clairement
+      votre produit, service ou entreprise.
+
+    </div>
+
+  </main>
+
+
+  <!-- NAVIGATION MOBILE -->
+
+  <nav class="mobile-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a
+      href="publish.html"
+      class="active"
+    >
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+
+        /*
+         * Vérifier la connexion
+         */
+
+        if (
+          window.HELPY &&
+          typeof HELPY.isLoggedIn ===
+            "function"
+        ) {
+
+          if (!HELPY.isLoggedIn()) {
+
+            window.location.href =
+              "login.html?redirect=publish.html";
+
+          }
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
