@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Mes commandes - HELPY</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <style>
+    /* ==================================================
+       HELPY - ORDERS
+    ================================================== */
+
+    .orders-page {
+      min-height: 100vh;
+      background: #f7f7fb;
+      padding-bottom: 90px;
+    }
+
+    .orders-header {
+      background: #ffffff;
+      border-bottom: 1px solid #ececf2;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .orders-header-inner {
+      max-width: 1100px;
+      margin: auto;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .orders-back {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      background: #f1efff;
+      color: #5b45e6;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .orders-title-wrap {
+      flex: 1;
+    }
+
+    .orders-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      color: #18181f;
+    }
+
+    .orders-subtitle {
+      margin: 3px 0 0;
+      font-size: 13px;
+      color: #777783;
+    }
+
+    .orders-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px 16px;
+    }
+
+    /* ==================================================
+       FILTERS
+    ================================================== */
+
+    .orders-filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+      scrollbar-width: none;
+    }
+
+    .orders-filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .order-filter {
+      flex: 0 0 auto;
+      border: 1px solid #e2e2ea;
+      background: #ffffff;
+      color: #666673;
+      border-radius: 30px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .order-filter.active {
+      background: #5b45e6;
+      border-color: #5b45e6;
+      color: #ffffff;
+    }
+
+    /* ==================================================
+       ORDER CARD
+    ================================================== */
+
+    .orders-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .order-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 5px 20px rgba(20, 20, 40, 0.05);
+    }
+
+    .order-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .order-number {
+      flex: 1;
+    }
+
+    .order-number strong {
+      display: block;
+      font-size: 14px;
+      color: #22222a;
+    }
+
+    .order-date {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: #898993;
+    }
+
+    .order-status {
+      border-radius: 30px;
+      padding: 6px 9px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-pending {
+      background: #fff5dd;
+      color: #9a6800;
+    }
+
+    .status-confirmed {
+      background: #edf1ff;
+      color: #4359ad;
+    }
+
+    .status-shipped {
+      background: #eeeaff;
+      color: #5b45e6;
+    }
+
+    .status-delivered {
+      background: #eaf8ef;
+      color: #18733c;
+    }
+
+    .status-cancelled {
+      background: #fff0f0;
+      color: #b42323;
+    }
+
+    .order-body {
+      display: flex;
+      gap: 13px;
+      margin-top: 15px;
+    }
+
+    .order-image {
+      width: 82px;
+      height: 82px;
+      flex: 0 0 82px;
+      border-radius: 14px;
+      background: #f0f0f5;
+      object-fit: cover;
+    }
+
+    .order-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-product {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #22222a;
+      word-break: break-word;
+    }
+
+    .order-meta {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #777783;
+      line-height: 1.5;
+    }
+
+    .order-total {
+      margin-top: 9px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #5b45e6;
+    }
+
+    .order-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid #eeeeF3;
+      margin-top: 15px;
+      padding-top: 13px;
+    }
+
+    .order-payment {
+      font-size: 11px;
+      color: #777783;
+    }
+
+    .order-details-btn {
+      border: 0;
+      border-radius: 11px;
+      background: #f1efff;
+      color: #5b45e6;
+      padding: 9px 13px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* ==================================================
+       EMPTY / LOADING
+    ================================================== */
+
+    .orders-state {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 45px 20px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(20, 20, 40, 0.05);
+    }
+
+    .orders-state-icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+
+    .orders-state strong {
+      display: block;
+      font-size: 16px;
+      color: #25252d;
+    }
+
+    .orders-state p {
+      margin: 8px auto 0;
+      max-width: 400px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #858590;
+    }
+
+    .orders-action {
+      display: inline-block;
+      margin-top: 17px;
+      padding: 11px 17px;
+      border-radius: 12px;
+      background: #5b45e6;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       BOTTOM NAV
+    ================================================== */
+
+    .orders-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 64px;
+      background: #ffffff;
+      border-top: 1px solid #e8e8ef;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .orders-bottom-nav a {
+      text-decoration: none;
+      color: #777783;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .orders-bottom-nav a span {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .orders-bottom-nav a.active {
+      color: #5b45e6;
+      font-weight: 800;
+    }
+
+    @media (min-width: 768px) {
+
+      .orders-container {
+        padding-top: 30px;
+      }
+
+      .orders-bottom-nav {
+        display: none;
+      }
+
+    }
+
+    @media (max-width: 480px) {
+
+      .order-body {
+        align-items: flex-start;
+      }
+
+      .order-image {
+        width: 70px;
+        height: 70px;
+        flex-basis: 70px;
+      }
+
+      .order-status {
+        max-width: 105px;
+        text-align: center;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="orders-page">
+
+  <!-- ==================================================
+       HEADER
+  ================================================== -->
+
+  <header class="orders-header">
+
+    <div class="orders-header-inner">
+
+      <button
+        type="button"
+        class="orders-back"
+        onclick="history.back()"
+        aria-label="Retour"
+      >
+        ←
+      </button>
+
+      <div class="orders-title-wrap">
+
+        <h1 class="orders-title">
+          Mes commandes
+        </h1>
+
+        <p class="orders-subtitle">
+          Suivez vos achats sur HELPY
+        </p>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="orders-container">
+
+    <!-- ==================================================
+         FILTERS
+    ================================================== -->
+
+    <div class="orders-filters">
+
+      <button
+        type="button"
+        class="order-filter active"
+        data-filter="all"
+      >
+        Toutes
+      </button>
+
+      <button
+        type="button"
+        class="order-filter"
+        data-filter="pending"
+      >
+        En attente
+      </button>
+
+      <button
+        type="button"
+        class="order-filter"
+        data-filter="confirmed"
+      >
+        Confirmées
+      </button>
+
+      <button
+        type="button"
+        class="order-filter"
+        data-filter="shipped"
+      >
+        Expédiées
+      </button>
+
+      <button
+        type="button"
+        class="order-filter"
+        data-filter="delivered"
+      >
+        Livrées
+      </button>
+
+      <button
+        type="button"
+        class="order-filter"
+        data-filter="cancelled"
+      >
+        Annulées
+      </button>
+
+    </div>
+
+
+    <!-- ==================================================
+         ORDERS LIST
+    ================================================== -->
+
+    <section id="ordersList">
+
+      <div class="orders-state">
+
+        <div class="orders-state-icon">
+          📦
+        </div>
+
+        <strong>
+          Chargement des commandes...
+        </strong>
+
+        <p>
+          Veuillez patienter.
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==================================================
+       MOBILE NAV
+  ================================================== -->
+
+  <nav class="orders-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      Accueil
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      Recherche
+    </a>
+
+    <a href="publish.html">
+      <span>＋</span>
+      Publier
+    </a>
+
+    <a href="favorites.html">
+      <span>♡</span>
+      Favoris
+    </a>
+
+    <a
+      href="profile.html"
+      class="active"
+    >
+      <span>♙</span>
+      Profil
+    </a>
+
+  </nav>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   HELPY - ORDERS
+================================================== */
+
+let allOrders = [];
+
+let currentFilter = "all";
+
+
+/* ==================================================
+   UTILITAIRES
+================================================== */
+
+function escapeOrderHTML(value) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.escapeHTML === "function"
+  ) {
+
+    return HELPY.escapeHTML(
+      String(value ?? "")
+    );
+
+  }
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function getOrderStatus(order) {
+
+  return String(
+    order.status ||
+    order.statut ||
+    order.order_status ||
+    "pending"
+  ).toLowerCase();
+
+}
+
+
+function getStatusLabel(status) {
+
+  const labels = {
+
+    pending:
+      "En attente",
+
+    confirmed:
+      "Confirmée",
+
+    shipped:
+      "Expédiée",
+
+    delivered:
+      "Livrée",
+
+    cancelled:
+      "Annulée",
+
+    canceled:
+      "Annulée",
+
+    processing:
+      "En traitement",
+
+    completed:
+      "Terminée"
+
+  };
+
+  return (
+    labels[status] ||
+    "En traitement"
+  );
+
+}
+
+
+function getStatusClass(status) {
+
+  if (
+    status === "cancelled" ||
+    status === "canceled"
+  ) {
+
+    return "status-cancelled";
+
+  }
+
+  if (
+    status === "delivered" ||
+    status === "completed"
+  ) {
+
+    return "status-delivered";
+
+  }
+
+  if (
+    status === "shipped"
+  ) {
+
+    return "status-shipped";
+
+  }
+
+  if (
+    status === "confirmed"
+  ) {
+
+    return "status-confirmed";
+
+  }
+
+  return "status-pending";
+
+}
+
+
+function getOrderId(order) {
+
+  return (
+    order.id ||
+    order.order_id ||
+    order.commande_id ||
+    ""
+  );
+
+}
+
+
+function getOrderDate(order) {
+
+  const value =
+    order.created_at ||
+    order.createdAt ||
+    order.date ||
+    order.order_date;
+
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+  return date.toLocaleDateString(
+    "fr-FR",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+function getOrderImage(order) {
+
+  return (
+    order.image ||
+    order.product_image ||
+    order.product_photo ||
+    order.photo ||
+    "https://via.placeholder.com/300x300?text=HELPY"
+  );
+
+}
+
+
+function getOrderTitle(order) {
+
+  return (
+    order.product_name ||
+    order.product_title ||
+    order.title ||
+    order.name ||
+    "Article HELPY"
+  );
+
+}
+
+
+function getOrderQuantity(order) {
+
+  return (
+    order.quantity ||
+    order.qty ||
+    1
+  );
+
+}
+
+
+function getOrderTotal(order) {
+
+  const total =
+    Number(
+      order.total ||
+      order.total_amount ||
+      order.amount ||
+      order.price ||
+      0
+    );
+
+  return total;
+
+}
+
+
+function getOrderCurrency(order) {
+
+  return (
+    order.currency ||
+    order.devise ||
+    "HTG"
+  );
+
+}
+
+
+function formatOrderPrice(
+  amount,
+  currency
+) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.formatPrice === "function"
+  ) {
+
+    try {
+
+      return HELPY.formatPrice(
+        amount,
+        currency
+      );
+
+    } catch (error) {}
+
+  }
+
+  return (
+    Number(amount || 0)
+      .toLocaleString(
+        "fr-FR"
+      ) +
+    " " +
+    currency
+  );
+
+}
+
+
+/* ==================================================
+   API
+================================================== */
+
+async function fetchOrders() {
+
+  try {
+
+    if (
+      window.HELPY &&
+      typeof HELPY.apiFetch === "function"
+    ) {
+
+      return await HELPY.apiFetch(
+        "/api/orders"
+      );
+
+    }
+
+
+    const user =
+      window.HELPY &&
+      typeof HELPY.currentUser === "function"
+        ? HELPY.currentUser()
+        : null;
+
+
+    const headers = {};
+
+    if (user) {
+
+      headers["x-user-id"] =
+        String(
+          user.id ||
+          user.user_id
+        );
+
+    }
+
+
+    const response =
+      await fetch(
+        "/api/orders",
+        {
+          headers
+        }
+      );
+
+
+    return await response.json();
+
+  } catch (error) {
+
+    console.error(
+      "Erreur commandes:",
+      error
+    );
+
+    return {
+      error:
+        "Impossible de charger les commandes."
+    };
+
+  }
+
+}
+
+
+/* ==================================================
+   NORMALISATION
+================================================== */
+
+function normalizeOrders(data) {
+
+  if (Array.isArray(data)) {
+
+    return data;
+
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.orders
+    )
+  ) {
+
+    return data.orders;
+
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.commandes
+    )
+  ) {
+
+    return data.commandes;
+
+  }
+
+  if (
+    data &&
+    Array.isArray(
+      data.data
+    )
+  ) {
+
+    return data.data;
+
+  }
+
+  return [];
+
+}
+
+
+/* ==================================================
+   AFFICHAGE
+================================================== */
+
+function renderOrders(
+  orders
+) {
+
+  const container =
+    document.getElementById(
+      "ordersList"
+    );
+
+  if (!container) {
+    return;
+  }
+
+
+  if (!orders.length) {
+
+    container.innerHTML = `
+      <div class="orders-state">
+
+        <div class="orders-state-icon">
+          📦
+        </div>
+
+        <strong>
+          Aucune commande
+        </strong>
+
+        <p>
+          Vous n'avez pas encore de commande correspondant à ce filtre.
+        </p>
+
+        <a
+          href="products.html"
+          class="orders-action"
+        >
+          Découvrir les produits
+        </a>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML = `
+    <div class="orders-list">
+
+      ${
+        orders.map(
+          function(order) {
+
+            const id =
+              getOrderId(
+                order
+              );
+
+            const status =
+              getOrderStatus(
+                order
+              );
+
+            const title =
+              getOrderTitle(
+                order
+              );
+
+            const date =
+              getOrderDate(
+                order
+              );
+
+            const image =
+              getOrderImage(
+                order
+              );
+
+            const quantity =
+              getOrderQuantity(
+                order
+              );
+
+            const total =
+              getOrderTotal(
+                order
+              );
+
+            const currency =
+              getOrderCurrency(
+                order
+              );
+
+            const payment =
+              order.payment_method ||
+              order.payment ||
+              order.mode_paiement ||
+              "Paiement";
+
+
+            return `
+              <article class="order-card">
+
+                <div class="order-top">
+
+                  <div class="order-number">
+
+                    <strong>
+                      Commande #${escapeOrderHTML(id)}
+                    </strong>
+
+                    <span class="order-date">
+                      ${escapeOrderHTML(date)}
+                    </span>
+
+                  </div>
+
+                  <span
+                    class="order-status ${getStatusClass(status)}"
+                  >
+                    ${escapeOrderHTML(
+                      getStatusLabel(status)
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="order-body">
+
+                  <img
+                    src="${escapeOrderHTML(image)}"
+                    class="order-image"
+                    alt="${escapeOrderHTML(title)}"
+                    onerror="this.src='https://via.placeholder.com/300x300?text=HELPY'"
+                  >
+
+
+                  <div class="order-info">
+
+                    <h3 class="order-product">
+                      ${escapeOrderHTML(title)}
+                    </h3>
+
+                    <div class="order-meta">
+                      Quantité : ${escapeOrderHTML(quantity)}
+                    </div>
+
+                    <div class="order-total">
+                      ${escapeOrderHTML(
+                        formatOrderPrice(
+                          total,
+                          currency
+                        )
+                      )}
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <div class="order-bottom">
+
+                  <span class="order-payment">
+                    ${escapeOrderHTML(payment)}
+                  </span>
+
+
+                  ${
+                    id
+                      ? `
+                        <a
+                          href="order-details.html?id=${encodeURIComponent(id)}"
+                          class="order-details-btn"
+                        >
+                          Voir les détails
+                        </a>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+              </article>
+            `;
+
+          }
+        ).join("")
+      }
+
+    </div>
+  `;
+
+}
+
+
+/* ==================================================
+   FILTRE
+================================================== */
+
+function applyOrderFilter() {
+
+  if (
+    currentFilter === "all"
+  ) {
+
+    renderOrders(
+      allOrders
+    );
+
+    return;
+
+  }
+
+
+  const filtered =
+    allOrders.filter(
+      function(order) {
+
+        const status =
+          getOrderStatus(
+            order
+          );
+
+
+        if (
+          currentFilter === "cancelled"
+        ) {
+
+          return (
+            status === "cancelled" ||
+            status === "canceled"
+          );
+
+        }
+
+
+        return (
+          status ===
+          currentFilter
+        );
+
+      }
+    );
+
+
+  renderOrders(
+    filtered
+  );
+
+}
+
+
+/* ==================================================
+   FILTER BUTTONS
+================================================== */
+
+function setupFilters() {
+
+  const buttons =
+    document.querySelectorAll(
+      ".order-filter"
+    );
+
+
+  buttons.forEach(
+    function(button) {
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          buttons.forEach(
+            function(item) {
+
+              item.classList.remove(
+                "active"
+              );
+
+            }
+          );
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          currentFilter =
+            button.dataset.filter ||
+            "all";
+
+
+          applyOrderFilter();
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   CHARGEMENT
+================================================== */
+
+async function loadOrders() {
+
+  const container =
+    document.getElementById(
+      "ordersList"
+    );
+
+
+  if (container) {
+
+    container.innerHTML = `
+      <div class="orders-state">
+
+        <div class="orders-state-icon">
+          📦
+        </div>
+
+        <strong>
+          Chargement des commandes...
+        </strong>
+
+        <p>
+          Veuillez patienter.
+        </p>
+
+      </div>
+    `;
+
+  }
+
+
+  const data =
+    await fetchOrders();
+
+
+  if (
+    data &&
+    data.error
+  ) {
+
+    if (container) {
+
+      container.innerHTML = `
+        <div class="orders-state">
+
+          <div class="orders-state-icon">
+            📦
+          </div>
+
+          <strong>
+            Les commandes ne sont pas encore disponibles
+          </strong>
+
+          <p>
+            Le système de commandes HELPY sera connecté au backend dans la prochaine étape.
+          </p>
+
+          <a
+            href="products.html"
+            class="orders-action"
+          >
+            Continuer mes achats
+          </a>
+
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+
+  allOrders =
+    normalizeOrders(
+      data
+    );
+
+
+  applyOrderFilter();
+
+}
+
+
+/* ==================================================
+   PROTECTION DE LA PAGE
+================================================== */
+
+function checkLogin() {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.isLoggedIn === "function"
+  ) {
+
+    if (
+      !HELPY.isLoggedIn()
+    ) {
+
+      window.location.href =
+        "login.html?redirect=orders.html";
+
+      return false;
+
+    }
+
+  }
+
+  return true;
+
+}
+
+
+/* ==================================================
+   INITIALISATION
+================================================== */
+
+function initializeOrders() {
+
+  if (!checkLogin()) {
+
+    return;
+
+  }
+
+
+  setupFilters();
+
+  loadOrders();
+
+}
+
+
+/* ==================================================
+   LANCEMENT
+================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeOrders
+);
+
+</script>
+
+</body>
+</html>
