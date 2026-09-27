@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Finaliser la commande — HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root {
+      --primary: #5b45e6;
+      --primary-dark: #4935c9;
+      --soft: #f4f2ff;
+      --bg: #f7f7fa;
+      --card: #fff;
+      --text: #17171c;
+      --muted: #74747d;
+      --border: #e7e7ee;
+      --success: #16833e;
+      --danger: #d93636;
+      --shadow: 0 8px 25px rgba(30,25,80,.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      padding-bottom: 80px;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ==================================================
+       HEADER
+    ================================================== */
+
+    .checkout-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      min-height: 64px;
+      margin: auto;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--soft);
+      color: var(--primary);
+      font-size: 21px;
+      cursor: pointer;
+    }
+
+    .header-title {
+      flex: 1;
+    }
+
+    .header-title strong {
+      display: block;
+      font-size: 17px;
+    }
+
+    .header-title span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .secure-badge {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       PAGE
+    ================================================== */
+
+    .checkout-page {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px 14px 40px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: 15px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: var(--shadow);
+      margin-bottom: 15px;
+    }
+
+    .section-title {
+      margin: 0 0 15px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       PRODUCT
+    ================================================== */
+
+    .product-box {
+      display: flex;
+      gap: 13px;
+    }
+
+    .product-image {
+      width: 95px;
+      height: 95px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #f0f0f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 7px;
+    }
+
+    .product-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .product-price {
+      margin-top: 7px;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    /* ==================================================
+       FORM
+    ================================================== */
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required {
+      color: var(--danger);
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: 47px;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: white;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea.form-control {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(91,69,230,.1);
+    }
+
+    .two-columns {
+      display: grid;
+      gap: 12px;
+    }
+
+    /* ==================================================
+       PAYMENT
+    ================================================== */
+
+    .payment-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .payment-option:last-child {
+      margin-bottom: 0;
+    }
+
+    .payment-option input {
+      accent-color: var(--primary);
+    }
+
+    .payment-icon {
+      width: 39px;
+      height: 39px;
+      border-radius: 11px;
+      background: var(--soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .payment-info {
+      flex: 1;
+    }
+
+    .payment-info strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .payment-info span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* ==================================================
+       SUMMARY
+    ================================================== */
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 9px 0;
+      font-size: 14px;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .summary-total {
+      margin-top: 8px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border);
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .summary-total span:last-child {
+      color: var(--primary);
+    }
+
+    .confirm-btn {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: 15px;
+    }
+
+    .confirm-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .confirm-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+
+    .security-note {
+      margin-top: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* ==================================================
+       MESSAGE
+    ================================================== */
+
+    .message {
+      display: none;
+      padding: 13px;
+      border-radius: 13px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .message.success {
+      display: block;
+      background: #e8f7ed;
+      color: #14743a;
+    }
+
+    .message.error {
+      display: block;
+      background: #ffe8e8;
+      color: #b72d2d;
+    }
+
+    /* ==================================================
+       LOADING
+    ================================================== */
+
+    .loading {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 35px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .loading-icon {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    /* ==================================================
+       BOTTOM NAV
+    ================================================== */
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 66px;
+      z-index: 100;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5,1fr);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .bottom-item span:first-child {
+      font-size: 19px;
+    }
+
+    .bottom-item.active {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* ==================================================
+       DESKTOP
+    ================================================== */
+
+    @media (min-width: 760px) {
+
+      body {
+        padding-bottom: 0;
+      }
+
+      .checkout-page {
+        padding: 28px 20px 50px;
+      }
+
+      .page-grid {
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
+        align-items: start;
+      }
+
+      .summary-column {
+        position: sticky;
+        top: 82px;
+      }
+
+      .two-columns {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      .product-image {
+        width: 115px;
+        height: 115px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================================================
+       HEADER
+  ================================================== -->
+
+  <header class="checkout-header">
+
+    <div class="header-inner">
+
+      <button
+        type="button"
+        class="back-btn"
+        id="backButton"
+      >
+        ←
+      </button>
+
+      <div class="header-title">
+        <strong>Finaliser la commande</strong>
+        <span>Vérifiez vos informations avant de continuer</span>
+      </div>
+
+      <div class="secure-badge">
+        🔒 Sécurisé
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ==================================================
+       PAGE
+  ================================================== -->
+
+  <main class="checkout-page">
+
+    <div id="messageBox" class="message"></div>
+
+    <div id="loadingBox" class="loading">
+
+      <div class="loading-icon">
+        ⏳
+      </div>
+
+      <strong>
+        Préparation de votre commande...
+      </strong>
+
+    </div>
+
+
+    <div
+      id="checkoutContent"
+      style="display:none;"
+    >
+
+      <div class="page-grid">
+
+        <!-- ==================================================
+             LEFT
+        ================================================== -->
+
+        <div>
+
+          <!-- PRODUIT -->
+
+          <section class="card">
+
+            <h2 class="section-title">
+              Votre article
+            </h2>
+
+            <div
+              class="product-box"
+              id="productBox"
+            ></div>
+
+          </section>
+
+
+          <!-- INFORMATIONS DE LIVRAISON -->
+
+          <section class="card">
+
+            <h2 class="section-title">
+              Informations de livraison
+            </h2>
+
+            <div class="two-columns">
+
+              <div class="form-group">
+
+                <label class="form-label">
+                  Nom complet
+                  <span class="required">*</span>
+                </label>
+
+                <input
+                  type="text"
+                  id="fullName"
+                  class="form-control"
+                  placeholder="Votre nom complet"
+                  autocomplete="name"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label class="form-label">
+                  Téléphone
+                  <span class="required">*</span>
+                </label>
+
+                <input
+                  type="tel"
+                  id="phone"
+                  class="form-control"
+                  placeholder="+509..."
+                  autocomplete="tel"
+                >
+
+              </div>
+
+            </div>
+
+
+            <div class="two-columns">
+
+              <div class="form-group">
+
+                <label class="form-label">
+                  Pays
+                  <span class="required">*</span>
+                </label>
+
+                <input
+                  type="text"
+                  id="country"
+                  class="form-control"
+                  placeholder="Votre pays"
+                  autocomplete="country-name"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label class="form-label">
+                  Ville / zone
+                  <span class="required">*</span>
+                </label>
+
+                <input
+                  type="text"
+                  id="city"
+                  class="form-control"
+                  placeholder="Votre ville ou zone"
+                >
+
+              </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label class="form-label">
+                Adresse
+                <span class="required">*</span>
+              </label>
+
+              <textarea
+                id="address"
+                class="form-control"
+                placeholder="Adresse complète de livraison"
+              ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label class="form-label">
+                WhatsApp
+              </label>
+
+              <input
+                type="tel"
+                id="whatsapp"
+                class="form-control"
+                placeholder="+509..."
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label class="form-label">
+                Note au vendeur
+              </label>
+
+              <textarea
+                id="note"
+                class="form-control"
+                placeholder="Informations supplémentaires..."
+              ></textarea>
+
+            </div>
+
+          </section>
+
+
+          <!-- PAIEMENT -->
+
+          <section class="card">
+
+            <h2 class="section-title">
+              Mode de paiement
+            </h2>
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="payment"
+                value="cash"
+                checked
+              >
+
+              <div class="payment-icon">
+                💵
+              </div>
+
+              <div class="payment-info">
+
+                <strong>
+                  Paiement à la livraison
+                </strong>
+
+                <span>
+                  Disponible selon le vendeur et la zone
+                </span>
+
+              </div>
+
+            </label>
+
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="payment"
+                value="mobile"
+              >
+
+              <div class="payment-icon">
+                📱
+              </div>
+
+              <div class="payment-info">
+
+                <strong>
+                  Paiement mobile
+                </strong>
+
+                <span>
+                  Les options disponibles dépendent du pays
+                </span>
+
+              </div>
+
+            </label>
+
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="payment"
+                value="other"
+              >
+
+              <div class="payment-icon">
+                💳
+              </div>
+
+              <div class="payment-info">
+
+                <strong>
+                  Autre moyen de paiement
+                </strong>
+
+                <span>
+                  À confirmer avec le vendeur
+                </span>
+
+              </div>
+
+            </label>
+
+          </section>
+
+        </div>
+
+
+        <!-- ==================================================
+             RIGHT / SUMMARY
+        ================================================== -->
+
+        <aside class="summary-column">
+
+          <section class="card">
+
+            <h2 class="section-title">
+              Résumé
+            </h2>
+
+            <div id="summaryBox"></div>
+
+            <button
+              type="button"
+              class="confirm-btn"
+              id="confirmButton"
+            >
+              Confirmer la commande
+            </button>
+
+            <div class="security-note">
+              🔒 Vos informations sont utilisées uniquement
+              pour traiter votre commande.
+            </div>
+
+          </section>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==================================================
+       BOTTOM NAV
+  ================================================== -->
+
+  <nav class="bottom-nav">
+
+    <a
+      href="index.html"
+      class="bottom-item"
+    >
+      <span>⌂</span>
+      <span>Accueil</span>
+    </a>
+
+    <a
+      href="search.html"
+      class="bottom-item"
+    >
+      <span>⌕</span>
+      <span>Recherche</span>
+    </a>
+
+    <a
+      href="publish.html"
+      class="bottom-item"
+    >
+      <span>＋</span>
+      <span>Publier</span>
+    </a>
+
+    <a
+      href="favorites.html"
+      class="bottom-item"
+    >
+      <span>♡</span>
+      <span>Favoris</span>
+    </a>
+
+    <a
+      href="profile.html"
+      class="bottom-item active"
+    >
+      <span>◯</span>
+      <span>Profil</span>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
+
+  <script>
+
+    /* ==================================================
+       PARAMÈTRES
+    ================================================== */
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const productId =
+      params.get("product_id") ||
+      params.get("productId") ||
+      params.get("id");
+
+    let product = null;
+
+
+    /* ==================================================
+       UTILITAIRES
+    ================================================== */
+
+    function escapeText(value) {
+
+      if (
+        window.HELPY &&
+        typeof HELPY.escapeHTML === "function"
+      ) {
+        return HELPY.escapeHTML(
+          String(value ?? "")
+        );
+      }
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    function formatPrice(
+      value,
+      currency
+    ) {
+
+      if (
+        window.HELPY &&
+        typeof HELPY.formatPrice === "function"
+      ) {
+        return HELPY.formatPrice(
+          value,
+          currency
+        );
+      }
+
+      return (
+        new Intl.NumberFormat("fr-FR")
+          .format(Number(value || 0)) +
+        " " +
+        (currency || "")
+      );
+
+    }
+
+
+    function getImage(item) {
+
+      if (!item) {
+        return "";
+      }
+
+      if (
+        typeof item.image === "string" &&
+        item.image.trim()
+      ) {
+        return item.image;
+      }
+
+      if (
+        Array.isArray(item.images) &&
+        item.images.length
+      ) {
+        return item.images[0];
+      }
+
+      return "";
+
+    }
+
+
+    function currentUser() {
+
+      if (
+        window.HELPY &&
+        typeof HELPY.currentUser === "function"
+      ) {
+        return HELPY.currentUser();
+      }
+
+      try {
+
+        return JSON.parse(
+          localStorage.getItem("helpy_user") ||
+          localStorage.getItem("user") ||
+          "null"
+        );
+
+      } catch (error) {
+
+        return null;
+
+      }
+
+    }
+
+
+    /* ==================================================
+       MESSAGE
+    ================================================== */
+
+    function showMessage(
+      message,
+      type
+    ) {
+
+      const box =
+        document.getElementById(
+          "messageBox"
+        );
+
+      box.className =
+        "message " +
+        (type || "error");
+
+      box.textContent =
+        message;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* ==================================================
+       API
+    ================================================== */
+
+    async function fetchProduct() {
+
+      if (!productId) {
+        throw new Error(
+          "Aucun article sélectionné."
+        );
+      }
+
+      let response;
+
+      if (
+        window.HELPY &&
+            typeof HELPY.apiFetch === "function"
+      ) {
+
+        response =
+          await HELPY.apiFetch(
+            "/api/products/" +
+            encodeURIComponent(
+              productId
+            )
+          );
+
+      } else {
+
+        const request =
+          await fetch(
+            "/api/products/" +
+            encodeURIComponent(
+              productId
+            )
+          );
+
+        response =
+          await request.json();
+
+      }
+
+      if (
+        response &&
+        response.error
+      ) {
+
+        throw new Error(
+          response.error
+        );
+
+      }
+
+      return (
+        response?.product ||
+        response?.produit ||
+        response?.data ||
+        response
+      );
+
+    }
+
+
+    /* ==================================================
+       AFFICHAGE DU PRODUIT
+    ================================================== */
+
+    function renderProduct() {
+
+      if (!product) {
+        return;
+      }
+
+      const title =
+        product.title ||
+        product.name ||
+        "Article";
+
+      const price =
+        Number(
+          product.price || 0
+        );
+
+      const currency =
+        product.currency ||
+        product.devise ||
+        "HTG";
+
+      const quantityAvailable =
+        Number(
+          product.quantity ??
+          product.stock ??
+          1
+        );
+
+      const image =
+        getImage(product);
+
+      document.getElementById(
+        "productBox"
+      ).innerHTML = `
+
+        <div class="product-image">
+
+          ${
+            image
+              ? `
+                <img
+                  src="${escapeText(image)}"
+                  alt="${escapeText(title)}"
+                  onerror="this.style.display='none';"
+                >
+              `
+              : "🛍️"
+          }
+
+        </div>
+
+        <div class="product-info">
+
+          <div class="product-name">
+            ${escapeText(title)}
+          </div>
+
+          <div class="product-meta">
+
+            ${
+              product.category
+                ? escapeText(
+                    product.category
+                  )
+                : ""
+            }
+
+            ${
+              product.condition
+                ? " · " +
+                  escapeText(
+                    product.condition
+                  )
+                : ""
+            }
+
+            <br>
+
+            ${
+              quantityAvailable > 0
+                ? "Disponible"
+                : "Rupture de stock"
+            }
+
+          </div>
+
+          <div
+            class="product-price"
+            id="productPrice"
+            data-price="${price}"
+            data-currency="${escapeText(currency)}"
+          >
+            ${escapeText(
+              formatPrice(
+                price,
+                currency
+              )
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+      renderSummary();
+
+    }
+
+
+    /* ==================================================
+       QUANTITÉ
+    ================================================== */
+
+    function getQuantity() {
+
+      const quantity =
+        Number(
+          document.getElementById(
+            "quantity"
+          )?.value || 1
+        );
+
+      return (
+        Number.isFinite(quantity) &&
+        quantity > 0
+          ? quantity
+          : 1
+      );
+
+    }
+
+
+    /* ==================================================
+       RÉSUMÉ
+    ================================================== */
+
+    function renderSummary() {
+
+      if (!product) {
+        return;
+      }
+
+      const price =
+        Number(
+          product.price || 0
+        );
+
+      const currency =
+        product.currency ||
+        product.devise ||
+        "HTG";
+
+      const quantity =
+        getQuantity();
+
+      const delivery =
+        0;
+
+      const subtotal =
+        price * quantity;
+
+      const total =
+        subtotal + delivery;
+
+      document.getElementById(
+        "summaryBox"
+      ).innerHTML = `
+
+        <div class="summary-row">
+
+          <span>
+            Prix unitaire
+          </span>
+
+          <strong>
+            ${escapeText(
+              formatPrice(
+                price,
+                currency
+              )
+            )}
+          </strong>
+
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Quantité
+          </span>
+
+          <strong>
+            × ${quantity}
+          </strong>
+
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Sous-total
+          </span>
+
+          <strong>
+            ${escapeText(
+              formatPrice(
+                subtotal,
+                currency
+              )
+            )}
+          </strong>
+
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Livraison
+          </span>
+
+          <strong>
+            ${
+              delivery > 0
+                ? escapeText(
+                    formatPrice(
+                      delivery,
+                      currency
+                    )
+                  )
+                : "À confirmer"
+            }
+          </strong>
+
+        </div>
+
+        <div class="summary-row summary-total">
+
+          <span>
+            Total
+          </span>
+
+          <span>
+            ${escapeText(
+              formatPrice(
+                total,
+                currency
+              )
+            )}
+          </span>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ==================================================
+       PROFIL UTILISATEUR
+    ================================================== */
+
+    function fillUserData() {
+
+      const user =
+        currentUser();
+
+      if (!user) {
+        return;
+      }
+
+      document.getElementById(
+        "fullName"
+      ).value =
+        user.name ||
+        user.full_name ||
+        user.nom ||
+        "";
+
+      document.getElementById(
+        "phone"
+      ).value =
+        user.phone ||
+        user.telephone ||
+        "";
+
+      document.getElementById(
+        "whatsapp"
+      ).value =
+        user.whatsapp ||
+        user.phone ||
+        "";
+
+      document.getElementById(
+        "country"
+      ).value =
+        user.country ||
+        user.pays ||
+        "";
+
+      document.getElementById(
+        "city"
+      ).value =
+        user.city ||
+        user.ville ||
+        "";
+
+      document.getElementById(
+        "address"
+      ).value =
+        user.address ||
+        user.adresse ||
+        "";
+
+    }
+
+
+    /* ==================================================
+       VALIDATION
+    ================================================== */
+
+    function validateForm() {
+
+      const fullName =
+        document.getElementById(
+          "fullName"
+        ).value.trim();
+
+      const phone =
+        document.getElementById(
+          "phone"
+        ).value.trim();
+
+      const country =
+        document.getElementById(
+          "country"
+        ).value.trim();
+
+      const city =
+        document.getElementById(
+          "city"
+        ).value.trim();
+
+      const address =
+        document.getElementById(
+          "address"
+        ).value.trim();
+
+      if (!fullName) {
+
+        showMessage(
+          "Veuillez entrer votre nom complet.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!phone) {
+
+        showMessage(
+          "Veuillez entrer votre numéro de téléphone.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!country) {
+
+        showMessage(
+          "Veuillez indiquer votre pays.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!city) {
+
+        showMessage(
+          "Veuillez indiquer votre ville ou zone.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!address) {
+
+        showMessage(
+          "Veuillez entrer votre adresse de livraison.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      return true;
+
+    }
+    /* ==================================================
+       VALIDATION DE LA COMMANDE
+    ================================================== */
+
+    function validateOrder() {
+
+      const fullName =
+        document.getElementById("fullName")?.value.trim();
+
+      const phone =
+        document.getElementById("phone")?.value.trim();
+
+      const city =
+        document.getElementById("city")?.value.trim();
+
+      const address =
+        document.getElementById("address")?.value.trim();
+
+      const paymentMethod =
+        document.getElementById("paymentMethod")?.value;
+
+      if (!fullName) {
+
+        showMessage(
+          "Veuillez entrer votre nom complet.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!phone) {
+
+        showMessage(
+          "Veuillez entrer votre numéro de téléphone.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!city) {
+
+        showMessage(
+          "Veuillez indiquer votre ville ou zone.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!address) {
+
+        showMessage(
+          "Veuillez entrer votre adresse de livraison.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (!paymentMethod) {
+
+        showMessage(
+          "Veuillez choisir un mode de paiement.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      return true;
+
+    }
+
+
+    /* ==================================================
+       RÉCUPÉRER LES INFORMATIONS DE LIVRAISON
+    ================================================== */
+
+    function getDeliveryInformation() {
+
+      const fullName =
+        document.getElementById("fullName")?.value.trim() || "";
+
+      const phone =
+        document.getElementById("phone")?.value.trim() || "";
+
+      const city =
+        document.getElementById("city")?.value.trim() || "";
+
+      const address =
+        document.getElementById("address")?.value.trim() || "";
+
+      const note =
+        document.getElementById("deliveryNote")?.value.trim() || "";
+
+      return {
+
+        full_name: fullName,
+
+        phone: phone,
+
+        city: city,
+
+        address: address,
+
+        note: note
+
+      };
+
+    }
+
+
+    /* ==================================================
+       RÉCUPÉRER LE MODE DE PAIEMENT
+    ================================================== */
+
+    function getPaymentMethod() {
+
+      const element =
+        document.getElementById("paymentMethod");
+
+      if (!element) {
+
+        return "";
+
+      }
+
+      return element.value || "";
+
+    }
+
+
+    /* ==================================================
+       CALCUL DU TOTAL
+    ================================================== */
+
+    function calculateOrderTotal() {
+
+      const quantityElement =
+        document.getElementById("quantity");
+
+      const quantity =
+        quantityElement
+          ? Number(quantityElement.value || 1)
+          : 1;
+
+      const price =
+        Number(currentProduct?.price || 0);
+
+      const deliveryFee =
+        Number(currentProduct?.delivery_fee || 0);
+
+      const subtotal =
+        price * quantity;
+
+      const total =
+        subtotal + deliveryFee;
+
+      return {
+
+        quantity: quantity,
+
+        price: price,
+
+        subtotal: subtotal,
+
+        delivery_fee: deliveryFee,
+
+        total: total
+
+      };
+
+    }
+
+
+    /* ==================================================
+       AFFICHER LE TOTAL
+    ================================================== */
+
+    function updateOrderTotal() {
+
+      const totals =
+        calculateOrderTotal();
+
+      const subtotalElement =
+        document.getElementById("subtotal");
+
+      const deliveryElement =
+        document.getElementById("deliveryFee");
+
+      const totalElement =
+        document.getElementById("total");
+
+      if (subtotalElement) {
+
+        subtotalElement.textContent =
+          formatPrice(totals.subtotal);
+
+      }
+
+      if (deliveryElement) {
+
+        deliveryElement.textContent =
+          formatPrice(totals.delivery_fee);
+
+      }
+
+      if (totalElement) {
+
+        totalElement.textContent =
+          formatPrice(totals.total);
+
+      }
+
+    }
+
+
+    /* ==================================================
+       FORMATAGE DU PRIX
+    ================================================== */
+
+    function formatPrice(value) {
+
+      const amount =
+        Number(value || 0);
+
+      return new Intl.NumberFormat(
+        "fr-FR",
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }
+      ).format(amount) + " HTG";
+
+    }
+
+
+    /* ==================================================
+       CRÉER LA COMMANDE
+    ================================================== */
+
+    async function createOrder() {
+
+      if (!validateOrder()) {
+
+        return;
+
+      }
+
+      if (!currentProduct) {
+
+        showMessage(
+          "Impossible de créer la commande : article introuvable.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const delivery =
+        getDeliveryInformation();
+
+      const paymentMethod =
+        getPaymentMethod();
+
+      const totals =
+        calculateOrderTotal();
+
+      const orderData = {
+
+        product_id:
+          Number(currentProduct.id),
+
+        quantity:
+          totals.quantity,
+
+        unit_price:
+          totals.price,
+
+        subtotal:
+          totals.subtotal,
+
+        delivery_fee:
+          totals.delivery_fee,
+
+        total:
+          totals.total,
+
+        full_name:
+          delivery.full_name,
+
+        phone:
+          delivery.phone,
+
+        city:
+          delivery.city,
+
+        address:
+          delivery.address,
+
+        delivery_note:
+          delivery.note,
+
+        payment_method:
+          paymentMethod
+
+      };
+
+      try {
+
+        setLoading(
+          true,
+          "Création de votre commande..."
+        );
+
+        const response =
+          await fetch(
+            `${API_BASE_URL}/api/orders`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              credentials: "include",
+
+              body:
+                JSON.stringify(orderData)
+            }
+          );
+
+        let result = {};
+
+        try {
+
+          result =
+            await response.json();
+
+        } catch (jsonError) {
+
+          result = {};
+
+        }
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.message ||
+            "Impossible de créer la commande."
+          );
+
+        }
+
+        const order =
+          result.order ||
+          result.commande ||
+          result.data ||
+          result;
+
+        showMessage(
+          "Votre commande a été créée avec succès.",
+          "success"
+        );
+
+        if (order?.id) {
+
+          setTimeout(() => {
+
+            window.location.href =
+              `order-details.html?id=${encodeURIComponent(order.id)}`;
+
+          }, 900);
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Erreur création commande :",
+          error
+        );
+
+        showMessage(
+          error.message ||
+          "Une erreur est survenue lors de la création de la commande.",
+          "error"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    }
+    /* ==================================================
+       GESTION DU BOUTON COMMANDER
+    ================================================== */
+
+    function setupOrderButton() {
+
+      const orderButton =
+        document.getElementById("orderButton");
+
+      if (!orderButton) {
+
+        console.warn(
+          "Bouton de commande introuvable."
+        );
+
+        return;
+
+      }
+
+      orderButton.addEventListener(
+        "click",
+        async function (event) {
+
+          event.preventDefault();
+
+          await createOrder();
+
+        }
+      );
+
+    }
+
+
+    /* ==================================================
+       GESTION DE LA QUANTITÉ
+    ================================================== */
+
+    function setupQuantityControls() {
+
+      const quantityInput =
+        document.getElementById("quantity");
+
+      const decreaseButton =
+        document.getElementById("decreaseQuantity");
+
+      const increaseButton =
+        document.getElementById("increaseQuantity");
+
+      if (!quantityInput) {
+
+        return;
+
+      }
+
+      function normalizeQuantity() {
+
+        let quantity =
+          Number(quantityInput.value);
+
+        if (
+          !Number.isFinite(quantity) ||
+          quantity < 1
+        ) {
+
+          quantity = 1;
+
+        }
+
+        quantity =
+          Math.floor(quantity);
+
+        const max =
+          Number(
+            currentProduct?.stock ||
+            currentProduct?.quantity ||
+            999999
+          );
+
+        if (
+          Number.isFinite(max) &&
+          max > 0 &&
+          quantity > max
+        ) {
+
+          quantity = max;
+
+        }
+
+        quantityInput.value =
+          quantity;
+
+        updateOrderTotal();
+
+      }
+
+      quantityInput.addEventListener(
+        "input",
+        normalizeQuantity
+      );
+
+      quantityInput.addEventListener(
+        "change",
+        normalizeQuantity
+      );
+
+      if (decreaseButton) {
+
+        decreaseButton.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            let quantity =
+              Number(quantityInput.value || 1);
+
+            quantity =
+              Math.max(
+                1,
+                Math.floor(quantity) - 1
+              );
+
+            quantityInput.value =
+              quantity;
+
+            updateOrderTotal();
+
+          }
+        );
+
+      }
+
+      if (increaseButton) {
+
+        increaseButton.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            let quantity =
+              Number(quantityInput.value || 1);
+
+            quantity =
+              Math.floor(quantity) + 1;
+
+            const max =
+              Number(
+                currentProduct?.stock ||
+                currentProduct?.quantity ||
+                999999
+              );
+
+            if (
+              Number.isFinite(max) &&
+              max > 0 &&
+              quantity > max
+            ) {
+
+              quantity = max;
+
+            }
+
+            quantityInput.value =
+              quantity;
+
+            updateOrderTotal();
+
+          }
+        );
+
+      }
+
+      normalizeQuantity();
+
+    }
+
+
+    /* ==================================================
+       GESTION DU MODE DE PAIEMENT
+    ================================================== */
+
+    function setupPaymentMethod() {
+
+      const paymentMethod =
+        document.getElementById(
+          "paymentMethod"
+        );
+
+      if (!paymentMethod) {
+
+        return;
+
+      }
+
+      paymentMethod.addEventListener(
+        "change",
+        function () {
+
+          const selected =
+            paymentMethod.value;
+
+          const paymentInfo =
+            document.getElementById(
+              "paymentInfo"
+            );
+
+          if (!paymentInfo) {
+
+            return;
+
+          }
+
+          if (!selected) {
+
+            paymentInfo.textContent =
+              "";
+
+            return;
+
+          }
+
+          if (
+            selected.toLowerCase()
+              .includes("cash")
+          ) {
+
+            paymentInfo.textContent =
+              "Le paiement sera effectué selon les conditions indiquées par le vendeur.";
+
+            return;
+
+          }
+
+          if (
+            selected.toLowerCase()
+              .includes("natcash")
+          ) {
+
+            paymentInfo.textContent =
+              "Les informations de paiement vous seront communiquées après validation de la commande.";
+
+            return;
+
+          }
+
+          if (
+            selected.toLowerCase()
+              .includes("moncash")
+          ) {
+
+            paymentInfo.textContent =
+              "Les informations de paiement vous seront communiquées après validation de la commande.";
+
+            return;
+
+          }
+
+          paymentInfo.textContent =
+            "Le mode de paiement sélectionné sera utilisé pour cette commande.";
+
+        }
+      );
+
+    }
+
+
+    /* ==================================================
+       SAUVEGARDER LES INFORMATIONS DE LIVRAISON
+    ================================================== */
+
+    function saveDeliveryInformation() {
+
+      try {
+
+        const delivery =
+          getDeliveryInformation();
+
+        localStorage.setItem(
+          "helpy_delivery_information",
+          JSON.stringify(delivery)
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Impossible de sauvegarder les informations de livraison :",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       CHARGER LES INFORMATIONS DE LIVRAISON
+    ================================================== */
+
+    function loadDeliveryInformation() {
+
+      try {
+
+        const saved =
+          localStorage.getItem(
+            "helpy_delivery_information"
+          );
+
+        if (!saved) {
+
+          return;
+
+        }
+
+        const delivery =
+          JSON.parse(saved);
+
+        if (
+          !delivery ||
+          typeof delivery !== "object"
+        ) {
+
+          return;
+
+        }
+
+        const fullName =
+          document.getElementById(
+            "fullName"
+          );
+
+        const phone =
+          document.getElementById(
+            "phone"
+          );
+
+        const city =
+          document.getElementById(
+            "city"
+          );
+
+        const address =
+          document.getElementById(
+            "address"
+          );
+
+        const note =
+          document.getElementById(
+            "deliveryNote"
+          );
+
+        if (
+          fullName &&
+          delivery.full_name
+        ) {
+
+          fullName.value =
+            delivery.full_name;
+
+        }
+
+        if (
+          phone &&
+          delivery.phone
+        ) {
+
+          phone.value =
+            delivery.phone;
+
+        }
+
+        if (
+          city &&
+          delivery.city
+        ) {
+
+          city.value =
+            delivery.city;
+
+        }
+
+        if (
+          address &&
+          delivery.address
+        ) {
+
+          address.value =
+            delivery.address;
+
+        }
+
+        if (
+          note &&
+          delivery.note
+        ) {
+
+          note.value =
+            delivery.note;
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "Impossible de charger les informations de livraison :",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       SAUVEGARDE AUTOMATIQUE DU FORMULAIRE
+    ================================================== */
+
+    function setupDeliveryAutoSave() {
+
+      const fields = [
+
+        "fullName",
+        "phone",
+        "city",
+        "address",
+        "deliveryNote"
+
+      ];
+
+      fields.forEach(
+        function (fieldId) {
+
+          const field =
+            document.getElementById(
+              fieldId
+            );
+
+          if (!field) {
+
+            return;
+
+          }
+
+          field.addEventListener(
+            "input",
+            function () {
+
+              saveDeliveryInformation();
+
+            }
+          );
+
+          field.addEventListener(
+            "change",
+            function () {
+
+              saveDeliveryInformation();
+
+            }
+          );
+
+        }
+      );
+
+    }
+
+
+    /* ==================================================
+       INITIALISATION DE LA PAGE
+    ================================================== */
+
+    function initializeOrderPage() {
+
+      loadDeliveryInformation();
+
+      setupOrderButton();
+
+      setupQuantityControls();
+
+      setupPaymentMethod();
+
+      setupDeliveryAutoSave();
+
+      updateOrderTotal();
+
+    }
+
+
+    /* ==================================================
+       LANCEMENT
+    ================================================== */
+
+    if (
+      document.readyState ===
+      "loading"
+    ) {
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        initializeOrderPage
+      );
+
+    } else {
+
+      initializeOrderPage();
+
+    }
+
+    /* ==================================================
+       SÉCURITÉ : EMPÊCHER LES ERREURS DE FORMATAGE
+    ================================================== */
+
+    window.addEventListener(
+      "error",
+      function (event) {
+
+        console.error(
+          "Erreur JavaScript HELPY :",
+          event.error || event.message
+        );
+
+      }
+    );
+
+
+    /* ==================================================
+       SÉCURITÉ : VÉRIFIER L'ÉTAT DE LA PAGE
+    ================================================== */
+
+    function checkOrderPageState() {
+
+      if (!currentProduct) {
+
+        console.warn(
+          "Aucun produit n'est actuellement chargé."
+        );
+
+        return false;
+
+      }
+
+      return true;
+
+    }
+
+
+    /* ==================================================
+       ACTUALISATION DU TOTAL SI LE PRODUIT CHANGE
+    ================================================== */
+
+    function refreshOrderSummary() {
+
+      if (!checkOrderPageState()) {
+
+        return;
+
+      }
+
+      updateOrderTotal();
+
+    }
+
+
+    /* ==================================================
+       NETTOYAGE DES DONNÉES TEMPORAIRES
+    ================================================== */
+
+    function clearTemporaryOrderData() {
+
+      try {
+
+        sessionStorage.removeItem(
+          "helpy_pending_order"
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Impossible de nettoyer les données temporaires :",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       PRÉPARER LES DONNÉES AVANT COMMANDE
+    ================================================== */
+
+    function prepareOrderData() {
+
+      const delivery =
+        getDeliveryInformation();
+
+      const totals =
+        calculateOrderTotal();
+
+      const paymentMethod =
+        getPaymentMethod();
+
+      return {
+
+        product_id:
+          currentProduct?.id || null,
+
+        product_name:
+          currentProduct?.name ||
+          currentProduct?.title ||
+          "",
+
+        quantity:
+          totals.quantity,
+
+        unit_price:
+          totals.price,
+
+        subtotal:
+          totals.subtotal,
+
+        delivery_fee:
+          totals.delivery_fee,
+
+        total:
+          totals.total,
+
+        delivery: {
+
+          full_name:
+            delivery.full_name,
+
+          phone:
+            delivery.phone,
+
+          city:
+            delivery.city,
+
+          address:
+            delivery.address,
+
+          note:
+            delivery.note
+
+        },
+
+        payment_method:
+          paymentMethod
+
+      };
+
+    }
+
+
+    /* ==================================================
+       ENREGISTRER UNE COMMANDE EN ATTENTE
+    ================================================== */
+
+    function savePendingOrder() {
+
+      try {
+
+        const order =
+          prepareOrderData();
+
+        sessionStorage.setItem(
+          "helpy_pending_order",
+          JSON.stringify(order)
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Impossible d'enregistrer la commande temporaire :",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       CONFIRMATION AVANT ENVOI
+    ================================================== */
+
+    function confirmOrderBeforeSubmit() {
+
+      if (!validateOrder()) {
+
+        return false;
+
+      }
+
+      const totals =
+        calculateOrderTotal();
+
+      if (
+        totals.quantity < 1
+      ) {
+
+        showMessage(
+          "La quantité doit être supérieure à zéro.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      if (
+        totals.total <= 0
+      ) {
+
+        showMessage(
+          "Le montant de la commande est invalide.",
+          "error"
+        );
+
+        return false;
+
+      }
+
+      savePendingOrder();
+
+      return true;
+
+    }
+
+
+    /* ==================================================
+       REMPLACER LA CRÉATION DE COMMANDE
+       PAR LA VERSION SÉCURISÉE
+    ================================================== */
+
+    const originalCreateOrder =
+      createOrder;
+
+    createOrder = async function () {
+
+      if (
+        !confirmOrderBeforeSubmit()
+      ) {
+
+        return;
+
+      }
+
+      try {
+
+        await originalCreateOrder();
+
+        clearTemporaryOrderData();
+
+      } catch (error) {
+
+        console.error(
+          "Erreur pendant la commande :",
+          error
+        );
+
+      }
+
+    };
+
+
+    /* ==================================================
+       DERNIÈRE MISE À JOUR DU RÉCAPITULATIF
+    ================================================== */
+
+    setTimeout(
+      function () {
+
+        refreshOrderSummary();
+
+      },
+      100
+    );
+    /* ==================================================
+       SYNCHRONISATION FINALE DU FORMULAIRE
+    ================================================== */
+
+    function synchronizeOrderForm() {
+
+      try {
+
+        const quantityInput =
+          document.getElementById("quantity");
+
+        if (quantityInput) {
+
+          let quantity =
+            Number(quantityInput.value || 1);
+
+          if (
+            !Number.isFinite(quantity) ||
+            quantity < 1
+          ) {
+
+            quantity = 1;
+
+          }
+
+          quantityInput.value =
+            Math.floor(quantity);
+
+        }
+
+        updateOrderTotal();
+
+      } catch (error) {
+
+        console.error(
+          "Erreur de synchronisation :",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==================================================
+       ÉCOUTER LES MODIFICATIONS DU PRODUIT
+    ================================================== */
+
+    document.addEventListener(
+      "productUpdated",
+      function () {
+
+        synchronizeOrderForm();
+
+      }
+    );
+
+
+    /* ==================================================
+       EMPÊCHER UNE DOUBLE SOUMISSION
+    ================================================== */
+
+    let orderSubmissionInProgress =
+      false;
+
+    const protectedOrderButton =
+      document.getElementById(
+        "orderButton"
+      );
+
+    if (protectedOrderButton) {
+
+      protectedOrderButton.addEventListener(
+        "click",
+        async function (event) {
+
+          if (orderSubmissionInProgress) {
+
+            event.preventDefault();
+
+            return;
+
+          }
+
+          if (!validateOrder()) {
+
+            return;
+
+          }
+
+          orderSubmissionInProgress =
+            true;
+
+          protectedOrderButton.disabled =
+            true;
+
+          const originalText =
+            protectedOrderButton.textContent;
+
+          protectedOrderButton.textContent =
+            "Traitement...";
+
+          try {
+
+            await createOrder();
+
+          } catch (error) {
+
+            console.error(
+              "Erreur de soumission :",
+              error
+            );
+
+          } finally {
+
+            setTimeout(
+              function () {
+
+                orderSubmissionInProgress =
+                  false;
+
+                protectedOrderButton.disabled =
+                  false;
+
+                protectedOrderButton.textContent =
+                  originalText;
+
+              },
+              1200
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /* ==================================================
+       VÉRIFICATION FINALE
+    ================================================== */
+
+    console.log(
+      "HELPY — Page de commande initialisée."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erreur lors de l'initialisation de la page HELPY :",
+      error
+    );
+
+    if (
+      typeof showMessage ===
+      "function"
+    ) {
+
+      showMessage(
+        "Une erreur est survenue lors du chargement de la page.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  /* ==================================================
+     FIN DU SCRIPT
+  ================================================== */
+
+</script>
+
+</body>
+</html>
