@@ -1,1 +1,1162 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Recherche — HELPY</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body><main class="container"><form onsubmit="go(event)"><div class="field"><input id="q" placeholder="Rechercher un produit, service ou entreprise..."></div><button class="btn">Rechercher</button></form><div id="grid" class="grid"></div></main><script>async function go(e){e.preventDefault();const r=await apiFetch('/api/search?q='+encodeURIComponent(q.value));grid.innerHTML=[...(r.produits||[]).map(x=>`<article class=card><h3>${x.title||x.name}</h3><p>Produit</p></article>`),...(r.services||[]).map(x=>`<article class=card><h3>${x.title||x.name}</h3><p>Service</p></article>`),...(r.entreprises||[]).map(x=>`<article class=card><h3>${x.name}</h3><p>Entreprise</p></article>`)].join('')||'<p>Aucun résultat.</p>'}</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5b45e6">
+
+  <title>Recherche - HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .search-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+
+    .search-hero {
+      background: linear-gradient(135deg, #5b45e6, #7a67ee);
+      color: #fff;
+      border-radius: 24px;
+      padding: 25px 18px;
+      margin-bottom: 18px;
+    }
+
+    .search-hero h1 {
+      margin: 0 0 7px;
+      font-size: 25px;
+    }
+
+    .search-hero p {
+      margin: 0;
+      opacity: .9;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .search-box-large {
+      background: #fff;
+      border-radius: 16px;
+      padding: 7px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.12);
+    }
+
+    .search-box-large input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 13px 10px;
+      font-size: 15px;
+      color: #222;
+      background: transparent;
+    }
+
+    .search-button {
+      border: 0;
+      background: #5b45e6;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .filters {
+      background: #fff;
+      border-radius: 18px;
+      padding: 15px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 25px rgba(0,0,0,.05);
+    }
+
+    .filter-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .filter-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    .filter-group select,
+    .filter-group input {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 11px;
+      padding: 11px 12px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      border-color: #5b45e6;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0 12px;
+    }
+
+    .result-header h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    #resultCount {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .result-card {
+      background: #fff;
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0 6px 22px rgba(0,0,0,.06);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform .15s ease;
+    }
+
+    .result-card:active {
+      transform: scale(.98);
+    }
+
+    .result-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: #f1f1f1;
+    }
+
+    .result-content {
+      padding: 11px;
+    }
+
+    .result-type {
+      display: inline-block;
+      background: #f0edff;
+      color: #5b45e6;
+      border-radius: 20px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .result-title {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .result-price {
+      color: #5b45e6;
+      font-size: 15px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .result-location {
+      color: #777;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-state {
+      background: #fff;
+      border-radius: 20px;
+      padding: 45px 20px;
+      text-align: center;
+      box-shadow: 0 6px 25px rgba(0,0,0,.05);
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    .error-message {
+      grid-column: 1 / -1;
+      background: #fff0f0;
+      color: #b42318;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    @media (min-width: 650px) {
+      .search-page {
+        padding-top: 30px;
+      }
+
+      .filter-row {
+        grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      }
+
+      .results-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 1000px) {
+      .results-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .search-hero {
+        padding: 35px;
+      }
+
+      .search-hero h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+
+    <a href="index.html" class="logo">
+      HELPY
+    </a>
+
+    <nav class="nav-links">
+      <a href="products.html">Produits</a>
+      <a href="services.html">Services</a>
+      <a href="businesses.html">Entreprises</a>
+      <a href="search.html">Recherche</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="profile.html" class="profile-link">
+        👤
+      </a>
+    </div>
+
+  </div>
+</header>
+
+
+<main class="search-page">
+
+  <section class="search-hero">
+
+    <h1>Que recherchez-vous ?</h1>
+
+    <p>
+      Trouvez des produits, services et entreprises
+      disponibles sur HELPY.
+    </p>
+
+    <form id="searchForm" class="search-box-large">
+
+      <span>🔎</span>
+
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Produit, service, entreprise..."
+        autocomplete="off"
+      >
+
+      <button
+        type="submit"
+        class="search-button"
+      >
+        Rechercher
+      </button>
+
+    </form>
+
+  </section>
+
+
+  <section class="filters">
+
+    <div class="filter-title">
+      Filtrer les résultats
+    </div>
+
+    <div class="filter-row">
+
+      <div class="filter-group">
+
+        <label for="typeFilter">
+          Type
+        </label>
+
+        <select id="typeFilter">
+
+          <option value="all">
+            Tout
+          </option>
+
+          <option value="products">
+            Produits
+          </option>
+
+          <option value="services">
+            Services
+          </option>
+
+          <option value="businesses">
+            Entreprises
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="filter-group">
+
+        <label for="categoryFilter">
+          Catégorie
+        </label>
+
+        <select id="categoryFilter">
+
+          <option value="all">
+            Toutes les catégories
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="filter-group">
+
+        <label for="countryFilter">
+          Pays
+        </label>
+
+        <input
+          type="text"
+          id="countryFilter"
+          placeholder="Ex. Haïti"
+        >
+
+      </div>
+
+
+      <div class="filter-group">
+
+        <label for="cityFilter">
+          Ville / zone
+        </label>
+
+        <input
+          type="text"
+          id="cityFilter"
+          placeholder="Ex. Delmas"
+        >
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div class="result-header">
+
+    <h2>
+      Résultats
+    </h2>
+
+    <span id="resultCount">
+      —
+    </span>
+
+  </div>
+
+
+  <section
+    id="results"
+    class="results-grid"
+  >
+
+    <div class="loading">
+      Recherche en cours...
+    </div>
+
+  </section>
+
+</main>
+
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    <small>Accueil</small>
+  </a>
+
+  <a href="search.html" class="active">
+    <span>⌕</span>
+    <small>Recherche</small>
+  </a>
+
+  <a href="publish.html">
+    <span>＋</span>
+    <small>Publier</small>
+  </a>
+
+  <a href="favorites.html">
+    <span>♡</span>
+    <small>Favoris</small>
+  </a>
+
+  <a href="profile.html">
+    <span>👤</span>
+    <small>Profil</small>
+  </a>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+<script>
+
+let allResults = [];
+
+
+function safe(value) {
+
+  if (typeof escapeHTML === "function") {
+    return escapeHTML(value || "");
+  }
+
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+function getImage(item) {
+
+  if (
+    window.HELPY &&
+    typeof HELPY.getItemImage === "function"
+  ) {
+    return HELPY.getItemImage(item);
+  }
+
+  return (
+    item.image ||
+    item.photo ||
+    (
+      Array.isArray(item.images)
+        ? item.images[0]
+        : ""
+    ) ||
+    "https://placehold.co/600x600?text=HELPY"
+  );
+
+}
+
+
+function getTitle(item) {
+
+  return (
+    item.title ||
+    item.name ||
+    item.nom ||
+    "Sans titre"
+  );
+
+}
+
+
+function getCategory(item) {
+
+  return (
+    item.category ||
+    item.categorie ||
+    "Autre"
+  );
+
+}
+
+
+function getCountry(item) {
+
+  return (
+    item.country ||
+    item.pays ||
+    ""
+  );
+
+}
+
+
+function getCity(item) {
+
+  return (
+    item.city ||
+    item.ville ||
+    item.location ||
+    item.localisation ||
+    ""
+  );
+
+}
+
+
+function formatItemPrice(item) {
+
+  if (
+    item.type === "business" ||
+    item.type === "entreprise"
+  ) {
+    return "Entreprise";
+  }
+
+  const price =
+    item.price ??
+    item.prix ??
+    item.tariff ??
+    item.tarif;
+
+  if (
+    price === null ||
+    price === undefined ||
+    price === ""
+  ) {
+    return "Prix sur demande";
+  }
+
+  if (
+    window.HELPY &&
+    typeof HELPY.formatPrice === "function"
+  ) {
+    return HELPY.formatPrice(
+      price,
+      item.currency || item.devise
+    );
+  }
+
+  const currency =
+    item.currency ||
+    item.devise ||
+    "";
+
+  return String(price) + " " + currency;
+
+}
+
+
+function getDetailsLink(item) {
+
+  const id = item.id;
+
+  if (item.type === "product") {
+    return "product-details.html?id=" +
+      encodeURIComponent(id);
+  }
+
+  if (item.type === "service") {
+    return "service-details.html?id=" +
+      encodeURIComponent(id);
+  }
+
+  return "business-details.html?id=" +
+    encodeURIComponent(id);
+
+}
+
+
+function getTypeLabel(type) {
+
+  if (type === "product") {
+    return "Produit";
+  }
+
+  if (type === "service") {
+    return "Service";
+  }
+
+  return "Entreprise";
+
+}
+
+
+function normalizeItems(response, type) {
+
+  if (!response) {
+    return [];
+  }
+
+  let items = [];
+
+  if (Array.isArray(response)) {
+    items = response;
+  } else if (Array.isArray(response.products)) {
+    items = response.products;
+  } else if (Array.isArray(response.produits)) {
+    items = response.produits;
+  } else if (Array.isArray(response.services)) {
+    items = response.services;
+  } else if (Array.isArray(response.businesses)) {
+    items = response.businesses;
+  } else if (Array.isArray(response.entreprises)) {
+    items = response.entreprises;
+  } else if (Array.isArray(response.data)) {
+    items = response.data;
+  }
+
+  return items.map(function(item) {
+
+    return {
+      ...item,
+      type: type
+    };
+
+  });
+
+}
+
+
+async function fetchAllData() {
+
+  const results = [];
+
+  try {
+
+    const endpoints = [
+      {
+        url: "/api/products",
+        type: "product"
+      },
+      {
+        url: "/api/services",
+        type: "service"
+      },
+      {
+        url: "/api/businesses",
+        type: "business"
+      }
+    ];
+
+
+    const responses =
+      await Promise.allSettled(
+
+        endpoints.map(function(endpoint) {
+
+          if (
+            window.HELPY &&
+            typeof HELPY.apiFetch === "function"
+          ) {
+
+            return HELPY.apiFetch(
+              endpoint.url
+            );
+
+          }
+
+          return fetch(
+            endpoint.url
+          ).then(function(response) {
+            return response.json();
+          });
+
+        })
+
+      );
+
+
+    responses.forEach(
+      function(result, index) {
+
+        if (
+          result.status === "fulfilled"
+        ) {
+
+          results.push(
+            ...normalizeItems(
+              result.value,
+              endpoints[index].type
+            )
+          );
+
+        }
+
+      }
+    );
+
+
+    return results;
+
+  } catch (error) {
+
+    console.error(error);
+
+    return [];
+
+  }
+
+}
+
+
+function fillCategories(items) {
+
+  const select =
+    document.getElementById("categoryFilter");
+
+  const categories =
+    new Set();
+
+  items.forEach(function(item) {
+
+    const category =
+      getCategory(item);
+
+    if (category) {
+      categories.add(category);
+    }
+
+  });
+
+
+  Array.from(categories)
+    .sort()
+    .forEach(function(category) {
+
+      const option =
+        document.createElement("option");
+
+      option.value = category;
+      option.textContent = category;
+
+      select.appendChild(option);
+
+    });
+
+}
+
+
+function applyFilters() {
+
+  const query =
+    document
+      .getElementById("searchInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const type =
+    document
+      .getElementById("typeFilter")
+      .value;
+
+  const category =
+    document
+      .getElementById("categoryFilter")
+      .value;
+
+  const country =
+    document
+      .getElementById("countryFilter")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const city =
+    document
+      .getElementById("cityFilter")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    allResults.filter(function(item) {
+
+      const title =
+        getTitle(item).toLowerCase();
+
+      const description =
+        String(
+          item.description ||
+          item.description_fr ||
+          ""
+        ).toLowerCase();
+
+      const itemCategory =
+        getCategory(item).toLowerCase();
+
+      const itemCountry =
+        getCountry(item).toLowerCase();
+
+      const itemCity =
+        getCity(item).toLowerCase();
+
+
+      const matchesQuery =
+        !query ||
+        title.includes(query) ||
+        description.includes(query) ||
+        itemCategory.includes(query) ||
+        itemCountry.includes(query) ||
+        itemCity.includes(query);
+
+
+      const matchesType =
+        type === "all" ||
+        item.type === type.slice(0, -1);
+
+
+      const matchesCategory =
+        category === "all" ||
+        itemCategory === category.toLowerCase();
+
+
+      const matchesCountry =
+        !country ||
+        itemCountry.includes(country);
+
+
+      const matchesCity =
+        !city ||
+        itemCity.includes(city);
+
+
+      return (
+        matchesQuery &&
+        matchesType &&
+        matchesCategory &&
+        matchesCountry &&
+        matchesCity
+      );
+
+    });
+
+
+  renderResults(filtered);
+
+}
+
+
+function renderResults(items) {
+
+  const container =
+    document.getElementById("results");
+
+  const count =
+    document.getElementById("resultCount");
+
+
+  count.textContent =
+    items.length +
+    (
+      items.length > 1
+        ? " résultats"
+        : " résultat"
+    );
+
+
+  if (!items.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          🔎
+        </div>
+
+        <h3>
+          Aucun résultat
+        </h3>
+
+        <p>
+          Essayez un autre mot-clé ou modifiez
+          vos filtres de recherche.
+        </p>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    items.map(function(item) {
+
+      const image =
+        getImage(item);
+
+      const title =
+        getTitle(item);
+
+      const category =
+        getCategory(item);
+
+      const country =
+        getCountry(item);
+
+      const city =
+        getCity(item);
+
+      const location =
+        [city, country]
+          .filter(Boolean)
+          .join(", ");
+
+
+      return `
+        <a
+          href="${getDetailsLink(item)}"
+          class="result-card"
+        >
+
+          <img
+            class="result-image"
+            src="${safe(image)}"
+            alt="${safe(title)}"
+            loading="lazy"
+            onerror="
+              this.src='https://placehold.co/600x600?text=HELPY'
+            "
+          >
+
+          <div class="result-content">
+
+            <span class="result-type">
+              ${getTypeLabel(item.type)}
+            </span>
+
+            <div class="result-title">
+              ${safe(title)}
+            </div>
+
+            <div class="result-price">
+              ${safe(formatItemPrice(item))}
+            </div>
+
+            ${
+              location
+                ? `
+                  <div class="result-location">
+                    📍 ${safe(location)}
+                  </div>
+                `
+                : ""
+            }
+
+          </div>
+
+        </a>
+      `;
+
+    }).join("");
+
+}
+
+
+async function initializeSearch() {
+
+  const container =
+    document.getElementById("results");
+
+  container.innerHTML = `
+    <div class="loading">
+      Chargement des résultats...
+    </div>
+  `;
+
+
+  allResults =
+    await fetchAllData();
+
+
+  fillCategories(allResults);
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const initialQuery =
+    params.get("q") || "";
+
+
+  if (initialQuery) {
+
+    document
+      .getElementById("searchInput")
+      .value = initialQuery;
+
+  }
+
+
+  applyFilters();
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    document
+      .getElementById("searchForm")
+      .addEventListener(
+        "submit",
+        function(event) {
+
+          event.preventDefault();
+
+          applyFilters();
+
+          const query =
+            document
+              .getElementById("searchInput")
+              .value
+              .trim();
+
+          const url =
+            new URL(
+              window.location.href
+            );
+
+          if (query) {
+            url.searchParams.set(
+              "q",
+              query
+            );
+          } else {
+            url.searchParams.delete("q");
+          }
+
+          window.history.replaceState(
+            {},
+            "",
+            url
+          );
+
+        }
+      );
+
+
+    document
+      .getElementById("typeFilter")
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+
+    document
+      .getElementById("categoryFilter")
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+
+    document
+      .getElementById("countryFilter")
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+
+    document
+      .getElementById("cityFilter")
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+
+    document
+      .getElementById("searchInput")
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+
+    initializeSearch();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
