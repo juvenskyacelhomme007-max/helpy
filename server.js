@@ -943,7 +943,6 @@ function itemRoutes(type, table) {
               title,
               clean(body.description),
               Number(body.price) || 0,
-              clean(body.currency
               clean(body.currency, 10) || "USD",
               clean(body.category, 150),
               Number(body.quantity) || 1,
