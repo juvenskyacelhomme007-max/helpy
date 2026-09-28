@@ -29,12 +29,15 @@ async function apiFetch(
   };
 
 
-  /*
-    Utilisateur connecté
-  */
+  /* =======================================================
+     UTILISATEUR CONNECTÉ
+     ======================================================= */
 
   const userId =
-    localStorage.getItem("helpy_user_id");
+    localStorage.getItem("helpy_user_id") ||
+    localStorage.getItem("user_id") ||
+    "";
+
 
   if (userId) {
     headers["x-user-id"] = userId;
@@ -71,7 +74,11 @@ async function apiFetch(
     let result;
 
 
-    if (contentType.includes("application/json")) {
+    if (
+      contentType.includes(
+        "application/json"
+      )
+    ) {
 
       result =
         await response.json();
@@ -103,6 +110,7 @@ async function apiFetch(
 
 
     return result;
+
 
   } catch (error) {
 
@@ -141,11 +149,28 @@ function saveUser(user) {
       String(user.id)
     );
 
+    /*
+     * Compatibilité avec les anciennes pages.
+     */
+    localStorage.setItem(
+      "user_id",
+      String(user.id)
+    );
+
   }
 
 
   localStorage.setItem(
     "helpy_user",
+    JSON.stringify(user)
+  );
+
+
+  /*
+   * Compatibilité avec l'ancien système.
+   */
+  localStorage.setItem(
+    "user",
     JSON.stringify(user)
   );
 
@@ -160,20 +185,49 @@ function currentUser() {
 
   try {
 
-    const user =
+    const primaryUser =
       localStorage.getItem(
         "helpy_user"
       );
 
 
-    if (!user) {
-      return null;
+    if (primaryUser) {
+
+      return JSON.parse(
+        primaryUser
+      );
+
     }
 
 
-    return JSON.parse(user);
+    /*
+     * Compatibilité avec l'ancien stockage.
+     */
+
+    const oldUser =
+      localStorage.getItem(
+        "user"
+      );
+
+
+    if (oldUser) {
+
+      return JSON.parse(
+        oldUser
+      );
+
+    }
+
+
+    return null;
+
 
   } catch (error) {
+
+    console.warn(
+      "HELPY USER STORAGE ERROR:",
+      error
+    );
 
     return null;
 
@@ -188,8 +242,16 @@ function currentUser() {
 
 function currentUserId() {
 
-  return localStorage.getItem(
-    "helpy_user_id"
+  return (
+    localStorage.getItem(
+      "helpy_user_id"
+    ) ||
+
+    localStorage.getItem(
+      "user_id"
+    ) ||
+
+    null
   );
 
 }
@@ -201,7 +263,132 @@ function currentUserId() {
 
 function isLoggedIn() {
 
-  return !!currentUserId();
+  return Boolean(
+    currentUserId()
+  );
+
+}
+
+
+/* =========================================================
+   CLEAR HELPY SESSION
+   ========================================================= */
+
+function clearHelpySession() {
+
+  /*
+   * Toutes les clés utilisées par HELPY
+   * pour conserver la session utilisateur.
+   */
+
+  const keysToRemove = [
+
+    "helpy_user_id",
+    "helpy_user",
+
+    "user_id",
+    "user",
+
+    "helpy_token",
+    "token",
+
+    "helpy_access_token",
+    "access_token",
+
+    "helpy_refresh_token",
+    "refresh_token",
+
+    "helpy_session",
+    "session",
+
+    "helpy_auth",
+    "auth",
+
+    "helpy_current_user",
+    "current_user",
+
+    "helpy_profile_photo_preview"
+
+  ];
+
+
+  keysToRemove.forEach(
+    function(key) {
+
+      try {
+
+        localStorage.removeItem(
+          key
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "HELPY STORAGE REMOVE:",
+          key,
+          error
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+   * Nettoyage de sessionStorage.
+   */
+
+  const sessionKeys = [
+
+    "helpy_user_id",
+    "helpy_user",
+
+    "user_id",
+    "user",
+
+    "helpy_token",
+    "token",
+
+    "helpy_access_token",
+    "access_token",
+
+    "helpy_refresh_token",
+    "refresh_token",
+
+    "helpy_session",
+    "session",
+
+    "helpy_auth",
+    "auth",
+
+    "helpy_current_user",
+    "current_user"
+
+  ];
+
+
+  sessionKeys.forEach(
+    function(key) {
+
+      try {
+
+        sessionStorage.removeItem(
+          key
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "HELPY SESSION REMOVE:",
+          key,
+          error
+        );
+
+      }
+
+    }
+  );
 
 }
 
@@ -212,17 +399,58 @@ function isLoggedIn() {
 
 function logoutUser() {
 
-  localStorage.removeItem(
-    "helpy_user_id"
+  try {
+
+    /*
+     * Supprimer toute la session HELPY.
+     */
+
+    clearHelpySession();
+
+
+    /*
+     * Informer les autres onglets/pages.
+     */
+
+    try {
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "helpy:logout"
+        )
+      );
+
+    } catch (eventError) {
+
+      console.warn(
+        "HELPY logout event error:",
+        eventError
+      );
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "HELPY LOGOUT ERROR:",
+      error
+    );
+
+  }
+
+
+  /*
+   * Redirection forcée vers LOGIN.
+   *
+   * replace() évite que le bouton
+   * précédent du navigateur ramène
+   * facilement vers le profil.
+   */
+
+  window.location.replace(
+    "login.html"
   );
-
-  localStorage.removeItem(
-    "helpy_user"
-  );
-
-
-  window.location.href =
-    "index.html";
 
 }
 
@@ -237,8 +465,9 @@ function requireLogin(
 
   if (!isLoggedIn()) {
 
-    window.location.href =
-      redirect;
+    window.location.replace(
+      redirect
+    );
 
     return false;
 
@@ -341,6 +570,7 @@ function formatPrice(
 
 
     return `${formatted} ${currency || ""}`.trim();
+
 
   } catch {
 
@@ -512,12 +742,16 @@ function updateAuthUI() {
 
 
   loginLinks.forEach(
-    link => {
+    function(link) {
 
       if (
-        link.closest(".bottom-nav")
+        link.closest(
+          ".bottom-nav"
+        )
       ) {
+
         return;
+
       }
 
 
@@ -547,13 +781,32 @@ function setupLogoutButtons() {
 
 
   buttons.forEach(
-    button => {
+    function(button) {
+
+      /*
+       * Evite de brancher le même bouton
+       * plusieurs fois.
+       */
+
+      if (
+        button.dataset.helpyLogoutReady === "true"
+      ) {
+
+        return;
+
+      }
+
+
+      button.dataset.helpyLogoutReady =
+        "true";
+
 
       button.addEventListener(
         "click",
         function(event) {
 
           event.preventDefault();
+          event.stopPropagation();
 
           logoutUser();
 
@@ -579,7 +832,7 @@ function setupSearchForms() {
 
 
   forms.forEach(
-    form => {
+    function(form) {
 
       form.addEventListener(
         "submit",
@@ -618,7 +871,7 @@ function setupSearchForms() {
 
 
 /* =========================================================
-   PROTECT PUBLISH PAGE
+   PROTECT PAGES
    ========================================================= */
 
 function setupProtectedPages() {
@@ -630,12 +883,14 @@ function setupProtectedPages() {
 
 
   const protectedPages = [
+
     "publish.html",
     "add-product.html",
     "add-service.html",
     "add-business.html",
     "profile.html",
     "messages.html"
+
   ];
 
 
@@ -689,6 +944,8 @@ window.HELPY = {
   currentUserId,
 
   isLoggedIn,
+
+  clearHelpySession,
 
   logoutUser,
 
