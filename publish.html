@@ -3,77 +3,375 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HELPY - Publier</title>
+
+  <title>Publier — HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
   <style>
-    body { font-family: sans-serif; background: #f8fafc; padding: 20px; max-width: 500px; margin: auto; }
-    .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.9rem; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .publish-page {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 24px 16px 110px;
+    }
+
+    .publish-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .publish-header h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    .publish-header p {
+      margin: 0;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .publish-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .publish-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+      border: 1px solid #eee;
+      transition: .2s ease;
+    }
+
+    .publish-card:hover {
+      transform: translateY(-3px);
+      border-color: #5b45e6;
+      box-shadow: 0 12px 35px rgba(91,69,230,.12);
+    }
+
+    .publish-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      border-radius: 20px;
+      background: #f1efff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .publish-card h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .publish-card p {
+      margin: 0;
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .publish-info {
+      margin-top: 24px;
+      background: #f6f4ff;
+      border-radius: 16px;
+      padding: 16px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #5b45e6;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+
+      .publish-options {
+        grid-template-columns: 1fr;
+      }
+
+      .publish-card {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        gap: 16px;
+        padding: 18px;
+      }
+
+      .publish-icon {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        margin: 0;
+      }
+
+      .publish-card h2 {
+        margin-bottom: 5px;
+      }
+
+      .publish-header h1 {
+        font-size: 26px;
+      }
+
+    }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h2>Publier sur HELPY</h2>
-    <form id="publishForm">
-      <div class="form-group">
-        <label>Type de publication</label>
-        <select id="type">
-          <option value="product">Produit</option>
-          <option value="service">Service</option>
-          <option value="business">Entreprise</option>
-        </select>
+
+  <!-- HEADER -->
+
+  <header class="site-header">
+
+    <div class="header-inner">
+
+      <a href="index.html" class="logo">
+        HELPY
+      </a>
+
+      <nav class="nav-links">
+
+        <a href="products.html">
+          Produits
+        </a>
+
+        <a href="services.html">
+          Services
+        </a>
+
+        <a href="businesses.html">
+          Entreprises
+        </a>
+
+        <a href="search.html">
+          Rechercher
+        </a>
+
+      </nav>
+
+      <div class="header-actions">
+
+        <a
+          href="profile.html"
+          class="profile-link"
+        >
+          Profil
+        </a>
+
       </div>
-      <div class="form-group">
-        <label>Titre</label>
-        <input type="text" id="title" required placeholder="Ex: Vente Téléphone, Service Plomberie...">
-      </div>
-      <div class="form-group">
-        <label>Catégorie</label>
-        <input type="text" id="category" placeholder="Ex: Électronique, Maison...">
-      </div>
-      <div class="form-group">
-        <label>Prix ($ USD / HTG)</label>
-        <input type="number" id="price" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Emplacement</label>
-        <input type="text" id="location" placeholder="Ex: Port-au-Prince, Delmas...">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="description" rows="4"></textarea>
-      </div>
-      <button type="submit">Publier maintenant</button>
-    </form>
-  </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- CONTENU -->
+
+  <main class="publish-page">
+
+    <a
+      href="index.html"
+      class="back-link"
+    >
+      ← Retour à l'accueil
+    </a>
+
+
+    <section class="publish-header">
+
+      <h1>
+        Que voulez-vous publier ?
+      </h1>
+
+      <p>
+        Choisissez le type de contenu que vous souhaitez
+        proposer sur HELPY.
+      </p>
+
+    </section>
+
+
+    <section class="publish-options">
+
+
+      <!-- PRODUIT -->
+
+      <a
+        href="add-product.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🛍️
+        </div>
+
+        <div>
+
+          <h2>
+            Produit
+          </h2>
+
+          <p>
+            Vendez un produit et présentez-le
+            aux acheteurs.
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <!-- SERVICE -->
+
+      <a
+        href="add-service.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🛠️
+        </div>
+
+        <div>
+
+          <h2>
+            Service
+          </h2>
+
+          <p>
+            Proposez vos compétences ou vos
+            services aux utilisateurs.
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <!-- ENTREPRISE -->
+
+      <a
+        href="add-business.html"
+        class="publish-card"
+      >
+
+        <div class="publish-icon">
+          🏢
+        </div>
+
+        <div>
+
+          <h2>
+            Entreprise
+          </h2>
+
+          <p>
+            Présentez votre entreprise,
+            commerce ou activité professionnelle.
+          </p>
+
+        </div>
+
+      </a>
+
+
+    </section>
+
+
+    <div class="publish-info">
+
+      <strong>
+        💡 Conseil
+      </strong>
+
+      <br>
+
+      Utilisez des informations précises et des photos
+      de bonne qualité afin de présenter clairement
+      votre produit, service ou entreprise.
+
+    </div>
+
+  </main>
+
+
+  <!-- NAVIGATION MOBILE -->
+
+  <nav class="mobile-bottom-nav">
+
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Accueil</small>
+    </a>
+
+    <a href="search.html">
+      <span>⌕</span>
+      <small>Recherche</small>
+    </a>
+
+    <a
+      href="publish.html"
+      class="active"
+    >
+      <span>＋</span>
+      <small>Publier</small>
+    </a>
+
+    <a href="profile.html">
+      <span>◯</span>
+      <small>Profil</small>
+    </a>
+
+  </nav>
+
+
+  <script src="app.js"></script>
 
   <script>
-    document.getElementById('publishForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        type: document.getElementById('type').value,
-        title: document.getElementById('title').value,
-        category: document.getElementById('category').value,
-        price: document.getElementById('price').value,
-        location: document.getElementById('location').value,
-        description: document.getElementById('description').value
-      };
 
-      const res = await fetch('/api/items', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
 
-      if (res.ok) {
-        alert('Publication réussie !');
-        window.location.href = 'index.html';
-      } else {
-        alert('Erreur lors de la publication.');
+        /*
+         * Vérifier la connexion
+         */
+
+        if (
+          window.HELPY &&
+          typeof HELPY.isLoggedIn ===
+            "function"
+        ) {
+
+          if (!HELPY.isLoggedIn()) {
+
+            window.location.href =
+              "login.html?redirect=publish.html";
+
+          }
+
+        }
+
       }
-    });
+    );
+
   </script>
+
 </body>
 </html>

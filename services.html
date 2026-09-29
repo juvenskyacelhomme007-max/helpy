@@ -1,67 +1,376 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HELPY - Services</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; padding: 15px; max-width: 600px; margin: auto; padding-bottom: 70px; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .logo { font-size: 1.5rem; font-weight: 800; color: #2563eb; text-decoration: none; }
-    .item-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .badge { display: inline-block; padding: 4px 8px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 0.75rem; font-weight: bold; margin-bottom: 8px; }
-    .price { font-weight: bold; color: #16a34a; }
-    .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #e2e8f0; }
-    .nav a { text-decoration: none; color: #64748b; font-size: 0.8rem; text-align: center; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Services — HELPY</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="app.js"></script>
 </head>
+
 <body>
-  <header>
-    <a href="index.html" class="logo">HELPY</a>
-    <a href="profile.html" style="text-decoration:none;">👤</a>
-  </header>
 
-  <h2>🛠️ Services disponibles</h2>
-  <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Trouvez des professionnels et des services sur mesure.</p>
+  <main class="container">
 
-  <div id="servicesContainer">Chargement des services...</div>
+    <div class="section-heading">
 
-  <nav class="nav">
-    <a href="index.html">⌂<br>Accueil</a>
-    <a href="search.html">⌕<br>Recherche</a>
-    <a href="publish.html">＋<br>Publier</a>
-    <a href="favorites.html">♡<br>Favoris</a>
-    <a href="profile.html">👤<br>Profil</a>
-  </nav>
+      <div>
+
+        <h1>
+          Services
+        </h1>
+
+        <p class="muted">
+          Trouvez un professionnel ou un service partout dans le monde.
+        </p>
+
+      </div>
+
+      <a
+        class="btn light"
+        href="publish.html"
+      >
+        ＋ Publier
+      </a>
+
+    </div>
+
+
+    <div
+      id="grid"
+      class="grid"
+    >
+
+      <div class="card">
+        Chargement des services...
+      </div>
+
+    </div>
+
+  </main>
+
 
   <script>
+
+    const grid =
+      document.getElementById("grid");
+
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+        .replace(
+          /[&<>"']/g,
+          char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          }[char])
+        );
+
+    }
+
+
+    function getServicesPayload(result) {
+
+      if (
+        Array.isArray(
+          result?.services
+        )
+      ) {
+
+        return result.services;
+
+      }
+
+      if (
+        Array.isArray(
+          result?.produits
+        )
+      ) {
+
+        return result.produits;
+
+      }
+
+      if (
+        Array.isArray(
+          result?.data
+        )
+      ) {
+
+        return result.data;
+
+      }
+
+      if (
+        Array.isArray(result)
+      ) {
+
+        return result;
+
+      }
+
+      return [];
+
+    }
+
+
+    function formatPrice(service) {
+
+      if (
+        service?.price === null ||
+        service?.price === undefined ||
+        service?.price === ""
+      ) {
+
+        return "Prix sur demande";
+
+      }
+
+      return (
+        String(service.price) +
+        " " +
+        (service.currency || "USD")
+      );
+
+    }
+
+
+    function renderServices(services) {
+
+      if (!services.length) {
+
+        grid.innerHTML = `
+
+          <div class="card">
+
+            <h3>
+              Aucun service pour le moment
+            </h3>
+
+            <p class="muted">
+              Les services publiés apparaîtront ici.
+            </p>
+
+            <a
+              class="btn"
+              href="publish.html"
+            >
+              Publier un service
+            </a>
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      grid.innerHTML =
+        services.map(service => {
+
+          const id =
+            service.id;
+
+          const title =
+            service.name ||
+            service.title ||
+            "Service HELPY";
+
+          const description =
+            service.description ||
+            "Aucune description disponible.";
+
+          const category =
+            service.category ||
+            "Service";
+
+          const location =
+            service.city ||
+            service.location ||
+            service.country ||
+            "";
+
+          const image =
+            service.image ||
+            "";
+
+
+          return `
+
+            <article class="card">
+
+              <div class="pic">
+
+                ${
+                  image
+
+                  ?
+
+                  `<img
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(title)}"
+                    style="
+                      width:100%;
+                      height:100%;
+                      object-fit:cover;
+                      border-radius:13px;
+                    "
+                    onerror="
+                      this.style.display='none';
+                      this.parentElement.textContent='🛠️';
+                    "
+                  >`
+
+                  :
+
+                  "🛠️"
+
+                }
+
+              </div>
+
+
+              <h3>
+                ${escapeHTML(title)}
+              </h3>
+
+
+              <p class="muted">
+
+                ${escapeHTML(category)}
+
+                ${
+                  location
+                    ? " · " + escapeHTML(location)
+                    : ""
+                }
+
+              </p>
+
+
+              <p>
+                ${escapeHTML(description)}
+              </p>
+
+
+              <p class="price">
+                ${escapeHTML(
+                  formatPrice(service)
+                )}
+              </p>
+
+
+              <a
+                class="btn"
+                href="service-details.html?id=${encodeURIComponent(id)}"
+              >
+                Voir détails
+              </a>
+
+            </article>
+
+          `;
+
+        }).join("");
+
+    }
+
+
     async function loadServices() {
+
+      grid.innerHTML = `
+        <div class="card">
+          Chargement des services...
+        </div>
+      `;
+
+
       try {
-        const res = await fetch('/api/items?type=service');
-        const items = await res.json();
-        const container = document.getElementById('servicesContainer');
-        
-        if (items.length === 0) {
-          container.innerHTML = "<p>Aucun service disponible pour le moment.</p>";
-          return;
+
+        const result =
+          await apiFetch(
+            "/api/services"
+          );
+
+
+        if (
+          !result ||
+          result.error
+        ) {
+
+          throw new Error(
+            result?.message ||
+            "Impossible de charger les services."
+          );
+
         }
 
-        container.innerHTML = items.map(item => `
-          <div class="item-card">
-            <span class="badge">${item.category || 'Service'}</span>
-            <h3>${item.title}</h3>
-            <p style="color: #475569; font-size: 0.9rem; margin: 8px 0;">${item.description}</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="price">${item.price > 0 ? item.price + ' USD' : 'Sur devis'}</span>
-              <small style="color: #64748b;">📍 ${item.location}</small>
-            </div>
+
+        const services =
+          getServicesPayload(
+            result
+          );
+
+
+        renderServices(
+          services
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "HELPY services:",
+          error
+        );
+
+
+        grid.innerHTML = `
+
+          <div class="card">
+
+            <h3>
+              Impossible de charger les services
+            </h3>
+
+            <p class="muted">
+              ${escapeHTML(
+                error.message
+              )}
+            </p>
+
+            <button
+              class="btn"
+              type="button"
+              onclick="loadServices()"
+            >
+              Réessayer
+            </button>
+
           </div>
-        `).join('');
-      } catch (e) {
-        document.getElementById('servicesContainer').innerHTML = "<p>Erreur lors du chargement des services.</p>";
+
+        `;
+
       }
+
     }
-    loadServices();
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadServices
+    );
+
   </script>
+
 </body>
 </html>
