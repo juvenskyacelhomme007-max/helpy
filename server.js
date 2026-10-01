@@ -1992,3 +1992,773 @@ app.post(
     );
   })
 );
+
+/* =========================================================
+   REVIEWS
+========================================================= */
+
+app.get(
+  "/api/reviews/:type/:id",
+  wrap(async (req, res) => {
+
+    const allowed = [
+      "users",
+      "services",
+      "businesses"
+    ];
+
+    if (!allowed.includes(req.params.type)) {
+      return bad(res, "Type invalide.");
+    }
+
+    const targetId =
+      Number(req.params.id);
+
+    if (!Number.isInteger(targetId)) {
+      return bad(res, "ID invalide.");
+    }
+
+    const result =
+      await q(
+        `
+        SELECT
+          r.id,
+          r.rating,
+          r.comment,
+          r.created_at,
+          u.id AS author_id,
+          u.name AS author,
+          u.photo AS author_photo
+        FROM reviews r
+        JOIN users u
+          ON u.id=r.author_id
+        WHERE
+          r.target_type=$1
+          AND r.target_id=$2
+        ORDER BY r.created_at DESC
+        LIMIT 100
+        `,
+        [
+          req.params.type,
+          targetId
+        ]
+      );
+
+    res.json(result.rows);
+  })
+);
+
+
+/* =========================================================
+   CREATE REVIEW
+========================================================= */
+
+app.post(
+  "/api/reviews",
+  auth,
+  wrap(async (req, res) => {
+
+    const {
+      target_type,
+      target_id,
+      rating,
+      comment
+    } =
+      req.body || {};
+
+    const allowed = [
+      "users",
+      "services",
+      "businesses"
+    ];
+
+    const id =
+      Number(target_id);
+
+    const stars =
+      Number(rating);
+
+    if (
+      !allowed.includes(target_type)
+    ) {
+      return bad(
+        res,
+        "Type de publication invalide."
+      );
+    }
+
+    if (
+      !Number.isInteger(id)
+    ) {
+      return bad(
+        res,
+        "ID invalide."
+      );
+    }
+
+    if (
+      !Number.isInteger(stars) ||
+      stars < 1 ||
+      stars > 5
+    ) {
+      return bad(
+        res,
+        "La note doit être comprise entre 1 et 5."
+      );
+    }
+
+    const text =
+      typeof comment === "string"
+        ? comment.trim().slice(0,2000)
+        : null;
+
+    let ownerId = null;
+
+    if (
+      target_type === "users"
+    ) {
+
+      const user =
+        await q(
+          `
+          SELECT id
+          FROM users
+          WHERE id=$1
+          `,
+          [id]
+        );
+
+      if (!user.rowCount) {
+        return bad(
+          res,
+          "Utilisateur introuvable.",
+          404
+        );
+      }
+
+      ownerId = id;
+
+    } else {
+
+      const table =
+        target_type;
+
+      const item =
+        await q(
+          `
+          SELECT
+            id,
+            user_id
+          FROM ${table}
+          WHERE id=$1
+          `,
+          [id]
+        );
+
+      if (!item.rowCount) {
+        return bad(
+          res,
+          "Publication introuvable.",
+          404
+        );
+      }
+
+      ownerId =
+        item.rows[0].user_id;
+    }
+
+    if (
+      ownerId === req.uid
+    ) {
+      return bad(
+        res,
+        "Vous ne pouvez pas évaluer votre propre publication."
+      );
+    }
+
+    try {
+
+      const result =
+        await q(
+          `
+          INSERT INTO reviews
+          (
+            author_id,
+            target_type,
+            target_id,
+            rating,
+            comment
+          )
+          VALUES($1,$2,$3,$4,$5)
+          RETURNING *
+          `,
+          [
+            req.uid,
+            target_type,
+            id,
+            stars,
+            text
+          ]
+        );
+
+      if (
+        ownerId &&
+        ownerId !== req.uid
+      ) {
+        await notify(
+          ownerId,
+          "review",
+          `Vous avez reçu une nouvelle évaluation de ${stars}/5.`
+        );
+      }
+
+      res.status(201).json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      if (
+        error.code === "23505"
+      ) {
+        return bad(
+          res,
+          "Vous avez déjà évalué cet élément."
+        );
+      }
+
+      throw error;
+    }
+  })
+);
+
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+
+app.get(
+  "/api/notifications",
+  auth,
+  wrap(async (req, res) => {
+
+    const result =
+      await q(
+        `
+        SELECT *
+        FROM notifications
+        WHERE user_id=$1
+        ORDER BY created_at DESC
+        LIMIT 100
+        `,
+        [req.uid]
+      );
+
+    res.json(
+      result.rows
+    );
+  })
+);
+
+
+/* =========================================================
+   MARK NOTIFICATION AS READ
+========================================================= */
+
+app.put(
+  "/api/notifications/:id/read",
+  auth,
+  wrap(async (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+      return bad(
+        res,
+        "ID invalide."
+      );
+    }
+
+    await q(
+      `
+      UPDATE notifications
+      SET is_read=true
+      WHERE
+        id=$1
+        AND user_id=$2
+      `,
+      [
+        id,
+        req.uid
+      ]
+    );
+
+    res.json({
+      ok: true
+    });
+  })
+);
+
+
+/* =========================================================
+   MARK ALL NOTIFICATIONS AS READ
+========================================================= */
+
+app.put(
+  "/api/notifications/read-all",
+  auth,
+  wrap(async (req, res) => {
+
+    await q(
+      `
+      UPDATE notifications
+      SET is_read=true
+      WHERE user_id=$1
+      `,
+      [req.uid]
+    );
+
+    res.json({
+      ok: true
+    });
+  })
+);
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+app.get(
+  "/api/counts",
+  auth,
+  wrap(async (req, res) => {
+
+    const [
+      products,
+      services,
+      businesses,
+      favorites,
+      unreadMessages,
+      unreadNotifications
+    ] =
+      await Promise.all([
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM products
+          WHERE
+            user_id=$1
+            AND status='published'
+          `,
+          [req.uid]
+        ),
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM services
+          WHERE
+            user_id=$1
+            AND status='published'
+          `,
+          [req.uid]
+        ),
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM businesses
+          WHERE
+            user_id=$1
+            AND status='published'
+          `,
+          [req.uid]
+        ),
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM favorites
+          WHERE user_id=$1
+          `,
+          [req.uid]
+        ),
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM messages
+          WHERE
+            receiver_id=$1
+            AND is_read=false
+          `,
+          [req.uid]
+        ),
+
+        q(
+          `
+          SELECT COUNT(*)::int AS count
+          FROM notifications
+          WHERE
+            user_id=$1
+            AND is_read=false
+          `,
+          [req.uid]
+        )
+      ]);
+
+    res.json({
+      products:
+        products.rows[0].count,
+
+      services:
+        services.rows[0].count,
+
+      businesses:
+        businesses.rows[0].count,
+
+      favorites:
+        favorites.rows[0].count,
+
+      unread_messages:
+        unreadMessages.rows[0].count,
+
+      unread_notifications:
+        unreadNotifications.rows[0].count
+    });
+  })
+);
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+app.post(
+  "/api/reports",
+  auth,
+  wrap(async (req, res) => {
+
+    const {
+      target_type,
+      target_id,
+      reason
+    } =
+      req.body || {};
+
+    const id =
+      Number(target_id);
+
+    const allowed =
+      [
+        "products",
+        "services",
+        "businesses",
+        "users"
+      ];
+
+    const text =
+      typeof reason === "string"
+        ? reason.trim().slice(0,1000)
+        : "";
+
+    if (
+      !allowed.includes(
+        target_type
+      )
+    ) {
+      return bad(
+        res,
+        "Type de signalement invalide."
+      );
+    }
+
+    if (
+      !Number.isInteger(id)
+    ) {
+      return bad(
+        res,
+        "ID invalide."
+      );
+    }
+
+    if (!text) {
+      return bad(
+        res,
+        "Veuillez indiquer la raison du signalement."
+      );
+    }
+
+    const result =
+      await q(
+        `
+        INSERT INTO reports
+        (
+          reporter_id,
+          target_type,
+          target_id,
+          reason
+        )
+        VALUES($1,$2,$3,$4)
+        RETURNING *
+        `,
+        [
+          req.uid,
+          target_type,
+          id,
+          text
+        ]
+      );
+
+    res.status(201).json({
+      ok: true,
+      report:
+        result.rows[0]
+    });
+  })
+);
+
+
+/* =========================================================
+   SEARCH GLOBAL
+========================================================= */
+
+app.get(
+  "/api/search",
+  optAuth,
+  wrap(async (req, res) => {
+
+    const query =
+      String(
+        req.query.q || ""
+      ).trim();
+
+    if (!query) {
+      return res.json({
+        products: [],
+        services: [],
+        businesses: []
+      });
+    }
+
+    const term =
+      `%${query}%`;
+
+    const [
+      products,
+      services,
+      businesses
+    ] =
+      await Promise.all([
+
+        q(
+          `
+          SELECT
+            p.*,
+            u.name AS seller_name,
+            u.photo AS seller_photo
+          FROM products p
+          JOIN users u
+            ON u.id=p.user_id
+          WHERE
+            p.status='published'
+            AND (
+              p.title ILIKE $1
+              OR COALESCE(
+                p.description,
+                ''
+              ) ILIKE $1
+              OR p.category ILIKE $1
+            )
+          ORDER BY
+            p.created_at DESC
+          LIMIT 30
+          `,
+          [term]
+        ),
+
+        q(
+          `
+          SELECT
+            s.*,
+            u.name AS seller_name,
+            u.photo AS seller_photo,
+            ${ratingSQL(
+              "services",
+              "s.id"
+            )}
+          FROM services s
+          JOIN users u
+            ON u.id=s.user_id
+          WHERE
+            s.status='published'
+            AND (
+              s.title ILIKE $1
+              OR COALESCE(
+                s.description,
+                ''
+              ) ILIKE $1
+              OR s.category ILIKE $1
+            )
+          ORDER BY
+            s.created_at DESC
+          LIMIT 30
+          `,
+          [term]
+        ),
+
+        q(
+          `
+          SELECT
+            b.*,
+            u.name AS owner_name,
+            u.photo AS owner_photo,
+            ${ratingSQL(
+              "businesses",
+              "b.id"
+            )}
+          FROM businesses b
+          JOIN users u
+            ON u.id=b.user_id
+          WHERE
+            b.status='published'
+            AND (
+              b.title ILIKE $1
+              OR COALESCE(
+                b.description,
+                ''
+              ) ILIKE $1
+              OR b.category ILIKE $1
+              OR COALESCE(
+                b.city,
+                ''
+              ) ILIKE $1
+              OR COALESCE(
+                b.country,
+                ''
+              ) ILIKE $1
+            )
+          ORDER BY
+            b.created_at DESC
+          LIMIT 30
+          `,
+          [term]
+        )
+      ]);
+
+    res.json({
+      products:
+        products.rows,
+
+      services:
+        services.rows,
+
+      businesses:
+        businesses.rows
+    });
+  })
+);
+
+
+/* =========================================================
+   API 404
+========================================================= */
+
+app.use(
+  "/api",
+  (req, res) => {
+    return bad(
+      res,
+      "Route introuvable.",
+      404
+    );
+  }
+);
+
+
+/* =========================================================
+   FRONTEND FALLBACK
+========================================================= */
+
+app.get(
+  "/{*splat}",
+  (req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "public",
+        "index.html"
+      )
+    );
+  }
+);
+
+
+/* =========================================================
+   ERROR HANDLER
+========================================================= */
+
+app.use(
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
+
+    console.error(
+      "HELPY ERROR:",
+      error
+    );
+
+    if (
+      res.headersSent
+    ) {
+      return next(error);
+    }
+
+    res.status(500).json({
+      error:
+        "Une erreur est survenue."
+    });
+  }
+);
+
+
+/* =========================================================
+   START SERVER
+========================================================= */
+
+(async () => {
+
+  try {
+
+    await q(SCHEMA);
+
+    await q(MIGRATION);
+
+    await q("SELECT 1");
+
+    app.listen(
+      PORT,
+      () => {
+        console.log(
+          `HELPY sur le port ${PORT}`
+        );
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erreur base de données:",
+      error.message
+    );
+
+    process.exit(1);
+  }
+
+})();
